@@ -402,4 +402,5 @@ FodyWeavers.xsd
 /.idea/
 
 .env
-WebAPI/Properties/launchSettings.json
+BE_ModernEstate.WebAPI/Properties/launchSettings.json
+BE_ModernEstate.WebAPI/appsettings.json

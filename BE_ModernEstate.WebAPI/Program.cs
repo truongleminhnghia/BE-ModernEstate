@@ -1,7 +1,6 @@
 ﻿
 using BE_ModernEstate.WebAPI.Configurations;
 using BE_ModernEstate.WebAPI.Middlewares;
-using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
@@ -17,8 +16,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var connectionString =
-    $"Server=localhost;Port=3306;User Id=root;Password=Nghia_2003;Database=db_local_ModernEstate;SslMode=Required;";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
+// var connectionString =
+//     $"Server=localhost;Port=3306;User Id=root;Password=Nghia_2003;Database=db_local_ModernEstate;SslMode=Required;";
 
 builder.Services.AddDbContext<ApplicationDbConext>(options =>
 {
