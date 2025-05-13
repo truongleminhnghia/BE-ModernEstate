@@ -23,62 +23,62 @@ namespace ModernEstate.BLL.Services.AccountServices
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<bool> CreateAccount(AccountRequest req, bool isAdmin)
-        {
-            try
-            {
-                var existingAccount = await _unitOfWork.Accounts.GetByEmail(req.Email);
-                if (existingAccount != null)
-                {
-                    _logger.LogWarning("Không thể tạo tài khoản, email {Email} đã tồn tại.", req.Email);
-                    return false;
-                }
-                var account = _mapper.Map<Account>(req);
-                account.Role = isAdmin ? req.Role : EnumRoleName.ROLE_CUSTOMER;
-                account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
-                account.Password = _passwordHasher.HashPassword(req.Password);
-                await _unitOfWork.Accounts.CreateAsync(account);
-                await _unitOfWork.SaveChangesWithTransactionAsync();
-                _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", req.Email, account.Role);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi xảy ra khi tạo tài khoản với email {Email}", req.Email);
-                return false;
-            }
-        }
+        // public async Task<bool> CreateAccount(AccountRequest req, bool isAdmin)
+        // {
+        //     try
+        //     {
+        //         var existingAccount = await _unitOfWork.Accounts.GetByEmail(req.Email);
+        //         if (existingAccount != null)
+        //         {
+        //             _logger.LogWarning("Không thể tạo tài khoản, email {Email} đã tồn tại.", req.Email);
+        //             return false;
+        //         }
+        //         var account = _mapper.Map<Account>(req);
+        //         account.Role = isAdmin ? req.Role : EnumRoleName.ROLE_CUSTOMER;
+        //         account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
+        //         account.Password = _passwordHasher.HashPassword(req.Password);
+        //         await _unitOfWork.Accounts.CreateAsync(account);
+        //         await _unitOfWork.SaveChangesWithTransactionAsync();
+        //         _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", req.Email, account.Role);
+        //         return true;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Lỗi xảy ra khi tạo tài khoản với email {Email}", req.Email);
+        //         return false;
+        //     }
+        // }
 
-        public async Task<AccountResponse> GetById(Guid id)
-        {
-            try
-            {
+        // public async Task<AccountResponse> GetById(Guid id)
+        // {
+        //     try
+        //     {
 
-                // Lấy tài khoản từ repository
-                var account = await _unitOfWork.Accounts.GetByIdAsync(id);
+        //         // Lấy tài khoản từ repository
+        //         var account = await _unitOfWork.Accounts.GetByIdAsync(id);
 
-                // Nếu không tìm thấy tài khoản
-                if (account == null)
-                {
-                    return null; // Trả về null nếu không tìm thấy
-                }
+        //         // Nếu không tìm thấy tài khoản
+        //         if (account == null)
+        //         {
+        //             return null; // Trả về null nếu không tìm thấy
+        //         }
 
-                // Chuyển đổi từ Entity sang DTO để trả về
-                return new AccountResponse
-                {
-                    Id = account.Id,
-                    Email = account.Email,
-                    FirstName = account.FirstName,
-                    LastName = account.LastName,
-                    Phone = account.Phone,
-                    Address = account.Address,
-                    Role = account.Role
-                };
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
+        //         // Chuyển đổi từ Entity sang DTO để trả về
+        //         return new AccountResponse
+        //         {
+        //             Id = account.Id,
+        //             Email = account.Email,
+        //             FirstName = account.FirstName,
+        //             LastName = account.LastName,
+        //             Phone = account.Phone,
+        //             Address = account.Address,
+        //             Role = account.Role
+        //         };
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return null;
+        //     }
+        // }
     }
 }

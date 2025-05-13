@@ -20,69 +20,69 @@ namespace BE_ModernEstate.WebAPI.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
-        [Authorize(Roles = "ROLE_ADMIN, ROLE_STAFF, ROLE_MANAGER")]
-        public async Task<ApiResponse> CreateAccount([FromBody] AccountRequest request)
-        {
-            try
-            {
-                _logger.LogInformation($"Creating account for email: {request.Email}");
+        // [HttpPost]
+        // [Authorize(Roles = "ROLE_ADMIN, ROLE_STAFF, ROLE_MANAGER")]
+        // public async Task<ApiResponse> CreateAccount([FromBody] AccountRequest request)
+        // {
+        //     try
+        //     {
+        //         _logger.LogInformation($"Creating account for email: {request.Email}");
 
-                if (!User.Identity.IsAuthenticated)
-                {
-                    _logger.LogWarning("Unauthorized access attempt - User not authenticated");
-                    return new ApiResponse
-                    {
-                        Code = StatusCodes.Status401Unauthorized,
-                        Success = false,
-                        Message = "User not authenticated",
-                        Data = null
-                    };
-                }
+        //         if (!User.Identity.IsAuthenticated)
+        //         {
+        //             _logger.LogWarning("Unauthorized access attempt - User not authenticated");
+        //             return new ApiResponse
+        //             {
+        //                 Code = StatusCodes.Status401Unauthorized,
+        //                 Success = false,
+        //                 Message = "User not authenticated",
+        //                 Data = null
+        //             };
+        //         }
 
-                var userRoles = User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
-                                         .Select(c => c.Value)
-                                         .ToList();
+        //         var userRoles = User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+        //                                  .Select(c => c.Value)
+        //                                  .ToList();
 
-                _logger.LogInformation($"User roles: {string.Join(", ", userRoles)}");
+        //         _logger.LogInformation($"User roles: {string.Join(", ", userRoles)}");
 
-                var result = await _accountService.CreateAccount(request, true);
+        //         var result = await _accountService.CreateAccount(request, true);
 
-                if (result)
-                {
-                    _logger.LogInformation($"Account created successfully for email: {request.Email}");
-                    return new ApiResponse
-                    {
-                        Code = StatusCodes.Status201Created,
-                        Success = true,
-                        Message = "Account created successfully.",
-                        Data = null
-                    };
-                }
-                else
-                {
-                    _logger.LogError($"Failed to create account for email: {request.Email}");
-                    return new ApiResponse
-                    {
-                        Code = StatusCodes.Status500InternalServerError,
-                        Success = false,
-                        Message = "An error occurred while creating the account.",
-                        Data = null
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Exception while creating account: {ex.Message}");
-                return new ApiResponse
-                {
-                    Code = StatusCodes.Status500InternalServerError,
-                    Success = false,
-                    Message = "An unexpected error occurred.",
-                    Data = null
-                };
-            }
-        }
+        //         if (result)
+        //         {
+        //             _logger.LogInformation($"Account created successfully for email: {request.Email}");
+        //             return new ApiResponse
+        //             {
+        //                 Code = StatusCodes.Status201Created,
+        //                 Success = true,
+        //                 Message = "Account created successfully.",
+        //                 Data = null
+        //             };
+        //         }
+        //         else
+        //         {
+        //             _logger.LogError($"Failed to create account for email: {request.Email}");
+        //             return new ApiResponse
+        //             {
+        //                 Code = StatusCodes.Status500InternalServerError,
+        //                 Success = false,
+        //                 Message = "An error occurred while creating the account.",
+        //                 Data = null
+        //             };
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError($"Exception while creating account: {ex.Message}");
+        //         return new ApiResponse
+        //         {
+        //             Code = StatusCodes.Status500InternalServerError,
+        //             Success = false,
+        //             Message = "An unexpected error occurred.",
+        //             Data = null
+        //         };
+        //     }
+        // }
 
         // GET: api/accounts/{id}
         // [HttpGet("{id}")]

@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using ModernEstate.Common.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("account")]
+    [Index(nameof(Email), IsUnique = true)]
+    [Index(nameof(EnumAccountStatus))]
     public class Account : BaseEntity
     {
         [Key]
@@ -35,12 +38,11 @@ namespace ModernEstate.DAL.Entites
         [Column("avatar", TypeName = "longtext")]
         public string? Avatar { get; set; }
 
+        [ForeignKey("Role")]
         [Column("role_id")]
         [Required]
-        public Guid? RoleId { get; set; }
-
-        [ForeignKey("RoleId")]
-        public virtual Role? Role { get; set; }
+        public Guid RoleId { get; set; }
+        public Role? Role { get; set; }
 
         [EnumDataType(typeof(EnumAccountStatus))]
         [Column("account_status", TypeName = "nvarchar(50)")]

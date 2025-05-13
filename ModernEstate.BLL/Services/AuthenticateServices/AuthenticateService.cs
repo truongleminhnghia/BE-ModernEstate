@@ -56,30 +56,30 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             }
         }
 
-        public async Task<bool> Register(RegisterRequest request)
-        {
-            try
-            {
-                var existingAccount = await _unitOfWork.Accounts.GetByEmail(request.Email);
-                if (existingAccount != null)
-                {
-                    _logger.LogWarning("Không thể tạo tài khoản, email {Email} đã tồn tại.", request.Email);
-                    return false;
-                }
-                var account = _mapper.Map<Account>(request);
-                account.Role = EnumRoleName.ROLE_CUSTOMER;
-                account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
-                account.Password = _passwordHasher.HashPassword(request.Password);
-                await _unitOfWork.Accounts.CreateAsync(account);
-                await _unitOfWork.SaveChangesWithTransactionAsync();
-                _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", request.Email, account.Role);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Lỗi xảy ra khi tạo tài khoản với email {Email}", request.Email);
-                return false;
-            }
-        }
+        // public async Task<bool> Register(RegisterRequest request)
+        // {
+        //     try
+        //     {
+        //         var existingAccount = await _unitOfWork.Accounts.GetByEmail(request.Email);
+        //         if (existingAccount != null)
+        //         {
+        //             _logger.LogWarning("Không thể tạo tài khoản, email {Email} đã tồn tại.", request.Email);
+        //             return false;
+        //         }
+        //         var account = _mapper.Map<Account>(request);
+        //         account.Role = EnumRoleName.ROLE_CUSTOMER;
+        //         account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
+        //         account.Password = _passwordHasher.HashPassword(request.Password);
+        //         await _unitOfWork.Accounts.CreateAsync(account);
+        //         await _unitOfWork.SaveChangesWithTransactionAsync();
+        //         _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", request.Email, account.Role);
+        //         return true;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Lỗi xảy ra khi tạo tài khoản với email {Email}", request.Email);
+        //         return false;
+        //     }
+        // }
     }
 }

@@ -10,7 +10,7 @@ namespace ModernEstate.BLL.Services.AccountServices
 {
     public interface IAccountService
     {
-        public Task<bool> CreateAccount(AccountRequest req, bool _isAdmin);
-        public Task<AccountResponse> GetById(Guid id);
+        // public Task<bool> CreateAccount(AccountRequest req, bool _isAdmin);
+        // public Task<AccountResponse> GetById(Guid id);
     }
 }

@@ -26,12 +26,12 @@ namespace ModernEstate.DAL.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Account>()
-                .Property(o => o.Role)
-                .HasConversion<string>();
-            modelBuilder.Entity<Account>()
-                .Property(o => o.EnumAccountStatus)
-                .HasConversion<string>();
+            // modelBuilder.Entity<Account>()
+            //     .Property(o => o.Role)
+            //     .HasConversion<string>();
+            // modelBuilder.Entity<Account>()
+            //     .Property(o => o.EnumAccountStatus)
+            //     .HasConversion<string>();
         }
     }
 }

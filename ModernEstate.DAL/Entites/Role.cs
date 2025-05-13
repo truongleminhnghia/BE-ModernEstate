@@ -9,7 +9,7 @@ namespace ModernEstate.DAL.Entites
     public class Role
     {
         [Key]
-        [Column("account_id")]
+        [Column("role_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
@@ -18,6 +18,6 @@ namespace ModernEstate.DAL.Entites
         [Required]
         public EnumRoleName RoleName { get; set; }
 
-        public virtual ICollection<Account>? Accounts { get; set; }
+        public ICollection<Account>? Accounts { get; set; }
     }
 }
