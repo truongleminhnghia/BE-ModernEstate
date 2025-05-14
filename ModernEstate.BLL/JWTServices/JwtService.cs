@@ -17,6 +17,16 @@ namespace ModernEstate.BLL.JWTServices
         {
             _httpContextAccessor = httpContextAccessor;
             _jwtSettings = jwtOptions.Value;
+            // Ghi đè từ biến môi trường nếu tồn tại
+            _jwtSettings.SecretKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? _jwtSettings.SecretKey;
+            _jwtSettings.Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _jwtSettings.Issuer;
+            _jwtSettings.Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? _jwtSettings.Audience;
+
+            string? envExpires = Environment.GetEnvironmentVariable("JWT_EXPIRES_IN_MINUTES");
+            if (int.TryParse(envExpires, out int expiresInMinutes))
+            {
+                _jwtSettings.ExpiresInMinutes = expiresInMinutes;
+            }
         }
 
         private ClaimsPrincipal GetUserClaims()

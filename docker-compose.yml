@@ -1,36 +1,32 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  webapi:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:80"
-      - "8081:443"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnectionString=Server=mysql;Port=3306;User Id=root;Password=Nghia_2003;Database=db_local_ModernEstate;SslMode=Required;
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
     depends_on:
-      - mysql
-    networks:
-      - modernestate-network
+      - db
 
-  mysql:
-    image: mysql:8.0.31
-    ports:
-      - "3306:3306"
+  db:
+    image: mysql:8.0
+    restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=Nghia_2003
-      - MYSQL_DATABASE=db_local_ModernEstate
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3307:3306"
     volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - modernestate-network
-
-networks:
-  modernestate-network:
-    driver: bridge
+      - dbdata:/var/lib/mysql
 
 volumes:
-  mysql-data: 
+  dbdata:

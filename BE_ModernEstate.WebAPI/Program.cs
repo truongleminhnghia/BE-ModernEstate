@@ -16,9 +16,25 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
+// var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
+
 // var connectionString =
 //     $"Server=localhost;Port=3306;User Id=root;Password=Nghia_2003;Database=db_local_ModernEstate;SslMode=Required;";
+
+var dbSection = builder.Configuration.GetSection("Database");
+var server = dbSection["Server"];
+var port = dbSection["Port"];
+var database = dbSection["DataName"];
+var user = dbSection["UserId"];
+var password = dbSection["Password"];
+
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? server;
+var dbPort = Environment.GetEnvironmentVariable("DB_PORT") ?? port;
+var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? database;
+var dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? user;
+var dbPass = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? password;
+
+var connectionString = $"Server={dbHost};Port={dbPort};Database={dbName};User Id={dbUser};Password={dbPass};SslMode=Required;";
 
 builder.Services.AddDbContext<ApplicationDbConext>(options =>
 {

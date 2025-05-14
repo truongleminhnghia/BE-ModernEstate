@@ -16,6 +16,19 @@ namespace BE_ModernEstate.WebAPI.Controllers
             _accountService = accountService;
         }
 
+        [HttpGet]
+        public async Task<ApiResponse> GetPublic()
+        {
+            var response = new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Public API accessed successfully.",
+                Data = null
+            };
+            return response;
+        }
+
         // [HttpPost]
         // public async Task<ApiResponse> Register([FromBody] AccountRequest request)
         // {
