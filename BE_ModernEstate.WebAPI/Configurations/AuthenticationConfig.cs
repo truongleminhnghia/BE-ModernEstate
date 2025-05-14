@@ -10,9 +10,9 @@ namespace BE_ModernEstate.WebAPI.Configurations
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             var jwtSettings = configuration.GetSection("Jwt");
-            var secretKey = jwtSettings["SecretKey"];
-            var issuer = jwtSettings["Issuer"];
-            var audience = jwtSettings["Audience"];
+            var secretKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? jwtSettings["SecretKey"];
+            var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? jwtSettings["Issuer"];
+            var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? jwtSettings["Audience"];
 
             services.AddAuthentication(options =>
             {
