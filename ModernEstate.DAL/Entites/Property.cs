@@ -18,8 +18,6 @@ namespace ModernEstate.DAL.Entites
         public string? OwnershipStatus { get; set; }
         public ICollection<Image>? Images { get; set; }
         public decimal? ManagementFee { get; set; }
-        public bool HasGym { get; set; }
-        public bool HasPool { get; set; }
         public string? Description { get; set; }
         public int Floor { get; set; }
         public string? RoomNumber { get; set; }
@@ -31,6 +29,7 @@ namespace ModernEstate.DAL.Entites
         public bool Balcony { get; set; }
         public string? Furniture { get; set; }
         public string? Direction { get; set; }
+        public ICollection<PropertyAmenity>? PropertyAmenities { get; set; }
         public Guid PostedById { get; set; }
         public Account? PostedBy { get; set; }
         public Guid? ProjectId { get; set; }
