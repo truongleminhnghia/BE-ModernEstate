@@ -9,7 +9,8 @@ namespace ModernEstate.DAL.Entites
         [Key]
         [Column("property_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public Guid CategoryId { get; set; }
+        public Category Category { get; set; }
         public string? Name { get; set; }
         public string? Building { get; set; }
         public decimal? Price { get; set; }
@@ -30,6 +31,7 @@ namespace ModernEstate.DAL.Entites
         public bool Balcony { get; set; }
         public string? Furniture { get; set; }
         public string? Direction { get; set; }
+        public Guid PostedById { get; set; }
         public Account? PostedBy { get; set; }
         public Guid? ProjectId { get; set; }
         public Project? Project { get; set; }
