@@ -1,11 +1,10 @@
-﻿using ModernEstate.Common.Enums;
-using System.ComponentModel.DataAnnotations;
+
+using ModernEstate.Common.Enums;
 
 namespace ModernEstate.Common.Models.Requests
 {
-    public class AccountRequest
+    public class UpdateAccountRequest
     {
-        [Required(ErrorMessage = "Email is required.")]
         public string? Email { get; set; }
         public string? LastName { get; set; }
         public string? FirstName { get; set; }
@@ -13,8 +12,7 @@ namespace ModernEstate.Common.Models.Requests
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public string? Avatar { get; set; }
-        public EnumRoleName RoleName { get; set; }
+        public EnumRoleName? Role { get; set; }
         public EnumAccountStatus? EnumAccountStatus { get; set; }
-        public EnumGender Gender { get; set; }
     }
 }

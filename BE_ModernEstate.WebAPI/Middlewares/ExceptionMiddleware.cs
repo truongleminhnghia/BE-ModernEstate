@@ -1,8 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.ApiResponse;
+using ShoppEcommerce_WebApp.WebAPI.Extensions;
 using System.Text.Json;
 
-namespace BE_ModernEstate.WebAPI.Middlewares
+namespace ShoppEcommerce_WebApp.WebAPI.Middlewares
 {
     public class ExceptionMiddleware
     {
@@ -26,95 +28,93 @@ namespace BE_ModernEstate.WebAPI.Middlewares
                 {
                     await HandleUnauthorizedResponse(context);
                 }
+                else if (context.Response.StatusCode == 403)
+                {
+                    await HandleForbiddenResponse(context);
+                }
+            }
+            catch (AppException ex)
+            {
+                await HandleAppException(context, ex);
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                await HandleAppException(context, new AppException(ErrorCode.TOKEN_EXPIRED));
+            }
+            catch (SecurityTokenInvalidAudienceException)
+            {
+                await HandleAppException(context, new AppException(ErrorCode.INVALID_TOKEN));
+            }
+            catch (SecurityTokenInvalidIssuerException)
+            {
+                await HandleAppException(context, new AppException(ErrorCode.INVALID_TOKEN));
+            }
+            catch (SecurityTokenInvalidSigningKeyException)
+            {
+                await HandleAppException(context, new AppException(ErrorCode.INVALID_TOKEN));
+            }
+            catch (SecurityTokenValidationException)
+            {
+                await HandleAppException(context, new AppException(ErrorCode.INVALID_TOKEN));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                await HandleAppException(context, new AppException(ErrorCode.UNAUTHORIZED));
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex);
+                await HandleGenericException(context, ex);
             }
         }
 
-        private async Task HandleUnauthorizedResponse(HttpContext context)
+        private async Task HandleAppException(HttpContext context, AppException ex)
         {
+            _logger.LogError(ex, "An application exception occurred: {ErrorCode}", ex.ErrorCode);
             context.Response.ContentType = "application/json";
             var response = new ApiResponse
             {
-                Code = StatusCodes.Status401Unauthorized,
+                Code = (int)ex.ErrorCode.GetStatusCode(),
                 Success = false,
-                Message = "Unauthorized access. Please provide valid authentication credentials.",
+                Message = ex.ErrorCode.GetMessage(),
                 Data = null
             };
-
             var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
-
             await context.Response.WriteAsync(json);
         }
 
-        private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        private async Task HandleGenericException(HttpContext context, Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred.");
-
+            _logger.LogError(ex, "An unhandled exception occurred");
             context.Response.ContentType = "application/json";
-            var response = new ApiResponse();
-
-            switch (ex)
+            var response = new ApiResponse
             {
-                case SecurityTokenExpiredException:
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    response.Code = StatusCodes.Status401Unauthorized;
-                    response.Message = "Token has expired. Please login again.";
-                    break;
-
-                case SecurityTokenInvalidAudienceException:
-                case SecurityTokenInvalidIssuerException:
-                case SecurityTokenInvalidSigningKeyException:
-                case SecurityTokenValidationException:
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    response.Code = StatusCodes.Status401Unauthorized;
-                    response.Message = "Invalid authentication token.";
-                    break;
-
-                case UnauthorizedAccessException:
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    response.Code = StatusCodes.Status401Unauthorized;
-                    response.Message = "You are not authorized to access this resource.";
-                    break;
-
-                case ArgumentException:
-                case InvalidOperationException:
-                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                    response.Code = StatusCodes.Status400BadRequest;
-                    response.Message = ex.Message;
-                    break;
-
-                default:
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    response.Code = StatusCodes.Status500InternalServerError;
-                    response.Message = _env.IsDevelopment()
-                        ? $"Internal Server Error: {ex.Message}"
-                        : "An unexpected error occurred. Please try again later.";
-                    break;
-            }
-
-            response.Success = false;
-            if (_env.IsDevelopment())
-            {
-                response.Data = new
-                {
-                    Exception = ex.GetType().Name,
-                    Message = ex.Message,
-                    StackTrace = ex.StackTrace
-                };
-            }
-
-            var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions
+                Code = StatusCodes.Status500InternalServerError,
+                Success = false,
+                Message = _env.IsDevelopment()
+                    ? $"Internal Server Error: {ex.Message}"
+                    : "An unexpected error occurred. Please try again later.",
+                Data = _env.IsDevelopment()
+                    ? new { Exception = ex.GetType().Name, Message = ex.Message, StackTrace = ex.StackTrace }
+                    : null
+            };
+            var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
+            await context.Response.WriteAsync(json);
+        }
 
-            await context.Response.WriteAsync(jsonResponse);
+        private async Task HandleUnauthorizedResponse(HttpContext context)
+        {
+            await HandleAppException(context, new AppException(ErrorCode.UNAUTHORIZED));
+        }
+
+        private async Task HandleForbiddenResponse(HttpContext context)
+        {
+            await HandleAppException(context, new AppException(ErrorCode.FORBIDDEN));
         }
     }
 }

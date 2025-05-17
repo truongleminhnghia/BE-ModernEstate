@@ -1,6 +1,6 @@
-﻿using BE_ModernEstate.WebAPI.Middlewares;
+﻿using ShoppEcommerce_WebApp.WebAPI.Middlewares;
 
-namespace BE_ModernEstate.WebAPI.Extensions
+namespace ShoppEcommerce_WebApp.WebAPI.Extensions
 {
     public static class ExceptionMiddlewareExtensions
     {

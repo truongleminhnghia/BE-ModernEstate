@@ -50,7 +50,7 @@ namespace ModernEstate.BLL.JWTServices
             var claims = new List<Claim> {
                 new Claim("accountId", _account.Id.ToString()),
                 new Claim("email", _account.Email),
-                new Claim(ClaimTypes.Role, _account.Role.ToString()),
+                new Claim(ClaimTypes.Role, _account.Role.RoleName.ToString()),
                 // new Claim("role", _account.Role.ToString())
             };
             var tokenDescriptor = new SecurityTokenDescriptor

@@ -1,5 +1,7 @@
-﻿using ModernEstate.DAL.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Repositories.AccountRepositories;
+using ModernEstate.DAL.Repositories.RoleRepositories;
 
 namespace ModernEstate.DAL
 {
@@ -7,6 +9,8 @@ namespace ModernEstate.DAL
     {
         private readonly ApplicationDbConext _unitOfWorkContext;
         private IAccountRepository? _accountRepository;
+        private IRoleRepository? _roleRepository;
+
 
         public UnitOfWork(ApplicationDbConext context)
         {
@@ -15,48 +19,65 @@ namespace ModernEstate.DAL
 
         public IAccountRepository Accounts => _accountRepository ??= new AccountRepository(_unitOfWorkContext);
 
+        public IRoleRepository Roles => _roleRepository ??= new RoleRepository(_unitOfWorkContext);
+
         // SaveChangesWithTransaction đồng bộ
-        public int SaveChangesWithTransaction()
+        public async Task<int> SaveChangesAsync()
         {
-            int result = -1;
-            using (var dbContextTransaction = _unitOfWorkContext.Database.BeginTransaction())
+            try
             {
-                try
-                {
-                    result = _unitOfWorkContext.SaveChanges();
-                    dbContextTransaction.Commit(); // Commit nếu không lỗi
-                }
-                catch (Exception ex)
-                {
-                    dbContextTransaction.Rollback(); // Rollback nếu có lỗi
-                    // Log exception or handle as per requirement
-                    throw new InvalidOperationException("An error occurred during the transaction.", ex);
-                }
+                return await _unitOfWorkContext.SaveChangesAsync();
             }
-            return result;
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"SaveChanges failed: {ex.Message}", ex);
+            }
         }
 
-        // SaveChangesWithTransaction bất đồng bộ
         public async Task<int> SaveChangesWithTransactionAsync()
         {
-            int result = -1;
-            using (var dbContextTransaction = await _unitOfWorkContext.Database.BeginTransactionAsync())
+            var strategy = _unitOfWorkContext.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync(async () =>
             {
+                // Tạo một transaction scope
+                await using var transaction = await _unitOfWorkContext.Database.BeginTransactionAsync();
                 try
                 {
-                    result = await _unitOfWorkContext.SaveChangesAsync();
-                    await dbContextTransaction.CommitAsync();
+                    // Thực hiện lưu thay đổi
+                    var result = await _unitOfWorkContext.SaveChangesAsync();
+
+                    // Commit transaction
+                    await transaction.CommitAsync();
+
+                    return result;
                 }
                 catch (Exception ex)
                 {
-                    await dbContextTransaction.RollbackAsync();
-                    // Log thông tin chi tiết của lỗi
-                    Console.WriteLine($"Error occurred: {ex.Message}");
-                    Console.WriteLine($"Inner Exception: {ex.InnerException?.Message}");
-                    throw new InvalidOperationException("An error occurred during the transaction.", ex);
+                    // Rollback nếu có lỗi
+                    await transaction.RollbackAsync();
+                    throw new InvalidOperationException($"Transaction failed: {ex.Message}", ex);
                 }
-            }
-            return result;
+            });
+        }
+
+        public int SaveChangesWithTransaction()
+        {
+            var strategy = _unitOfWorkContext.Database.CreateExecutionStrategy();
+            return strategy.Execute(() =>
+            {
+                using var transaction = _unitOfWorkContext.Database.BeginTransaction();
+                try
+                {
+                    var result = _unitOfWorkContext.SaveChanges();
+                    transaction.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new InvalidOperationException($"Transaction failed: {ex.Message}", ex);
+                }
+            });
         }
     }
 }

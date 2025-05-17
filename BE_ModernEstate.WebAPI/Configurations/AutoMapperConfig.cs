@@ -1,4 +1,5 @@
 ﻿using ModernEstate.BLL.Mappers;
+using ShoppEcommerce_WebApp.BLL.Mappers;
 
 namespace BE_ModernEstate.WebAPI.Configurations
 {
@@ -6,9 +7,8 @@ namespace BE_ModernEstate.WebAPI.Configurations
     {
         public static IServiceCollection AddAutoMapperConfiguration(this IServiceCollection services)
         {
-            services.AddAutoMapper(
-                typeof(AccountMapper).Assembly
-            );
+            services.AddAutoMapper(typeof(AccountMapper));
+            services.AddAutoMapper(typeof(RoleMapper));
             return services;
         }
     }

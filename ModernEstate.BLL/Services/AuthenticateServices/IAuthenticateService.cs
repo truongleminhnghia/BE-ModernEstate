@@ -6,7 +6,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
 {
     public interface IAuthenticateService
     {
-        // public Task<AuthenticateResponse> Login(string email, string password);
-        // public Task<bool> Register(RegisterRequest request);
+        public Task<AuthenticateResponse> Login(string email, string password);
+        public Task<bool> Register(RegisterRequest request);
     }
 }

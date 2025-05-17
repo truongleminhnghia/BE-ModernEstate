@@ -7,6 +7,7 @@ using ModernEstate.DAL.Entites;
 using ModernEstate.DAL;
 using ModernEstate.BLL.HashPasswords;
 using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Exceptions;
 
 namespace ModernEstate.BLL.Services.AuthenticateServices
 {
@@ -32,16 +33,11 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             try
             {
                 Account? account = await _unitOfWork.Accounts.GetByEmail(email);
-                if (account == null)
-                {
-                    throw new Exception("Account not found.");
-                }
+                if (account == null) throw new AppException(ErrorCode.EMAIL_DOT_NOT_EXISTS);
                 bool checkPassword = _passwordHasher.VerifyPassword(password, account.Password);
-                if (!checkPassword)
-                {
-                    throw new Exception("Invalid password.");
-                }
+                if (!checkPassword) throw new AppException(ErrorCode.INVALID_PASSWORD);
                 var token = _jwtService.GenerateJwtToken(account);
+                if (string.IsNullOrEmpty(token)) throw new AppException(ErrorCode.TOKEN_NOT_NULL);
                 var currentAccount = _mapper.Map<AccountCurrent>(account);
                 var authenticateResponse = new AuthenticateResponse
                 {
@@ -50,36 +46,62 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 };
                 return authenticateResponse;
             }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred while logging in.", ex);
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
 
-        // public async Task<bool> Register(RegisterRequest request)
-        // {
-        //     try
-        //     {
-        //         var existingAccount = await _unitOfWork.Accounts.GetByEmail(request.Email);
-        //         if (existingAccount != null)
-        //         {
-        //             _logger.LogWarning("Không thể tạo tài khoản, email {Email} đã tồn tại.", request.Email);
-        //             return false;
-        //         }
-        //         var account = _mapper.Map<Account>(request);
-        //         account.Role = EnumRoleName.ROLE_CUSTOMER;
-        //         account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
-        //         account.Password = _passwordHasher.HashPassword(request.Password);
-        //         await _unitOfWork.Accounts.CreateAsync(account);
-        //         await _unitOfWork.SaveChangesWithTransactionAsync();
-        //         _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", request.Email, account.Role);
-        //         return true;
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Lỗi xảy ra khi tạo tài khoản với email {Email}", request.Email);
-        //         return false;
-        //     }
-        // }
+        public async Task<bool> Register(RegisterRequest request)
+        {
+            try
+            {
+                var existingAccount = await _unitOfWork.Accounts.GetByEmail(request.Email);
+                if (existingAccount != null)
+                {
+                    _logger.LogWarning("Không thể tạo tài khoản, email {Email} đã tồn tại.", request.Email);
+                    throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+                }
+                var account = _mapper.Map<Account>(request);
+                Role? role = await _unitOfWork.Roles.GetByName(EnumRoleName.ROLE_CUSTOMER);
+                if (role == null) throw new AppException(ErrorCode.ROLE_NOT_NULL);
+                account.RoleId = role.Id;
+                account.Role = role;
+                account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
+                account.CreatedAt = DateTime.UtcNow;
+                account.UpdatedAt = DateTime.UtcNow;
+                if (account.EnumAccountStatus == null) throw new AppException(ErrorCode.ACCOUNT_STATUS_NOT_NULL);
+                if (request.Password != request.ConfirmPassword) throw new AppException(ErrorCode.INVALID_PASSWORD);
+                account.Password = _passwordHasher.HashPassword(request.Password);
+                await _unitOfWork.Accounts.CreateAsync(account);
+                // await _unitOfWork.SaveChangesWithTransactionAsync();
+                // Customer customer = new Customer
+                // {
+                //     Account = account,
+                //     HomeAddressId = null,
+                //     OrderAddresses = new List<Address>()
+                // };
+                // await _unitOfWork.Customers.CreateAsync(customer);
+                await _unitOfWork.SaveChangesWithTransactionAsync();
+                _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", request.Email, account.Role);
+                return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 }

@@ -15,8 +15,6 @@ namespace ModernEstate.DAL.Entites
     [Index(nameof(Status), Name = "IX_Account_Package_Subscription_Status")]
     [Index(nameof(StartDate), Name = "IX_Account_Package_Subscription_StartDate")]
     [Index(nameof(EndDate), Name = "IX_Account_Package_Subscription_EndDate")]
-    [Index(nameof(Transactions), Name = "IX_Account_Package_Subscription_Transactions")]
-    [Index(nameof(Account), Name = "IX_Account_Package_Subscription_Account")]
     public class PostPackage : BaseEntity
     {
 

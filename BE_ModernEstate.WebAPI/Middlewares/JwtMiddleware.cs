@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace BE_ModernEstate.WebAPI.Middlewares
+namespace ShoppEcommerce_WebApp.WebAPI.Middlewares
 {
     public class JwtMiddleware
     {
