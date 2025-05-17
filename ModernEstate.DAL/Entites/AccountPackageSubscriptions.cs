@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ModernEstate.DAL.Entites
 {
-    [Table("property")]
-    public class Property
+    [Table("account_package_subscriptions")]
+    public class AccountPackageSubscriptions
     {
         [Key]
-        [Column("property_id")]
+        [Column("account_package_subscription_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
     }

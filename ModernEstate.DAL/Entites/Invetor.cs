@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ModernEstate.DAL.Entites
 {
-    [Table("property")]
-    public class Property
+    [Table("invetor")]
+    public class Invetor
     {
         [Key]
-        [Column("property_id")]
+        [Column("invertor_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
     }

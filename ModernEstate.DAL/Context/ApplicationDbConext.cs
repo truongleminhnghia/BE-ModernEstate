@@ -12,17 +12,28 @@ namespace ModernEstate.DAL.Context
         }
 
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<New> News { get; set; }
-        public DbSet<Image> Images { get; set; }
-        public DbSet<Location> Locations { get; set; }
-        public DbSet<Contact> Contacts { get; set; }
+        public DbSet<AccountPackageSubscriptions> AccountPackageSubscriptions { get; set; }
+        public DbSet<AccountService> AccountServices { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Broker> Brokers { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Employee> Employees { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
-        public DbSet<Listing> Listings { get; set; }
+        public DbSet<History> Histories { get; set; }
+        public DbSet<Image> Images { get; set; }
+        public DbSet<Invetor> Inventories { get; set; }
+        public DbSet<New> News { get; set; }
+        public DbSet<NewTag> NewTags { get; set; }
+        public DbSet<OwnerProperty> OwnerProperties { get; set; }
+        public DbSet<Package> Packages { get; set; }
+        public DbSet<Post> Posts { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Property> Properties { get; set; }
+        public DbSet<Provide> Providers { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

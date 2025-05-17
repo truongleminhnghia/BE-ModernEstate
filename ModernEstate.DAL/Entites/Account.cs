@@ -59,8 +59,7 @@ namespace ModernEstate.DAL.Entites
         public DateTime DateOfBirth { get; set; }
         [Column(TypeName = "nvarchar(20)")]
         public EnumSubscription Subscription { get; set; } = EnumSubscription.Free;
-        public ICollection<Listing>? Listings { get; set; }
-        public ICollection<Favorite>? Favorites { get; set; }
+
 
     }
 }

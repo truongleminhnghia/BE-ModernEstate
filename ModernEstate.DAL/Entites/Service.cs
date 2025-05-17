@@ -1,10 +1,11 @@
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("service")]
-    public class Service : BaseEntity
+    public class Service
     {
         [Key]
         [Column("service_id")]
