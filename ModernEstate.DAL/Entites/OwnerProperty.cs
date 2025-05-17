@@ -11,5 +11,9 @@ namespace ModernEstate.DAL.Entites
         [Column("owner_property_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
+
+        [Column("code", TypeName = "varchar(10)")]
+        [Required]
+        public string? Code { get; set; }
     }
 }

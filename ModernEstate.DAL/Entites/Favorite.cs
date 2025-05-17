@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ModernEstate.DAL.Entites
 {
     [Table("favorite")]
-    public class Favorite
+    public class Favorite : BaseEntity
     {
         [Key]
         [Column("favorite_id")]

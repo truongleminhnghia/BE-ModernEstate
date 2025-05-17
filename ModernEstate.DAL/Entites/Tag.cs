@@ -11,5 +11,9 @@ namespace ModernEstate.DAL.Entites
         [Column("tag_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
+
+        [Column("tag_name", TypeName = "varchar(50)")]
+        [Required]
+        public string? TagName { get; set; }
     }
 }
