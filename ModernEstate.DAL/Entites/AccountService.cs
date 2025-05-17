@@ -1,6 +1,8 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.InteropServices;
+using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
@@ -33,5 +35,19 @@ namespace ModernEstate.DAL.Entites
         [Column("total_amount", TypeName = "double")]
         [Required]
         public double TotalAmount { get; set; }
+
+        [Column("account_id")]
+        [Required]
+        public Guid AccountId { get; set; }
+        [ForeignKey(nameof(AccountId))]
+        public Account? Account { get; set; }
+
+        [Column("service_id")]
+        [Required]
+        public Guid ServiceId { get; set; }
+        [ForeignKey(nameof(ServiceId))]
+        public Service? Service { get; set; }
+
+        public virtual ICollection<Transaction>? Transactions { get; set; }
     }
 }

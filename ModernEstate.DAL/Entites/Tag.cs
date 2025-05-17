@@ -15,5 +15,7 @@ namespace ModernEstate.DAL.Entites
         [Column("tag_name", TypeName = "varchar(50)")]
         [Required]
         public string? TagName { get; set; }
+
+        public virtual ICollection<NewTag>? NewTags { get; set; }
     }
 }

@@ -1,11 +1,13 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("role")]
+    [Index(nameof(RoleName), Name = "IX_Role_RoleName")]
     public class Role
     {
         [Key]

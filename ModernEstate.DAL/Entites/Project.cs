@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
@@ -55,5 +54,25 @@ namespace ModernEstate.DAL.Entites
         [Required]
         [EnumDataType(typeof(EnumProjectStatus))]
         public EnumProjectStatus Status { get; set; }
+
+        [Column("address_id")]
+        [Required]
+        public Guid AddressId { get; set; }
+
+        [ForeignKey(nameof(AddressId))]
+        [Description("Navigation property for the associated address")]
+        public Address? Address { get; set; }
+
+        [Column("provide_id")]
+        [Required]
+        public Guid ProvideId { get; set; }
+
+        [ForeignKey(nameof(ProvideId))]
+        [Description("Navigation property for the associated provider")]
+        public Provide? Provide { get; set; }
+
+        public virtual ICollection<Property>? Properties { get; set; }
+        public virtual ICollection<History>? Histories { get; set; }
+        public virtual ICollection<Image>? Images { get; set; }
     }
 }

@@ -36,5 +36,7 @@ namespace ModernEstate.DAL.Entites
         [Column("is_active")]
         [Required]
         public bool IsActive { get; set; } = true;
+
+        public virtual ICollection<Service>? Services { get; set; }
     }
 }

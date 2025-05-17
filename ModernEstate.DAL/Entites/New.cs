@@ -1,11 +1,18 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("new")]
+    [Index(nameof(Slug), Name = "IX_New_Slug")]
+    [Index(nameof(Title), Name = "IX_New_Title")]
+    [Index(nameof(StatusNew), Name = "IX_New_StatusNew")]
+    [Index(nameof(PublishDate), Name = "IX_New_PublishDate")]
+    [Index(nameof(AccountId), Name = "IX_New_AccountId")]
+    [Index(nameof(CategoryId), Name = "IX_New_CategoryId")]
     public class New : BaseEntity
     {
         [Key]
@@ -36,5 +43,19 @@ namespace ModernEstate.DAL.Entites
         [Column("publish_date", TypeName = "datetime")]
         [Required]
         public DateTime PublishDate { get; set; }
+
+        [Column("account_id")]
+        public Guid? AccountId { get; set; }
+
+        [ForeignKey(nameof(AccountId))]
+        public Account? Account { get; set; }
+
+        [Column("category_id")]
+        [Required]
+        public Guid CategoryId { get; set; }
+        [ForeignKey(nameof(CategoryId))]
+        public Category? Category { get; set; }
+
+        public virtual ICollection<NewTag>? NewTags { get; set; }
     }
 }

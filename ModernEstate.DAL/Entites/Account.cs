@@ -8,6 +8,7 @@ namespace ModernEstate.DAL.Entites
     [Table("account")]
     [Index(nameof(Email), IsUnique = true)]
     [Index(nameof(EnumAccountStatus))]
+    [Index(nameof(RoleId))]
     public class Account : BaseEntity
     {
         [Key]
@@ -38,10 +39,11 @@ namespace ModernEstate.DAL.Entites
         [Column("avatar", TypeName = "longtext")]
         public string? Avatar { get; set; }
 
-        [ForeignKey("Role")]
         [Column("role_id")]
         [Required]
         public Guid RoleId { get; set; }
+
+        [ForeignKey(nameof(RoleId))]
         public Role? Role { get; set; }
 
         [EnumDataType(typeof(EnumAccountStatus))]
@@ -57,9 +59,21 @@ namespace ModernEstate.DAL.Entites
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime DateOfBirth { get; set; }
-        [Column(TypeName = "nvarchar(20)")]
-        public EnumSubscription Subscription { get; set; } = EnumSubscription.Free;
 
+        [InverseProperty(nameof(Employee.Account))]
+        public Employee? Employee { get; set; }
 
+        [InverseProperty(nameof(Broker.Account))]
+        public Broker? Broker { get; set; }
+
+        [InverseProperty(nameof(OwnerProperty.Account))]
+        public OwnerProperty? OwnerProperty { get; set; }
+
+        public virtual ICollection<Transaction>? Transactions { get; set; }
+        public virtual ICollection<Favorite>? Favorites { get; set; }
+        public virtual ICollection<AccountService>? AccountServices { get; set; }
+        public virtual ICollection<New>? News { get; set; }
+        public virtual ICollection<PostPackage>? PostPackages { get; set; }
+        public virtual ICollection<Property>? Properties { get; set; }
     }
 }

@@ -1,10 +1,16 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("owner_property")]
+    [Index(nameof(AccountId), Name = "IX_OwnerProperty_AccountId")]
+    [Index(nameof(Code), Name = "IX_OwnerProperty_Code")]
+    [Index(nameof(Id), Name = "IX_OwnerProperty_Id")]
+    [Index(nameof(Properties), Name = "IX_OwnerProperty_Properties")]
+    [Index(nameof(Account), Name = "IX_OwnerProperty_Account")]
     public class OwnerProperty
     {
         [Key]
@@ -15,5 +21,15 @@ namespace ModernEstate.DAL.Entites
         [Column("code", TypeName = "varchar(10)")]
         [Required]
         public string? Code { get; set; }
+
+        [Column("account_id")]
+        [Required]
+        public Guid AccountId { get; set; }
+
+        [ForeignKey(nameof(AccountId))]
+        [InverseProperty(nameof(Account.OwnerProperty))]
+        public Account? Account { get; set; }
+
+        public virtual ICollection<Property>? Properties { get; set; }
     }
 }

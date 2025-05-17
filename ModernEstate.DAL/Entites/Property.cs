@@ -86,5 +86,23 @@ namespace ModernEstate.DAL.Entites
         [Description("Type of transaction for the property")]
         [EnumDataType(typeof(EnumTypeTransaction))]
         public EnumTypeTransaction TypeTransaction { get; set; }
+
+        [Column("address_id")]
+        [Required]
+        public Guid AddressId { get; set; }
+
+        [ForeignKey(nameof(AddressId))]
+        public Address? Address { get; set; }
+
+        [Column("owner_id")]
+        public Guid? OwnerId { get; set; }
+
+        [ForeignKey(nameof(OwnerId))]
+        public OwnerProperty? Owner { get; set; }
+
+        public virtual ICollection<Image>? PropertyImages { get; set; }
+        public virtual ICollection<History>? Histories { get; set; }
+        public virtual ICollection<Post>? Posts { get; set; }
+        public virtual ICollection<Favorite>? Favorites { get; set; }
     }
 }

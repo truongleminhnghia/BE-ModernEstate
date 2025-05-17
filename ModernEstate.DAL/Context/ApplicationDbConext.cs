@@ -12,7 +12,7 @@ namespace ModernEstate.DAL.Context
         }
 
         public DbSet<Account> Accounts { get; set; }
-        public DbSet<AccountPackageSubscriptions> AccountPackageSubscriptions { get; set; }
+        public DbSet<PostPackage> PostPackages { get; set; }
         public DbSet<AccountService> AccountServices { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Broker> Brokers { get; set; }
@@ -34,6 +34,8 @@ namespace ModernEstate.DAL.Context
         public DbSet<Service> Services { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Contact> contacts { get; set; }
+        public DbSet<Support> Supports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

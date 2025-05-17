@@ -1,11 +1,17 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("service")]
+    [Index(nameof(Title), Name = "IX_Service_Title")]
+    [Index(nameof(ProvideId), Name = "IX_Service_ProvideId")]
+    [Index(nameof(TypeService), Name = "IX_Service_TypeService")]
+    [Index(nameof(Status), Name = "IX_Service_Status")]
+    [Index(nameof(Id), Name = "IX_Service_Id")]
     public class Service : BaseEntity
     {
         [Key]
@@ -38,5 +44,14 @@ namespace ModernEstate.DAL.Entites
         [Required]
         [EnumDataType(typeof(EnumStatus))]
         public EnumStatus Status { get; set; }
+
+        [Column("provide_id")]
+        [Required]
+        public Guid ProvideId { get; set; }
+        [ForeignKey(nameof(ProvideId))]
+        public Provide? Provide { get; set; }
+
+        public virtual ICollection<AccountService>? AccountServices { get; set; }
+
     }
 }

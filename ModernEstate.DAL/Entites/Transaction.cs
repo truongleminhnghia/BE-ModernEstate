@@ -1,5 +1,4 @@
 
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -47,5 +46,24 @@ namespace ModernEstate.DAL.Entites
         [Column("transaction_code", TypeName = "varchar(150)")]
         [Required]
         public string? TransactionCode { get; set; }
+
+        [Column("account_id")]
+        [Required]
+        public Guid AccountId { get; set; }
+
+        [ForeignKey(nameof(AccountId))]
+        public Account? Account { get; set; }
+
+        [Column("account_service_id")]
+        public Guid? AccountServiceId { get; set; }
+
+        [ForeignKey(nameof(AccountServiceId))]
+        public AccountService? AccountService { get; set; }
+
+        [Column("post_package_id")]
+        public Guid? PostPackageId { get; set; }
+
+        [ForeignKey(nameof(PostPackageId))]
+        public PostPackage? PostPackage { get; set; }
     }
 }

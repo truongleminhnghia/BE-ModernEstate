@@ -26,6 +26,10 @@ namespace ModernEstate.DAL.Entites
         [Required]
         public string? Title { get; set; }
 
+        [Column("approve_by", TypeName = "varchar(400)")]
+        [Required]
+        public string? AppRovedBy { get; set; }
+
         [Column("post_by", TypeName = "varchar(400)")]
         [Required]
         public string? PostBy { get; set; }
@@ -48,5 +52,33 @@ namespace ModernEstate.DAL.Entites
         [Column("rejection_reason", TypeName = "text")]
         [Description("Reason for rejection, if applicable.")]
         public string? RejectionReason { get; set; }
+
+        [Column("property_id")]
+        [Required]
+        [Description("ID of the property associated with the post.")]
+        public Guid PropertyId { get; set; }
+
+        [ForeignKey(nameof(PropertyId))]
+        [Description("Navigation property for the associated property.")]
+        public Property? Property { get; set; }
+
+        [Column("contact_id")]
+        [Required]
+        [Description("ID of the contact associated with the post.")]
+        public Guid ContactId { get; set; }
+
+        [ForeignKey(nameof(ContactId))]
+        [Description("Navigation property for the associated contact.")]
+        public Contact? Contact { get; set; }
+
+        [Column("support_id")]
+        [Description("ID of the support associated with the post.")]
+        public Guid? SupportId { get; set; }
+
+        [ForeignKey(nameof(SupportId))]
+        [Description("Navigation property for the associated support.")]
+        public Support? Support { get; set; }
+
+        public virtual ICollection<PostPackage>? PostPackages { get; set; }
     }
 }

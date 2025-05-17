@@ -2,10 +2,17 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.InteropServices;
+using Microsoft.EntityFrameworkCore;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("address")]
+    [Index(nameof(HouseNumber), Name = "IX_Address_HouseNumber")]
+    [Index(nameof(Street), Name = "IX_Address_Street")]
+    [Index(nameof(Ward), Name = "IX_Address_Ward")]
+    [Index(nameof(District), Name = "IX_Address_District")]
+    [Index(nameof(City), Name = "IX_Address_City")]
     public class Address
     {
         [Key]
