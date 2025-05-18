@@ -51,7 +51,7 @@ namespace ModernEstate.DAL.Entites
         [ForeignKey(nameof(ProvideId))]
         public Provide? Provide { get; set; }
 
-        public virtual ICollection<AccountService>? AccountServices { get; set; }
+        public virtual ICollection<AccountBuyService>? AccountServices { get; set; }
 
     }
 }

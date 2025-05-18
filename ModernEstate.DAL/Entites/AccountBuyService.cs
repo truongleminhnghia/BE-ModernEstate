@@ -1,14 +1,12 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.InteropServices;
-using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("account_service")]
-    public class AccountService : BaseEntity
+    public class AccountBuyService : BaseEntity
     {
         [Key]
         [Column("account_service_id")]

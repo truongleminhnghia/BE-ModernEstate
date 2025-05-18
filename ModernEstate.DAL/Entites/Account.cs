@@ -71,7 +71,7 @@ namespace ModernEstate.DAL.Entites
 
         public virtual ICollection<Transaction>? Transactions { get; set; }
         public virtual ICollection<Favorite>? Favorites { get; set; }
-        public virtual ICollection<AccountService>? AccountServices { get; set; }
+        public virtual ICollection<AccountBuyService>? AccountServices { get; set; }
         public virtual ICollection<New>? News { get; set; }
         public virtual ICollection<PostPackage>? PostPackages { get; set; }
         public virtual ICollection<Property>? Properties { get; set; }
