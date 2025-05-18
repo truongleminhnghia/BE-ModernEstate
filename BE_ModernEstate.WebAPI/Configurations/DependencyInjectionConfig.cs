@@ -78,7 +78,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<IHistoryService, HistoryService>();
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IInvetorService, InvetorService>();
-            services.AddScoped<INewService, INewService>();
+            services.AddScoped<INewService, NewService>();
             services.AddScoped<INewTagService, NewTagService>();
             services.AddScoped<IOwnerPropertyService, OwnerPropertyService>();
             services.AddScoped<IPackageService, PackageService>();
