@@ -31,7 +31,7 @@ namespace ModernEstate.DAL
         IAccountRepository Accounts { get; }
         IRoleRepository Roles { get; }
         IAddressRepository Addresses { get; }
-        IAccountServiceRepository AccountServices { get; }
+        IAccountBuyServiceRepository AccountBuyServiceRepository { get; }
         IBrokerRepository Brokers { get; }
         ICategoryRepository Categories { get; }
         IContactRepository Contacts { get; }

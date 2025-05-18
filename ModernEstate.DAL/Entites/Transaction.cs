@@ -58,7 +58,7 @@ namespace ModernEstate.DAL.Entites
         public Guid? AccountServiceId { get; set; }
 
         [ForeignKey(nameof(AccountServiceId))]
-        public AccountService? AccountService { get; set; }
+        public AccountBuyService? AccountBuyService { get; set; }
 
         [Column("post_package_id")]
         public Guid? PostPackageId { get; set; }

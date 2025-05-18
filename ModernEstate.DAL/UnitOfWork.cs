@@ -34,7 +34,7 @@ namespace ModernEstate.DAL
         private IAccountRepository? _accountRepository;
         private IRoleRepository? _roleRepository;
         private IAddressRepository? _addressRepository;
-        private IAccountServiceRepository? _accountServiceRepository;
+        private IAccountBuyServiceRepository? _accountServiceRepository;
         private IBrokerRepository? _brokerRepository;
         private ICategoryRepository? _categoryRepository;
         private IContactRepository? _contactRepository;
@@ -68,8 +68,9 @@ namespace ModernEstate.DAL
         public IRoleRepository Roles => _roleRepository ??= new RoleRepository(_unitOfWorkContext);
         public IAddressRepository Addresses =>
             _addressRepository ??= new AddressRepository(_unitOfWorkContext);
-        public IAccountServiceRepository AccountServices =>
-            _accountServiceRepository ??= new AccountServiceRepository(_unitOfWorkContext);
+
+        public IAccountBuyServiceRepository AccountBuyServiceRepository =>
+            _accountServiceRepository ??= new AccountBuyServiceRepository(_unitOfWorkContext);
         public IBrokerRepository Brokers =>
             _brokerRepository ??= new BrokerRepository(_unitOfWorkContext);
         public ICategoryRepository Categories =>
@@ -117,6 +118,7 @@ namespace ModernEstate.DAL
         public ITagRepository Tags => _tagRepository ??= new TagRepository(_unitOfWorkContext);
         public ITransactionRepository Transactions =>
             _transactionRepository ??= new TransactionRepository(_unitOfWorkContext);
+
 
         // SaveChangesWithTransaction đồng bộ
         public async Task<int> SaveChangesAsync()

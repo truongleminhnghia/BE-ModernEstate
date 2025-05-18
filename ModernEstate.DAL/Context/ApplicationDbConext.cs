@@ -13,7 +13,7 @@ namespace ModernEstate.DAL.Context
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<PostPackage> PostPackages { get; set; }
-        public DbSet<AccountService> AccountServices { get; set; }
+        public DbSet<AccountBuyService> AccountBuyServices { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Broker> Brokers { get; set; }
         public DbSet<Category> Categories { get; set; }
