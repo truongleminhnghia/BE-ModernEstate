@@ -30,6 +30,29 @@ using ModernEstate.DAL.Repositories.TagRepositories;
 using ModernEstate.DAL.Repositories.TransactionRepositories;
 using ModernEstate.DAL.Repositories.NewTagRepositories;
 using ModernEstate.DAL.Repositories.AccountServiceRepositories;
+using ModernEstate.BLL.Services.AccountBuyServices;
+using ModernEstate.BLL.Services.AddressServices;
+using ModernEstate.BLL.Services.BrokerServices;
+using ModernEstate.BLL.Services.CategoryServices;
+using ModernEstate.BLL.Services.ContactServices;
+using ModernEstate.BLL.Services.EmployeeServices;
+using ModernEstate.BLL.Services.FavoriteServices;
+using ModernEstate.BLL.Services.HistoryServices;
+using ModernEstate.BLL.Services.ImageServices;
+using ModernEstate.BLL.Services.InvetorServices;
+using ModernEstate.BLL.Services.NewServices;
+using ModernEstate.BLL.Services.NewTagServices;
+using ModernEstate.BLL.Services.OwnerPropertyServices;
+using ModernEstate.BLL.Services.PackageServices;
+using ModernEstate.BLL.Services.PostServices;
+using ModernEstate.BLL.Services.PostPackageServices;
+using ModernEstate.BLL.Services.ProjectServices;
+using ModernEstate.BLL.Services.PropertyServices;
+using ModernEstate.BLL.Services.ProvideServices;
+using ModernEstate.BLL.Services.ServiceServices;
+using ModernEstate.BLL.Services.SupportServices;
+using ModernEstate.BLL.Services.TagServices;
+using ModernEstate.BLL.Services.TransactionServices;
 
 namespace BE_ModernEstate.WebAPI.Configurations
 {
@@ -45,6 +68,30 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthenticateService, AuthenticateService>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IAccountBuyService, AccountBuyService>();
+            services.AddScoped<IAddressService, AddressService>();
+            services.AddScoped<IBrokerService, BrokerService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IContactService, ContactService>();
+            services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IFavoriteService, FavoriteService>();
+            services.AddScoped<IHistoryService, HistoryService>();
+            services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IInvetorService, InvetorService>();
+            services.AddScoped<INewService, INewService>();
+            services.AddScoped<INewTagService, NewTagService>();
+            services.AddScoped<IOwnerPropertyService, OwnerPropertyService>();
+            services.AddScoped<IPackageService, PackageService>();
+            services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IPostPackageService, PostPackageService>();
+            services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<IPropertyService, PropertyService>();
+            services.AddScoped<IProvideService, ProvideService>();
+            services.AddScoped<IServiceService, ServiceService>();
+            services.AddScoped<ISupportService, SupportService>();
+            services.AddScoped<ITagService, TagService>();
+            services.AddScoped<ITransactionService, TransactionService>();
+
 
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
