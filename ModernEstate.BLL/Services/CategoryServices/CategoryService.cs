@@ -29,8 +29,8 @@ namespace ModernEstate.BLL.Services.CategoryServices
         {
             try
             {
-                var entities = await _unitOfWork.Categories.GetAllAsync();
-                return _mapper.Map<IEnumerable<CategoryResponse>>(entities);
+                var category = await _unitOfWork.Categories.GetAllAsync();
+                return _mapper.Map<IEnumerable<CategoryResponse>>(category);
             }
             catch (Exception ex)
             {
@@ -43,10 +43,10 @@ namespace ModernEstate.BLL.Services.CategoryServices
         {
             try
             {
-                var entity = await _unitOfWork.Categories.GetByIdAsync(id);
-                if (entity == null)
+                var category = await _unitOfWork.Categories.GetByIdAsync(id);
+                if (category == null)
                     return null;
-                return _mapper.Map<CategoryResponse>(entity);
+                return _mapper.Map<CategoryResponse>(category);
             }
             catch (Exception ex)
             {
@@ -59,13 +59,13 @@ namespace ModernEstate.BLL.Services.CategoryServices
         {
             try
             {
-                var entity = _mapper.Map<Category>(request);
-                entity.Id = Guid.NewGuid();
+                var category = _mapper.Map<Category>(request);
+                category.Id = Guid.NewGuid();
 
-                await _unitOfWork.Categories.CreateAsync(entity);
+                await _unitOfWork.Categories.CreateAsync(category);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
-                return _mapper.Map<CategoryResponse>(entity);
+                return _mapper.Map<CategoryResponse>(category);
             }
             catch (Exception ex)
             {
@@ -78,13 +78,13 @@ namespace ModernEstate.BLL.Services.CategoryServices
         {
             try
             {
-                var entity = await _unitOfWork.Categories.GetByIdAsync(id);
-                if (entity == null)
+                var category = await _unitOfWork.Categories.GetByIdAsync(id);
+                if (category == null)
                     return false;
 
-                _mapper.Map(request, entity);
+                _mapper.Map(request, category);
 
-                _unitOfWork.Categories.Update(entity);
+                _unitOfWork.Categories.Update(category);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
                 return true;
@@ -100,11 +100,11 @@ namespace ModernEstate.BLL.Services.CategoryServices
         {
             try
             {
-                var entity = await _unitOfWork.Categories.GetByIdAsync(id);
-                if (entity == null)
+                var category = await _unitOfWork.Categories.GetByIdAsync(id);
+                if (category == null)
                     return false;
 
-                _unitOfWork.Categories.Delete(entity);
+                _unitOfWork.Categories.Delete(category);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
                 return true;

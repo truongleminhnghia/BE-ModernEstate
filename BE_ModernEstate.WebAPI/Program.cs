@@ -3,6 +3,7 @@ using BE_ModernEstate.WebAPI.Configurations;
 using Microsoft.EntityFrameworkCore;
 using ModernEstate.BLL.Services.AddressServices;
 using ModernEstate.BLL.Services.CategoryServices;
+using ModernEstate.BLL.Services.FavoriteServices;
 using ModernEstate.BLL.Services.NewServices;
 using ModernEstate.BLL.Services.PackageServices;
 using ModernEstate.BLL.Services.ProjectServices;
@@ -77,6 +78,7 @@ builder.Services.AddScoped<IProvideService, ProvideService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<INewService, NewService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder
     .Services.AddControllers()
     .AddJsonOptions(options =>
