@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using ModernEstate.BLL.Services.AccountServices;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Entites;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,10 +14,12 @@ namespace ModernEstate.BLL.JWTServices
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JwtSettings _jwtSettings;
-        public JwtService(IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtOptions)
+        private readonly IAccountService _accountService;
+        public JwtService(IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtOptions, IAccountService accountService)
         {
             _httpContextAccessor = httpContextAccessor;
             _jwtSettings = jwtOptions.Value;
+            _accountService = accountService;
             // Ghi đè từ biến môi trường nếu tồn tại
             _jwtSettings.SecretKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? _jwtSettings.SecretKey;
             _jwtSettings.Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _jwtSettings.Issuer;
@@ -48,10 +51,8 @@ namespace ModernEstate.BLL.JWTServices
             }
             var key = Encoding.UTF8.GetBytes(secretKey);
             var claims = new List<Claim> {
-                new Claim("accountId", _account.Id.ToString()),
                 new Claim("email", _account.Email),
                 new Claim(ClaimTypes.Role, _account.Role.RoleName.ToString()),
-                // new Claim("role", _account.Role.ToString())
             };
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -86,6 +87,18 @@ namespace ModernEstate.BLL.JWTServices
             return GetUserClaims().FindFirst("tokenId")?.Value;
         }
 
+        public DateTime GetExpire(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token)) return default;
+
+            var jwtToken = handler.ReadJwtToken(token);
+            var exp = jwtToken.Payload.Exp;
+            return exp.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(exp.Value).UtcDateTime
+                : default;
+        }
+
         public int? ValidateToken(string token)
         {
             if (token == null)
@@ -116,6 +129,11 @@ namespace ModernEstate.BLL.JWTServices
             {
                 return null;
             }
+        }
+
+        public string RefeshToken(string email)
+        {
+            throw new NotImplementedException();
         }
     }
 }

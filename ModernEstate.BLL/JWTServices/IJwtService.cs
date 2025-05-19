@@ -10,5 +10,7 @@ namespace ModernEstate.BLL.JWTServices
         public string GetEmail();
         public string GetRole();
         public string GetTokenId();
+        DateTime GetExpire(string token);
+        public string RefeshToken(string email);
     }
 }
