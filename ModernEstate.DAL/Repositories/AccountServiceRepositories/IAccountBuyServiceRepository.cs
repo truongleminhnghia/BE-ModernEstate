@@ -6,7 +6,7 @@ using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.DAL.Repositories.AccountServiceRepositories
 {
-    public interface IAccountBuyServiceRepository
+    public interface IAccountBuyServiceRepository : IGenericRepository<AccountBuyService>
     {
         Task<AccountBuyService?> GetByIdAsync(Guid id);
         Task<IEnumerable<AccountBuyService>> GetAllAsync();
@@ -18,4 +18,5 @@ namespace ModernEstate.DAL.Repositories.AccountServiceRepositories
         void Update(AccountBuyService entity);
         void Remove(AccountBuyService entity);
     }
+  
 }

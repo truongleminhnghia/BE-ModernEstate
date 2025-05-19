@@ -9,29 +9,45 @@ using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.DAL.Repositories.AccountServiceRepositories
 {
-    public class AccountBuyServiceRepository : IAccountBuyServiceRepository
+    public class AccountBuyServiceRepository : GenericRepository<AccountBuyService>, IAccountBuyServiceRepository
     {
-        private readonly ApplicationDbConext _context;
-        private readonly DbSet<AccountBuyService> _dbSet;
+        public AccountBuyServiceRepository(ApplicationDbConext context) : base(context) { }
 
-        public AccountBuyServiceRepository(ApplicationDbConext context)
+        public async Task<AccountBuyService?> GetByIdAsync(Guid id)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _dbSet = _context.Set<AccountBuyService>();
+            return await _context.AccountBuyServices.FindAsync(id);
         }
 
-        public async Task<AccountBuyService?> GetByIdAsync(Guid id) => await _dbSet.FindAsync(id);
-
-        public async Task<IEnumerable<AccountBuyService>> GetAllAsync() => await _dbSet.ToListAsync();
+        public async Task<IEnumerable<AccountBuyService>> GetAllAsync()
+        {
+            return await _context.AccountBuyServices.ToListAsync();
+        }
 
         public async Task<IEnumerable<AccountBuyService>> FindAsync(
             Expression<Func<AccountBuyService, bool>> predicate
-        ) => await _dbSet.Where(predicate).ToListAsync();
+        )
+        {
+            return await _context.AccountBuyServices.Where(predicate).ToListAsync();
+        }
 
-        public async Task AddAsync(AccountBuyService entity) => await _dbSet.AddAsync(entity);
+        public async Task AddAsync(AccountBuyService entity)
+        {
+            await _context.AccountBuyServices.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
 
-        public void Update(AccountBuyService entity) => _dbSet.Update(entity);
+        public void Update(AccountBuyService entity)
+        {
+            _context.AccountBuyServices.Update(entity);
+            _context.SaveChanges();
+        }
 
-        public void Remove(AccountBuyService entity) => _dbSet.Remove(entity);
+        public void Remove(AccountBuyService entity)
+        {
+            _context.AccountBuyServices.Remove(entity);
+            _context.SaveChanges();
+        }
+
     }
+
 }
