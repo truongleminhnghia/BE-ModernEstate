@@ -1,0 +1,122 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using ModernEstate.BLL.Services.PackageServices;
+using ModernEstate.Common.Models.ApiResponse;
+using ModernEstate.Common.Models.Requests;
+
+namespace BE_ModernEstate.WebAPI.Controllers
+{
+    [ApiController]
+    [Route("api/v1/packages")]
+    public class PackageController : ControllerBase
+    {
+        private readonly IPackageService _packageService;
+        private readonly ILogger<PackageController> _logger;
+
+        public PackageController(IPackageService packageService, ILogger<PackageController> logger)
+        {
+            _packageService = packageService;
+            _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var packages = await _packageService.GetAllAsync();
+            return Ok(
+                new ApiResponse
+                {
+                    Code = StatusCodes.Status200OK,
+                    Success = true,
+                    Message = "Fetched packages successfully",
+                    Data = packages,
+                }
+            );
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var package = await _packageService.GetByIdAsync(id);
+            if (package == null)
+            {
+                _logger.LogWarning($"Package not found with id {id}");
+                return NotFound(
+                    new ApiResponse
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Success = false,
+                        Message = "Package not found",
+                        Data = null,
+                    }
+                );
+            }
+            return Ok(
+                new ApiResponse
+                {
+                    Code = StatusCodes.Status200OK,
+                    Success = true,
+                    Message = "Fetched package successfully",
+                    Data = package,
+                }
+            );
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] PackageRequest request)
+        {
+            var created = await _packageService.CreateAsync(request);
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = created.Id },
+                new ApiResponse
+                {
+                    Code = StatusCodes.Status201Created,
+                    Success = true,
+                    Message = "Package created successfully",
+                    Data = created,
+                }
+            );
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] PackageRequest request)
+        {
+            var success = await _packageService.UpdateAsync(id, request);
+            if (!success)
+            {
+                _logger.LogWarning($"Failed to update package with id {id} - not found");
+                return NotFound(
+                    new ApiResponse
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Success = false,
+                        Message = "Package not found",
+                        Data = null,
+                    }
+                );
+            }
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var success = await _packageService.DeleteAsync(id);
+            if (!success)
+            {
+                _logger.LogWarning($"Failed to delete package with id {id} - not found");
+                return NotFound(
+                    new ApiResponse
+                    {
+                        Code = StatusCodes.Status404NotFound,
+                        Success = false,
+                        Message = "Package not found",
+                        Data = null,
+                    }
+                );
+            }
+            return NoContent();
+        }
+    }
+}

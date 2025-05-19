@@ -1,10 +1,14 @@
-﻿
+﻿using System.Text.Json.Serialization;
 using BE_ModernEstate.WebAPI.Configurations;
 using Microsoft.EntityFrameworkCore;
+using ModernEstate.BLL.Services.AddressServices;
+using ModernEstate.BLL.Services.PackageServices;
+using ModernEstate.BLL.Services.ProjectServices;
+using ModernEstate.BLL.Services.ProvideServices;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
+using ModernEstate.DAL.Entites;
 using ShoppEcommerce_WebApp.WebAPI.Middlewares;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +17,11 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.WebHost.UseUrls("https://localhost:8080");
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 // var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
 
 // var connectionString =
@@ -34,7 +40,8 @@ var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? database;
 var dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? user;
 var dbPass = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? password;
 
-var connectionString = $"Server={dbHost};Port={dbPort};Database={dbName};User Id={dbUser};Password={dbPass};SslMode=Required;";
+var connectionString =
+    $"Server={dbHost};Port={dbPort};Database={dbName};User Id={dbUser};Password={dbPass};SslMode=Required;";
 
 builder.Services.AddDbContext<ApplicationDbConext>(options =>
 {
@@ -50,8 +57,7 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
     );
 });
 
-builder.Services.Configure<JwtSettings>(
-    builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddHttpContextAccessor();
 
@@ -61,6 +67,10 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddProjectDependencies();
 builder.Services.AddSwaggerDependencies();
 builder.Services.AddAutoMapperConfiguration();
+builder.Services.AddScoped<IPackageService, PackageService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IProvideService, ProvideService>();
 
 builder
     .Services.AddControllers()
@@ -69,7 +79,6 @@ builder
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-
 
 var app = builder.Build();
 
@@ -80,9 +89,11 @@ app.UseMiddleware<ExceptionMiddleware>();
 // {
 app.UseSwagger();
 app.UseSwaggerUI();
+
 // }
 
 app.UseHttpsRedirection();
+
 // Authentication & Authorization
 app.UseMiddleware<JwtMiddleware>();
 app.UseAuthentication();

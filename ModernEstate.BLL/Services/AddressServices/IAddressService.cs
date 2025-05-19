@@ -1,9 +1,14 @@
-
+using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Responses;
 
 namespace ModernEstate.BLL.Services.AddressServices
 {
-    public class IAddressService
+    public interface IAddressService
     {
-
+        Task<IEnumerable<AddressResponse>> GetAllAsync();
+        Task<AddressResponse?> GetByIdAsync(Guid id);
+        Task<AddressResponse> CreateAsync(AddressRequest request);
+        Task<bool> UpdateAsync(Guid id, AddressRequest request);
+        Task<bool> DeleteAsync(Guid id);
     }
 }
