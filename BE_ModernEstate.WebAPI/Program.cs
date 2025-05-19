@@ -5,6 +5,7 @@ using ModernEstate.BLL.Services.AddressServices;
 using ModernEstate.BLL.Services.PackageServices;
 using ModernEstate.BLL.Services.ProjectServices;
 using ModernEstate.BLL.Services.ProvideServices;
+using ModernEstate.BLL.Services.ServiceServices;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
@@ -71,7 +72,7 @@ builder.Services.AddScoped<IPackageService, PackageService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IProvideService, ProvideService>();
-
+builder.Services.AddScoped<IServiceService, ServiceService>();
 builder
     .Services.AddControllers()
     .AddJsonOptions(options =>
