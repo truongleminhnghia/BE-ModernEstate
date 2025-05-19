@@ -51,6 +51,7 @@ namespace ModernEstate.BLL.JWTServices
             }
             var key = Encoding.UTF8.GetBytes(secretKey);
             var claims = new List<Claim> {
+                new Claim("accountId", _account.Id.ToString()),
                 new Claim("email", _account.Email),
                 new Claim(ClaimTypes.Role, _account.Role.RoleName.ToString()),
             };
