@@ -3,6 +3,7 @@ using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.Common.Models.AuthenticateResponse;
 using ModernEstate.DAL.Entites;
+using ModernEstate.Common.Enums;
 
 namespace ModernEstate.BLL.Mappers
 {
@@ -14,6 +15,7 @@ namespace ModernEstate.BLL.Mappers
             CreateMap<RegisterRequest, Account>();
             CreateMap<Account, AccountResponse>();
             CreateMap<Account, AccountCurrent>();
+            
         }
     }
 }

@@ -17,7 +17,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
                     TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact
                     {
-                        Name = "NghiaTLM - Trương Lê Minh Nghĩa",
+                        Name = "Nghĩa ngu",
                         Email = "adronghia@gmail.com"
                     },
                     License = new OpenApiLicense

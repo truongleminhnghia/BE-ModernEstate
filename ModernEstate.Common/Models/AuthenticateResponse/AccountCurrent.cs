@@ -1,4 +1,5 @@
 ﻿using ModernEstate.Common.Enums;
+using ModernEstate.Common.Models.Responses;
 
 namespace ModernEstate.Common.Models.AuthenticateResponse
 {
@@ -10,7 +11,7 @@ namespace ModernEstate.Common.Models.AuthenticateResponse
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public string? Avatar { get; set; }
-        public EnumRoleName? Role { get; set; }
+        public RoleResponse? Role { get; set; }
         public EnumAccountStatus? EnumAccountStatus { get; set; }
     }
 }
