@@ -7,4 +7,6 @@ namespace ModernEstate.DAL.Repositories.AddressRepositories
     public interface IAddressRepository : IGenericRepository<Address>
     {
     }
+
+
 }

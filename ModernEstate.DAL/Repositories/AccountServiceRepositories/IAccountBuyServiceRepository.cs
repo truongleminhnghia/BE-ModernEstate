@@ -10,4 +10,5 @@ namespace ModernEstate.DAL.Repositories.AccountServiceRepositories
     public interface IAccountBuyServiceRepository : IGenericRepository<AccountBuyService>
     {
     }
+  
 }
