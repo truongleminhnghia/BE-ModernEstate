@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ModernEstate.DAL.Entites
 {
     [Table("employee")]
-    [Index(nameof(Code), Name = "IX_Employee_Code")]
+    [Index(nameof(Code), Name = "IX_Employee_Code", IsUnique = true)]
     [Index(nameof(AccountId), Name = "IX_Employee_AccountId")]
     public class Employee
     {

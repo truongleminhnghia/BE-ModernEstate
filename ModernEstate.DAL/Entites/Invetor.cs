@@ -8,7 +8,7 @@ using ModernEstate.Common.Enums;
 namespace ModernEstate.DAL.Entites
 {
     [Table("invetor")]
-    [Index(nameof(Code), Name = "IX_Invetor_Code")]
+    [Index(nameof(Code), Name = "IX_Invetor_Code", IsUnique = true)]
     [Index(nameof(Id), Name = "IX_Invetor_Id")]
     [Index(nameof(CompanyName), Name = "IX_Invetor_CompanyName")]
     [Index(nameof(TaxCode), Name = "IX_Invetor_TaxCode")]

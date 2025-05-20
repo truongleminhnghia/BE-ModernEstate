@@ -104,7 +104,7 @@ namespace ModernEstate.BLL.JWTServices
         {
             if (token == null)
                 return null;
-            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+            var secretKey = _jwtSettings.SecretKey;
             if (string.IsNullOrEmpty(secretKey))
             {
                 throw new InvalidOperationException("JWT environment variables are not set properly.");

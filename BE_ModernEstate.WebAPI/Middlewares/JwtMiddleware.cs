@@ -1,21 +1,34 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using ModernEstate.Common.Models.Settings;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace ShoppEcommerce_WebApp.WebAPI.Middlewares
+namespace BE_ModernEstate.WebAPI.WebAPI.Middlewares
 {
     public class JwtMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly IConfiguration _configuration;
         private readonly ILogger<JwtMiddleware> _logger;
+        private readonly JwtSettings _jwtSettings;
 
-        public JwtMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<JwtMiddleware> logger)
+        public JwtMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<JwtMiddleware> logger, IOptions<JwtSettings> jwtOptions)
         {
             _next = next;
             _configuration = configuration;
             _logger = logger;
+            _jwtSettings = jwtOptions.Value;
+            _jwtSettings.SecretKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? _jwtSettings.SecretKey;
+            _jwtSettings.Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _jwtSettings.Issuer;
+            _jwtSettings.Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? _jwtSettings.Audience;
+
+            string? envExpires = Environment.GetEnvironmentVariable("JWT_EXPIRES_IN_MINUTES");
+            if (int.TryParse(envExpires, out int expiresInMinutes))
+            {
+                _jwtSettings.ExpiresInMinutes = expiresInMinutes;
+            }
         }
 
         public async Task Invoke(HttpContext context)
@@ -65,7 +78,10 @@ namespace ShoppEcommerce_WebApp.WebAPI.Middlewares
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
+                var secretKey = _jwtSettings.SecretKey;
+                var key = Encoding.UTF8.GetBytes(secretKey);
+                var issuer = _jwtSettings.Issuer;
+                var audience = _jwtSettings.Audience;
                 _logger.LogInformation("Attempting to validate JWT token");
 
                 var validationParameters = new TokenValidationParameters
@@ -74,9 +90,9 @@ namespace ShoppEcommerce_WebApp.WebAPI.Middlewares
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidIssuer = _configuration["Jwt:Issuer"],
+                    ValidIssuer = issuer,
                     ValidateAudience = false,
-                    ValidAudience = _configuration["Jwt:Audience"],
+                    ValidAudience = audience,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };

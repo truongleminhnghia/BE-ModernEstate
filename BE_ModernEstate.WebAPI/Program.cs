@@ -1,9 +1,12 @@
 ﻿
 using BE_ModernEstate.WebAPI.Configurations;
+using BE_ModernEstate.WebAPI.Middlewares;
+using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
-using ShoppEcommerce_WebApp.WebAPI.Middlewares;
+using ModernEstate.DAL.Entites;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -70,8 +73,38 @@ builder
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowExpoApp",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
+    db.Database.Migrate();
+
+    // Lấy tên enum (Admin, Manager, User)
+    foreach (string name in Enum.GetNames<EnumRoleName>())
+    {
+        EnumRoleName roleName = (EnumRoleName)Enum.Parse(typeof(EnumRoleName), name);
+        // Kiểm tra xem đã có RoleName = roleName chưa
+        if (!db.Roles.Any(r => r.RoleName == roleName))
+        {
+            db.Roles.Add(new Role
+            {
+                RoleName = roleName
+            });
+        }
+    }
+
+    db.SaveChanges();
+}
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -87,6 +120,8 @@ app.UseHttpsRedirection();
 app.UseMiddleware<JwtMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors("AllowExpoApp");
 
 app.MapControllers();
 

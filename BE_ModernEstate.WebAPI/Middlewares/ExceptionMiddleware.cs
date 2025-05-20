@@ -4,7 +4,7 @@ using ModernEstate.Common.Models.ApiResponse;
 using ShoppEcommerce_WebApp.WebAPI.Extensions;
 using System.Text.Json;
 
-namespace ShoppEcommerce_WebApp.WebAPI.Middlewares
+namespace BE_ModernEstate.WebAPI.Middlewares
 {
     public class ExceptionMiddleware
     {
