@@ -8,6 +8,6 @@ namespace ModernEstate.Common.Enums
         ROLE_STAFF,
         ROLE_CUSTOMER,
         ROLE_BROKER,
-        ROLE_OWNER
+        ROLE_PROPERTY_OWNER
     }
 }
