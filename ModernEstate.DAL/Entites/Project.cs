@@ -63,13 +63,13 @@ namespace ModernEstate.DAL.Entites
         [Description("Navigation property for the associated address")]
         public Address? Address { get; set; }
 
-        [Column("provide_id")]
+        [Column("invetor_id")]
         [Required]
-        public Guid ProvideId { get; set; }
+        public Guid InvetorId { get; set; }
 
-        [ForeignKey(nameof(ProvideId))]
-        [Description("Navigation property for the associated provider")]
-        public Provide? Provide { get; set; }
+        [ForeignKey(nameof(InvetorId))]
+        [Description("Navigation property for the associated Invetor")]
+        public Invetor? Invetor { get; set; }
 
         public virtual ICollection<Property>? Properties { get; set; }
         public virtual ICollection<History>? Histories { get; set; }

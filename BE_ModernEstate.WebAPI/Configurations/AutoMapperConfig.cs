@@ -9,6 +9,10 @@ namespace BE_ModernEstate.WebAPI.Configurations
         {
             services.AddAutoMapper(typeof(AccountMapper));
             services.AddAutoMapper(typeof(RoleMapper));
+            services.AddAutoMapper(typeof(AddressMapper));
+            services.AddAutoMapper(typeof(InvetorMapper));
+            services.AddAutoMapper(typeof(ProjectMapper));
+            services.AddAutoMapper(typeof(ProvideMapper));
             return services;
         }
     }
