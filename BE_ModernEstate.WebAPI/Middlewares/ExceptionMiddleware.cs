@@ -71,6 +71,7 @@ namespace BE_ModernEstate.WebAPI.Middlewares
         {
             _logger.LogError(ex, "An application exception occurred: {ErrorCode}", ex.ErrorCode);
             context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)ex.ErrorCode.GetStatusCode();
             var response = new ApiResponse
             {
                 Code = (int)ex.ErrorCode.GetStatusCode(),
