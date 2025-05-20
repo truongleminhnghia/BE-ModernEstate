@@ -39,10 +39,12 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 var token = _jwtService.GenerateJwtToken(account);
                 if (string.IsNullOrEmpty(token)) throw new AppException(ErrorCode.TOKEN_NOT_NULL);
                 var currentAccount = _mapper.Map<AccountCurrent>(account);
+                var expiredAt = _jwtService.GetExpire(token);
                 var authenticateResponse = new AuthenticateResponse
                 {
                     Token = token,
-                    AccountCurrent = currentAccount
+                    AccountCurrent = currentAccount,
+                    ExpiredAt = expiredAt
                 };
                 return authenticateResponse;
             }
