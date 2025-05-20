@@ -7,7 +7,7 @@ namespace ModernEstate.DAL.Entites
 {
     [Table("owner_property")]
     [Index(nameof(AccountId), Name = "IX_OwnerProperty_AccountId")]
-    [Index(nameof(Code), Name = "IX_OwnerProperty_Code")]
+    [Index(nameof(Code), Name = "IX_OwnerProperty_Code", IsUnique = true)]
     [Index(nameof(Id), Name = "IX_OwnerProperty_Id")]
     public class OwnerProperty
     {
