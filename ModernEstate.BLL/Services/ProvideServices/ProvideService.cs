@@ -29,8 +29,8 @@ namespace ModernEstate.BLL.Services.ProvideServices
         {
             try
             {
-                var entities = await _unitOfWork.Provides.GetAllAsync();
-                return _mapper.Map<IEnumerable<ProvideResponse>>(entities);
+                var Provides = await _unitOfWork.Provides.GetAllAsync();
+                return _mapper.Map<IEnumerable<ProvideResponse>>(Provides);
             }
             catch (Exception ex)
             {
@@ -43,10 +43,10 @@ namespace ModernEstate.BLL.Services.ProvideServices
         {
             try
             {
-                var entity = await _unitOfWork.Provides.GetByIdAsync(id);
-                if (entity == null)
+                var Provides = await _unitOfWork.Provides.GetByIdAsync(id);
+                if (Provides == null)
                     return null;
-                return _mapper.Map<ProvideResponse>(entity);
+                return _mapper.Map<ProvideResponse>(Provides);
             }
             catch (Exception ex)
             {
@@ -59,13 +59,13 @@ namespace ModernEstate.BLL.Services.ProvideServices
         {
             try
             {
-                var entity = _mapper.Map<Provide>(request);
-                entity.Id = Guid.NewGuid();
+                var Provides = _mapper.Map<Provide>(request);
+                Provides.Id = Guid.NewGuid();
 
-                await _unitOfWork.Provides.CreateAsync(entity);
+                await _unitOfWork.Provides.CreateAsync(Provides);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
-                return _mapper.Map<ProvideResponse>(entity);
+                return _mapper.Map<ProvideResponse>(Provides);
             }
             catch (Exception ex)
             {
@@ -78,13 +78,13 @@ namespace ModernEstate.BLL.Services.ProvideServices
         {
             try
             {
-                var entity = await _unitOfWork.Provides.GetByIdAsync(id);
-                if (entity == null)
+                var Provides = await _unitOfWork.Provides.GetByIdAsync(id);
+                if (Provides == null)
                     return false;
 
-                _mapper.Map(request, entity);
+                _mapper.Map(request, Provides);
 
-                _unitOfWork.Provides.Update(entity);
+                _unitOfWork.Provides.Update(Provides);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
                 return true;
@@ -100,11 +100,11 @@ namespace ModernEstate.BLL.Services.ProvideServices
         {
             try
             {
-                var entity = await _unitOfWork.Provides.GetByIdAsync(id);
-                if (entity == null)
+                var Provides = await _unitOfWork.Provides.GetByIdAsync(id);
+                if (Provides == null)
                     return false;
 
-                _unitOfWork.Provides.Delete(entity);
+                _unitOfWork.Provides.Delete(Provides);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
                 return true;
