@@ -10,7 +10,7 @@ namespace ModernEstate.Common.Models.Responses
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public string? Avatar { get; set; }
-        public EnumRoleName? Role { get; set; }
+        public RoleResponse? Role { get; set; }
         public EnumAccountStatus? EnumAccountStatus { get; set; }
     }
 }

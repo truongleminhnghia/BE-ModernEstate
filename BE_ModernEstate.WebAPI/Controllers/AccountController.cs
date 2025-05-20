@@ -1,5 +1,8 @@
 ﻿
+using System.ComponentModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModernEstate.BLL.JWTServices;
 using ModernEstate.BLL.Services.AccountServices;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.ApiResponse;
@@ -13,18 +16,20 @@ namespace BE_ModernEstate.WebAPI.Controllers
     {
         private readonly IAccountService _accountService;
         private readonly ILogger<AccountController> _logger;
+        private readonly IJwtService _jwtService;
 
-        public AccountController(IAccountService accountService, ILogger<AccountController> logger)
+        public AccountController(IAccountService accountService, ILogger<AccountController> logger, IJwtService jwtService)
         {
             _accountService = accountService;
             _logger = logger;
+            _jwtService = jwtService;
         }
 
         [HttpPost]
-        // [Authorize(Roles = "ROLE_ADMIN, ROLE_STAFF, ROLE_MANAGER")]
+        [Authorize(Roles = "ROLE_ADMIN")]
         public async Task<IActionResult> CreateAccount([FromBody] AccountRequest request)
         {
-            var result = await _accountService.CreateAccount(request, true);
+            var result = await _accountService.CreateAccount(request);
             _logger.LogInformation($"Account created successfully for email: {request.Email}");
             if (!result)
             {
@@ -45,8 +50,8 @@ namespace BE_ModernEstate.WebAPI.Controllers
             });
         }
 
-        // GET: api/accounts/{id}
         [HttpGet("{id}")]
+        [Authorize(Roles = "ROLE_ADMIN, ROLE_STAFF")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var account = await _accountService.GetById(id);
@@ -69,46 +74,15 @@ namespace BE_ModernEstate.WebAPI.Controllers
             });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllAccounts()
+        [HttpGet()]
+        [Authorize(Roles = "ROLE_ADMIN, ROLE_STAFF")]
+        [Description("API FOR ADMIN AND STAFF")]
+        public async Task<IActionResult> GetWithParams([FromQuery] string? last_name, [FromQuery] string? first_name,
+                                                        [FromQuery] EnumAccountStatus? status, [FromQuery] EnumRoleName? role,
+                                                        [FromQuery] EnumGender? gender, [FromQuery] string? email,
+                                                        [FromQuery] int page_current = 1, [FromQuery] int page_size = 10)
         {
-            var accounts = await _accountService.GetAllAccounts();
-            if (accounts == null || !accounts.Any())
-            {
-                return NotFound(new ApiResponse
-                {
-                    Code = StatusCodes.Status404NotFound,
-                    Success = false,
-                    Message = "No accounts found",
-                    Data = null
-                });
-            }
-            return Ok(new ApiResponse
-            {
-                Code = StatusCodes.Status200OK,
-                Success = true,
-                Message = "Accounts retrieved successfully",
-                Data = accounts
-            });
-        }
-
-        [HttpGet("paging")]
-        public async Task<IActionResult> GetPagedAccounts([FromQuery] int page_current = 1, [FromQuery] int page_size = 10)
-        {
-            var result = await _accountService.GetAllByPaging(page_current, page_size);
-            return Ok(new ApiResponse
-            {
-                Code = StatusCodes.Status200OK,
-                Success = true,
-                Message = "Accounts retrieved successfully",
-                Data = result
-            });
-        }
-
-        [HttpGet("get-with-params")]
-        public async Task<IActionResult> GetWithParams([FromQuery] string? last_name, [FromQuery] string? first_name, [FromQuery] EnumAccountStatus? status, [FromQuery] EnumRoleName? role, [FromQuery] int page_current = 1, [FromQuery] int page_size = 10)
-        {
-            var result = await _accountService.GetWithParams(last_name, first_name, status, role, page_current, page_size);
+            var result = await _accountService.GetWithParams(last_name, first_name, status, role, gender, email, page_current, page_size);
             return Ok(new ApiResponse
             {
                 Code = StatusCodes.Status200OK,
@@ -119,56 +93,33 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAccount(Guid id, [FromBody] UpdateAccountRequest request, [FromQuery] string? changeStatus)
+        public async Task<IActionResult> UpdateAccount(Guid id, [FromBody] UpdateAccountRequest request)
         {
-            if (changeStatus != null)
+            var result = await _accountService.UpdateAccount(request, id);
+            if (!result)
             {
-                bool updateStatus = await _accountService.UpdateAccountStatus(id, request.EnumAccountStatus.Value, true);
-                if (!updateStatus)
+                return NotFound(new ApiResponse
                 {
-                    return NotFound(new ApiResponse
-                    {
-                        Code = StatusCodes.Status400BadRequest,
-                        Success = false,
-                        Message = "Account not found",
-                        Data = null
-                    });
-                }
-                return Ok(new ApiResponse
-                {
-                    Code = StatusCodes.Status200OK,
-                    Success = true,
-                    Message = "Account status updated successfully",
-                    Data = updateStatus
+                    Code = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = "Account not found",
+                    Data = null
                 });
             }
-            else
+            return Ok(new ApiResponse
             {
-                var result = await _accountService.UpdateAccount(request, id, false);
-                if (!result)
-                {
-                    return NotFound(new ApiResponse
-                    {
-                        Code = StatusCodes.Status400BadRequest,
-                        Success = false,
-                        Message = "Account not found",
-                        Data = null
-                    });
-                }
-                return Ok(new ApiResponse
-                {
-                    Code = StatusCodes.Status200OK,
-                    Success = true,
-                    Message = "Account updated successfully",
-                    Data = result
-                });
-            }
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Account updated successfully",
+                Data = result
+            });
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ROLE_ADMIN")]
         public async Task<IActionResult> DeleteAccount(Guid id)
         {
-            var result = await _accountService.DeleteAccount(id);
+            var result = await _accountService.UpdateAccountStatus(id);
             if (!result)
             {
                 return NotFound(new ApiResponse

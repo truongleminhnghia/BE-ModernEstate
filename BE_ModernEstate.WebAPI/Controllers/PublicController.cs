@@ -19,7 +19,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPost]
         public async Task<ApiResponse> Register([FromBody] AccountRequest request)
         {
-            var result = await _accountService.CreateAccount(request, false);
+            var result = await _accountService.CreateAccount(request);
 
             if (result)
             {

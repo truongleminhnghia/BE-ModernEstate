@@ -14,12 +14,10 @@ namespace ModernEstate.BLL.JWTServices
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JwtSettings _jwtSettings;
-        private readonly IAccountService _accountService;
-        public JwtService(IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtOptions, IAccountService accountService)
+        public JwtService(IHttpContextAccessor httpContextAccessor, IOptions<JwtSettings> jwtOptions)
         {
             _httpContextAccessor = httpContextAccessor;
             _jwtSettings = jwtOptions.Value;
-            _accountService = accountService;
             // Ghi đè từ biến môi trường nếu tồn tại
             _jwtSettings.SecretKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? _jwtSettings.SecretKey;
             _jwtSettings.Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _jwtSettings.Issuer;
@@ -80,13 +78,9 @@ namespace ModernEstate.BLL.JWTServices
 
         public string GetRole()
         {
-            return GetUserClaims().FindFirst("roleName")?.Value;
+            return GetUserClaims().FindFirst(ClaimTypes.Role)?.Value;
         }
 
-        public string GetTokenId()
-        {
-            return GetUserClaims().FindFirst("tokenId")?.Value;
-        }
 
         public DateTime GetExpire(string token)
         {
@@ -133,6 +127,11 @@ namespace ModernEstate.BLL.JWTServices
         }
 
         public string RefeshToken(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetTokenId()
         {
             throw new NotImplementedException();
         }

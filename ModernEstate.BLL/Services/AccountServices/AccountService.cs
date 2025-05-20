@@ -8,6 +8,8 @@ using ModernEstate.DAL;
 using ModernEstate.BLL.HashPasswords;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.Pages;
+using ModernEstate.BLL.JWTServices;
+using ModernEstate.Common.srcs;
 
 namespace ModernEstate.BLL.Services.AccountServices
 {
@@ -17,12 +19,17 @@ namespace ModernEstate.BLL.Services.AccountServices
         private readonly IMapper _mapper;
         private readonly ILogger<AccountService> _logger;
         private readonly IPasswordHasher _passwordHasher;
-        public AccountService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<AccountService> logger, IPasswordHasher passwordHasher)
+        private readonly IJwtService _jwtService;
+        private readonly Utils _utils;
+        public AccountService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<AccountService> logger,
+        IPasswordHasher passwordHasher, IJwtService jwtService, Utils utils)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _passwordHasher = passwordHasher;
+            _jwtService = jwtService;
+            _utils = utils;
         }
 
         public string GenerateRandomNumber()
@@ -32,15 +39,15 @@ namespace ModernEstate.BLL.Services.AccountServices
             return randomNumber;
         }
 
-
-        public async Task<bool> CreateAccount(AccountRequest req, bool isAdmin)
+        public async Task<bool> CreateAccount(AccountRequest req)
         {
             try
             {
+                bool checkRole = string.Equals(_jwtService.GetRole(), EnumRoleName.ROLE_ADMIN.ToString(), StringComparison.OrdinalIgnoreCase);
+                if (!checkRole) throw new AppException(ErrorCode.UNAUTHORIZED);
                 var existingAccount = await _unitOfWork.Accounts.GetByEmail(req.Email);
                 if (existingAccount != null) throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
                 var account = _mapper.Map<Account>(req);
-                // account.Role = isAdmin ? req.Role : EnumRoleName.ROLE_CUSTOMER;
                 Role? role = await _unitOfWork.Roles.GetByName(req.RoleName);
                 if (role == null) throw new AppException(ErrorCode.NOT_FOUND);
                 account.Role = role;
@@ -50,18 +57,7 @@ namespace ModernEstate.BLL.Services.AccountServices
                 account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
                 account.Password = _passwordHasher.HashPassword(req.Password);
                 await _unitOfWork.Accounts.CreateAsync(account);
-                // if (req.RoleName != EnumRoleName.ROLE_CUSTOMER)
-                // {
-                //     Employee employee = new Employee()
-                //     {
-                //         RefCode = GenerateRandomNumber(),
-                //         // StoreId = req.StoreId.Value,
-                //     };
-                //     await _unitOfWork.Employees.CreateAsync(employee);
-                //     await _unitOfWork.SaveChangesWithTransactionAsync();
-                //     account.EmployeeId = employee.Id;
-                //     account.Employee = employee;
-                // }
+                await setUpdateByRole(account.Role.RoleName, account.Id);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 return true;
             }
@@ -77,13 +73,49 @@ namespace ModernEstate.BLL.Services.AccountServices
             }
         }
 
-        public async Task<bool> DeleteAccount(Guid id)
+        private async Task setUpdateByRole(EnumRoleName roleName, Guid accountId)
+        {
+            switch (roleName)
+            {
+                case EnumRoleName.ROLE_STAFF:
+                case EnumRoleName.ROLE_ADMIN:
+                    Employee employee = new Employee
+                    {
+                        Code = await _utils.GenerateUniqueBrokerCodeAsync("EMP"),
+                        AccountId = accountId
+                    };
+                    await _unitOfWork.Employees.CreateAsync(employee);
+                    break;
+                case EnumRoleName.ROLE_BROKER:
+                    Broker broker = new Broker
+                    {
+                        Code = await _utils.GenerateUniqueBrokerCodeAsync("BRK"),
+                        AccountId = accountId
+                    };
+                    await _unitOfWork.Brokers.CreateAsync(broker);
+                    break;
+                case EnumRoleName.ROLE_PROPERTY_OWNER:
+                    OwnerProperty owner = new OwnerProperty
+                    {
+                        Code = await _utils.GenerateUniqueBrokerCodeAsync("OWR"),
+                        AccountId = accountId
+                    };
+                    await _unitOfWork.OwnerProperties.CreateAsync(owner);
+                    break;
+                default:
+                    throw new AppException(ErrorCode.NOT_FOUND, "Role không hợp lệ");
+            }
+        }
+
+        public async Task<bool> UpdateAccountStatus(Guid id)
         {
             try
             {
                 var account = await _unitOfWork.Accounts.GetByIdAsync(id);
                 if (account == null) throw new AppException(ErrorCode.USER_NOT_FOUND);
-                await _unitOfWork.Accounts.DeleteAsync(account);
+                if (account.EnumAccountStatus == EnumAccountStatus.IN_ACTIVE) throw new AppException(ErrorCode.HAS_INACTIVE);
+                account.EnumAccountStatus = EnumAccountStatus.IN_ACTIVE;
+                await _unitOfWork.Accounts.UpdateAccount(account);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 _logger.LogInformation("Delete account successfully with id {Id}", id);
                 return true;
@@ -100,57 +132,20 @@ namespace ModernEstate.BLL.Services.AccountServices
             }
         }
 
-        public async Task<IEnumerable<AccountResponse>> GetAllAccounts()
-        {
-            try
-            {
-                var accounts = await _unitOfWork.Accounts.FindAll();
-                if (accounts == null) throw new AppException(ErrorCode.LIST_EMPTY);
-                IEnumerable<AccountResponse> accountResponses = _mapper.Map<IEnumerable<AccountResponse>>(accounts);
-                return accountResponses;
-            }
-            catch (AppException ex)
-            {
-                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
-                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        public async Task<PageResult<AccountResponse>> GetAllByPaging(int pageCurrent, int pageSize)
-        {
-            try
-            {
-                var result = await _unitOfWork.Accounts.FindAll();
-                if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
-                var pagedResult = result.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
-                var total = result.Count();
-                var data = _mapper.Map<List<AccountResponse>>(pagedResult);
-                if (data == null || !data.Any()) throw new AppException(ErrorCode.LIST_EMPTY);
-                var pageResult = new PageResult<AccountResponse>(data, pageSize, pageCurrent, total);
-                return pageResult;
-            }
-            catch (AppException ex)
-            {
-                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
-                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-            }
-        }
 
         public async Task<AccountResponse> GetById(Guid id)
         {
             try
             {
-                var account = await _unitOfWork.Accounts.GetByIdAsync(id);
+                var validRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    EnumRoleName.ROLE_ADMIN.ToString(),
+                    EnumRoleName.ROLE_STAFF.ToString()
+                };
+                bool checkRole = validRoles.Contains(_jwtService.GetRole());
+                bool checkId = _jwtService.GetAccountId() == id.ToString() ? true : false;
+                if (!checkRole && !checkId) throw new AppException(ErrorCode.UNAUTHORIZED);
+                var account = await _unitOfWork.Accounts.FindById(id);
                 if (account == null) throw new AppException(ErrorCode.USER_NOT_FOUND);
                 var accountResponse = _mapper.Map<AccountResponse>(account);
                 return accountResponse;
@@ -167,11 +162,11 @@ namespace ModernEstate.BLL.Services.AccountServices
             }
         }
 
-        public async Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, int pageCurrent, int pageSize)
+        public async Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email, int pageCurrent, int pageSize)
         {
             try
             {
-                var result = await _unitOfWork.Accounts.FindWithParams(lastName, firstName, status, role);
+                var result = await _unitOfWork.Accounts.FindWithParams(lastName, firstName, status, role, gender, email);
                 if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
                 var pagedResult = result.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
                 var total = result.Count();
@@ -192,7 +187,7 @@ namespace ModernEstate.BLL.Services.AccountServices
             }
         }
 
-        public async Task<bool> UpdateAccount(UpdateAccountRequest req, Guid id, bool isAdmin)
+        public async Task<bool> UpdateAccount(UpdateAccountRequest req, Guid id)
         {
             try
             {
@@ -219,31 +214,5 @@ namespace ModernEstate.BLL.Services.AccountServices
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
-
-        public async Task<bool> UpdateAccountStatus(Guid id, EnumAccountStatus status, bool isAdmin)
-        {
-            try
-            {
-                if (!isAdmin) throw new AppException(ErrorCode.UNAUTHORIZED);
-                var account = await _unitOfWork.Accounts.GetByIdAsync(id);
-                if (account == null) throw new AppException(ErrorCode.USER_NOT_FOUND);
-                account.EnumAccountStatus = status;
-                _unitOfWork.Accounts.Update(account);
-                await _unitOfWork.SaveChangesWithTransactionAsync();
-                return true;
-            }
-            catch (AppException ex)
-            {
-                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
-                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-
     }
 }
