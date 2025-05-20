@@ -1,9 +1,10 @@
 ﻿
 using BE_ModernEstate.WebAPI.Configurations;
+using BE_ModernEstate.WebAPI.Middlewares;
+using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
-using ShoppEcommerce_WebApp.WebAPI.Middlewares;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
