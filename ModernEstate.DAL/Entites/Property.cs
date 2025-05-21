@@ -2,11 +2,13 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("property")]
+    [Index(nameof(Code), IsUnique = true)]
     public class Property : BaseEntity
     {
         [Key]
