@@ -33,6 +33,17 @@ namespace ModernEstate.DAL.Repositories.PropertyRepositories
                                         .FirstOrDefaultAsync(p => p.Id.Equals(id));
         }
 
+        public async Task<Property?> FindByTitle(string title)
+        {
+            return await _context.Properties.Include(p => p.Address)
+                                        .Include(p => p.Owner)
+                                        .Include(p => p.PropertyImages)
+                                        .Include(p => p.Histories)
+                                        .Include(p => p.Posts)
+                                        .Include(p => p.Favorites)
+                                        .FirstOrDefaultAsync(p => p.Title.Equals(title));
+        }
+
         public async Task<IEnumerable<Property>> FindProperties(string? title, double? minPrice, double? maxPrice, EnumTypeProperty? typeProperty,
                                                                 float? minArea, float? maxArea, int? numberOfBedroom, int? numberOfBathroom,
                                                                 int? numberOfFloor, int? numberOfRoom, EnumStateProperty? state, EnumStatusProperty? status

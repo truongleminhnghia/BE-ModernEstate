@@ -7,8 +7,8 @@ namespace ModernEstate.Common.Models.Requests
     {
         public string? Title { get; set; }
         public string? Description { get; set; }
-        public decimal OriginalPrice { get; set; }
-        public decimal SalePrice { get; set; }
+        public double OriginalPrice { get; set; }
+        public double SalePrice { get; set; }
         public string? PriceText { get; set; }
         public EnumTypeProperty TypeProperty { get; set; }
         public float PropertyArea { get; set; }

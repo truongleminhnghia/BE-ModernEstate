@@ -66,6 +66,45 @@ namespace ModernEstate.BLL.Services.AccountServices
             }
         }
 
+        public async Task<Guid> CreateAccountBrokerOrOwner(AccountRequest req)
+        {
+            try
+            {
+                var allowedRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    EnumRoleName.ROLE_BROKER.ToString(),
+                    EnumRoleName.ROLE_PROPERTY_OWNER.ToString()
+                };
+                bool checkRole = allowedRoles.Contains(_jwtService.GetRole());
+                if (!checkRole) throw new AppException(ErrorCode.UNAUTHORIZED);
+                var existingAccount = await _unitOfWork.Accounts.GetByEmail(req.Email);
+                if (existingAccount != null) throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+                var account = _mapper.Map<Account>(req);
+                Role? role = await _unitOfWork.Roles.GetByName(req.RoleName);
+                if (role == null) throw new AppException(ErrorCode.NOT_FOUND);
+                account.Role = role;
+                account.RoleId = role.Id;
+                account.CreatedAt = DateTime.UtcNow;
+                account.UpdatedAt = DateTime.UtcNow;
+                account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
+                account.Password = _passwordHasher.HashPassword(req.Password);
+                await _unitOfWork.Accounts.CreateAsync(account);
+                await setUpdateByRole(account.Role.RoleName, account.Id);
+                await _unitOfWork.SaveChangesWithTransactionAsync();
+                return account.OwnerProperty.Id;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
         private async Task setUpdateByRole(EnumRoleName roleName, Guid accountId)
         {
             switch (roleName)
@@ -195,6 +234,48 @@ namespace ModernEstate.BLL.Services.AccountServices
                 _unitOfWork.Accounts.Update(account);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<AccountResponse> GetByEmail(string email)
+        {
+            try
+            {
+                var account = await _unitOfWork.Accounts.GetByEmail(email);
+                if (account == null) throw new AppException(ErrorCode.USER_NOT_FOUND);
+                var accountResponse = _mapper.Map<AccountResponse>(account);
+                return accountResponse;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<AccountResponse> GetByPhone(string phone)
+        {
+            try
+            {
+                var account = await _unitOfWork.Accounts.FindByPhone(phone);
+                if (account == null) throw new AppException(ErrorCode.USER_NOT_FOUND);
+                var accountResponse = _mapper.Map<AccountResponse>(account);
+                return accountResponse;
             }
             catch (AppException ex)
             {

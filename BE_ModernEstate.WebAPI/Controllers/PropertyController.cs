@@ -23,7 +23,24 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPost()]
         public async Task<IActionResult> CreateProperty([FromBody] PropertyRequest request)
         {
-            return Ok();
+            var result = await _propertyService.Save(request);
+            if (!result)
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = "Property creation failed",
+                    Data = null
+                });
+            }
+            return Ok(new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Property created successfully",
+                Data = result
+            });
         }
 
         [HttpGet("{id}")]
