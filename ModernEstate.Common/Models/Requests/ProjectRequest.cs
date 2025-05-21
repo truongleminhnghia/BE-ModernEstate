@@ -14,5 +14,6 @@ namespace ModernEstate.Common.Models.Requests
         public EnumProjectStatus Status { get; set; }
         public AddressRequest? AddressRequest { get; set; }
         public InvetorRequest? InvetorRequest { get; set; }
+        public List<ImageRequest>? ImageRequests { get; set; }
     }
 }

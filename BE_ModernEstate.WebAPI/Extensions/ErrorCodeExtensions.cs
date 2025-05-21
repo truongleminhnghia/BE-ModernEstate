@@ -28,6 +28,7 @@ namespace ShoppEcommerce_WebApp.WebAPI.Extensions
             { ErrorCode.INVALID_ACCOUNT_ROLE, new(HttpStatusCode.BadRequest, "Invalid account role.") },
             {ErrorCode.HAS_INACTIVE, new (HttpStatusCode.BadRequest, "Status inactive")},
             {ErrorCode.HAS_EXISTED, new (HttpStatusCode.BadRequest, "Has existed")},
+            {ErrorCode.NOT_NULL, new (HttpStatusCode.BadRequest, "Must be not null")},
 
         };
 

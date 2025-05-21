@@ -29,7 +29,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         {
             var result = await _invetorService.CreateInventor(request);
             _logger.LogInformation($"Inventor created successfully for email: {request.Name}");
-            if (!result)
+            if (result == null)
             {
                 return BadRequest(new ApiResponse
                 {

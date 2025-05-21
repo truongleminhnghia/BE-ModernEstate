@@ -51,7 +51,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "ROLE_ADMIN, ROLE_STAFF")]
+        // [Authorize(Roles = "ROLE_ADMIN, ROLE_STAFF")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var account = await _accountService.GetById(id);

@@ -22,6 +22,7 @@ namespace ModernEstate.Common.Exceptions
         NOT_FOUND,
         INVALID_ACCOUNT_ROLE,
         HAS_INACTIVE,
-        HAS_EXISTED
+        HAS_EXISTED,
+        NOT_NULL
     }
 }

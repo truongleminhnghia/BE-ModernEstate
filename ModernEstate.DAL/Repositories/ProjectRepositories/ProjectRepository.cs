@@ -18,6 +18,16 @@ namespace ModernEstate.DAL.Repositories.ProjectRepositories
                                     .FirstOrDefaultAsync(p => p.Id.Equals(id));
         }
 
+        public Task<Project?> FindByTitle(string title)
+        {
+            return _context.Projects.Include(p => p.Address)
+                                    .Include(p => p.Invetor)
+                                    .Include(p => p.Properties)
+                                    .Include(p => p.Histories)
+                                    .Include(p => p.Images)
+                                    .FirstOrDefaultAsync(p => p.Title.Equals(title));
+        }
+
         public async Task<IEnumerable<Project>> FindProjects(
                                                 EnumProjectType? projectType,
                                                 string? title,
@@ -28,7 +38,10 @@ namespace ModernEstate.DAL.Repositories.ProjectRepositories
         {
             IQueryable<Project> query = _context.Projects
                 .Include(p => p.Address)
-                .Include(p => p.Invetor);
+                .Include(p => p.Invetor)
+                .Include(p => p.Properties)
+                .Include(p => p.Histories)
+                .Include(p => p.Images);
 
             if (projectType.HasValue)
                 query = query.Where(p => p.TypeProject == projectType.Value);

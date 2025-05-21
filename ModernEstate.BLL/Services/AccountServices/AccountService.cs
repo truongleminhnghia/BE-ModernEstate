@@ -32,13 +32,6 @@ namespace ModernEstate.BLL.Services.AccountServices
             _utils = utils;
         }
 
-        public string GenerateRandomNumber()
-        {
-            Random random = new Random();
-            string randomNumber = random.Next(10000000, 99999999).ToString(); // Tạo 1 số ngẫu nhiên từ 10000000 đến 99999999
-            return randomNumber;
-        }
-
         public async Task<bool> CreateAccount(AccountRequest req)
         {
             try

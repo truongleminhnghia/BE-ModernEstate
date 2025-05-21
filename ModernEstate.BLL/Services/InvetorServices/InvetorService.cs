@@ -27,7 +27,7 @@ namespace ModernEstate.BLL.Services.InvetorServices
             _utils = utils;
         }
 
-        public async Task<bool> CreateInventor(InvetorRequest req)
+        public async Task<Invetor> CreateInventor(InvetorRequest req)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ModernEstate.BLL.Services.InvetorServices
                 invetor.UpdatedAt = DateTime.UtcNow;
                 await _unitOfWork.Invetors.CreateAsync(invetor);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
-                return true;
+                return invetor;
             }
             catch (AppException ex)
             {

@@ -13,6 +13,8 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddAutoMapper(typeof(InvetorMapper));
             services.AddAutoMapper(typeof(ProjectMapper));
             services.AddAutoMapper(typeof(ProvideMapper));
+            services.AddAutoMapper(typeof(ImageMapper));
+            services.AddAutoMapper(typeof(HistoryMapper));
             return services;
         }
     }
