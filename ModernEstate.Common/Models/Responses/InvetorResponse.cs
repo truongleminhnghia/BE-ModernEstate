@@ -1,8 +1,18 @@
 
+using ModernEstate.Common.Enums;
+
 namespace ModernEstate.Common.Models.Responses
 {
     public class InvetorResponse
     {
-
+        public Guid Id { get; set; }
+        public string? Name { get; set; }
+        public string? CompanyName { get; set; }
+        public string? TaxCode { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
+        public string? Avatar { get; set; }
+        public EnumInvetorType InvetorType { get; set; }
+        public virtual ICollection<ProjectResponse>? Projects { get; set; }
     }
 }

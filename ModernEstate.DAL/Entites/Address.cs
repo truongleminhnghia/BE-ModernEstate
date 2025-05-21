@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace ModernEstate.DAL.Entites

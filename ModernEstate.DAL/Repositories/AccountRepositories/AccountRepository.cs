@@ -56,7 +56,7 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
             {
                 query = query.Where(a => a.Gender == gender.Value);
             }
-            query = query.OrderByDescending(a => a.Id); // mặc định là giảm dần, tức là cái mới nhất sẽ ở trên cùng
+            query = query.OrderByDescending(a => a.CreatedAt); // mặc định là giảm dần, tức là cái mới nhất sẽ ở trên cùng
             // Thay đổi thứ tự sắp xếp nếu cần thiết
             return await query.ToListAsync();
         }

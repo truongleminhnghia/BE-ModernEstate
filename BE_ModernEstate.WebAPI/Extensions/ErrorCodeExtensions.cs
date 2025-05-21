@@ -27,6 +27,7 @@ namespace ShoppEcommerce_WebApp.WebAPI.Extensions
             { ErrorCode.NOT_FOUND, new ErrorCodeMetadata(HttpStatusCode.NotFound, "Not found") },
             { ErrorCode.INVALID_ACCOUNT_ROLE, new(HttpStatusCode.BadRequest, "Invalid account role.") },
             {ErrorCode.HAS_INACTIVE, new (HttpStatusCode.BadRequest, "Status inactive")},
+            {ErrorCode.HAS_EXISTED, new (HttpStatusCode.BadRequest, "Has existed")},
 
         };
 
