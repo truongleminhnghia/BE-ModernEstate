@@ -15,6 +15,8 @@ namespace ModernEstate.DAL.Repositories.ProjectRepositories
         {
             return _context.Projects.Include(p => p.Address)
                                     .Include(p => p.Invetor)
+                                    .Include(p => p.Histories)
+                                    .Include(p => p.Images)
                                     .FirstOrDefaultAsync(p => p.Id.Equals(id));
         }
 

@@ -55,6 +55,32 @@ namespace ModernEstate.DAL.Entites
         [EnumDataType(typeof(EnumProjectStatus))]
         public EnumProjectStatus Status { get; set; }
 
+        [Column("attribute", TypeName = "JSON")]
+        [Description("List of attributes of the property")]
+        public string[]? Attribute { get; set; }
+
+        [Column("time_start", TypeName = "datetime")]
+        public DateTime? TimeStart { get; set; }
+
+        [Column("price_min", TypeName = "decimal(18,2)")]
+        public double? PriceMin { get; set; }
+
+        [Column("price_max", TypeName = "decimal(18,2)")]
+        public double? PriceMax { get; set; }
+
+        [Column("unit_area", TypeName = "varchar(100)")]
+        public string? UnitArea { get; set; }
+
+        [Column("total_investment", TypeName = "double")]
+        public double? TotalInvestment { get; set; }
+
+        [Column("unit_currency", TypeName = "varchar(100)")]
+        [EnumDataType(typeof(EnumCurrency))]
+        public EnumCurrency? UnitCurrency { get; set; }
+
+        [Column("description", TypeName = "varchar(500)")]
+        public string? Description { get; set; }
+
         [Column("address_id")]
         [Required]
         public Guid AddressId { get; set; }
