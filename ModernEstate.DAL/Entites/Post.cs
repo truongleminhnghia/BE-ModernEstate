@@ -80,5 +80,6 @@ namespace ModernEstate.DAL.Entites
         public Support? Support { get; set; }
 
         public virtual ICollection<PostPackage>? PostPackages { get; set; }
+        public virtual ICollection<History>? Histories { get; set; }
     }
 }

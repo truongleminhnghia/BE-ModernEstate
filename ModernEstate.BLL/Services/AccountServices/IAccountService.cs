@@ -7,13 +7,10 @@ namespace ModernEstate.BLL.Services.AccountServices
 {
     public interface IAccountService
     {
-        public Task<bool> CreateAccount(AccountRequest req, bool _isAdmin);
+        public Task<bool> CreateAccount(AccountRequest req);
         public Task<AccountResponse> GetById(Guid id);
-        public Task<IEnumerable<AccountResponse>> GetAllAccounts();
-        public Task<bool> UpdateAccount(UpdateAccountRequest req, Guid id, bool isAdmin);
-        public Task<bool> UpdateAccountStatus(Guid id, EnumAccountStatus status, bool isAdmin);
-        public Task<bool> DeleteAccount(Guid id);
-        Task<PageResult<AccountResponse>> GetAllByPaging(int pageCurrent, int pageSize);
-        Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, int pageCurrent, int pageSize);
+        public Task<bool> UpdateAccount(UpdateAccountRequest req, Guid id);
+        public Task<bool> UpdateAccountStatus(Guid id);
+        Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email, int pageCurrent, int pageSize);
     }
 }

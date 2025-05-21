@@ -83,12 +83,6 @@ namespace ModernEstate.DAL.Entites
         [Description("List of attributes of the property")]
         public string[]? Attribute { get; set; }
 
-        [Column("type_transaction", TypeName = "varchar(100)")]
-        [Required]
-        [Description("Type of transaction for the property")]
-        [EnumDataType(typeof(EnumTypeTransaction))]
-        public EnumTypeTransaction TypeTransaction { get; set; }
-
         [Column("address_id")]
         [Required]
         public Guid AddressId { get; set; }

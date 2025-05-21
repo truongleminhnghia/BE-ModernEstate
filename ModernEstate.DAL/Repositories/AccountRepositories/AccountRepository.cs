@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
-using ModernEstate.Common.Models.Pages;
 using ModernEstate.DAL.Bases;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
@@ -13,31 +12,33 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
 
         public async Task<Account?> GetByEmail(string email)
         {
-            return await _context.Accounts.Include(a => a.Role).FirstOrDefaultAsync(ac => ac.Email.Equals(email));
+            return await _context.Accounts.Include(a => a.Role)
+                                            .Include(a => a.Employee)
+                                            .Include(a => a.Broker)
+                                            .Include(a => a.OwnerProperty)
+                                            .FirstOrDefaultAsync(ac => ac.Email.Equals(email));
         }
 
-        public async Task<IEnumerable<Account>> FindAll()
+        public async Task<Account?> FindById(Guid id)
         {
-            return await _context.Accounts.ToListAsync();
+            return await _context.Accounts.Include(a => a.Role)
+                                            .Include(a => a.Employee)
+                                            .Include(a => a.Broker)
+                                            .Include(a => a.OwnerProperty)
+                                            .FirstOrDefaultAsync(ac => ac.Id.Equals(id));
         }
 
-        public async Task<PageResult<Account>> FindByPaging(int pageCurrent, int pageSize)
+        public async Task<IEnumerable<Account>> FindWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email)
         {
-            var accounts = await _context.Accounts
-                .Skip((pageCurrent - 1) * pageSize)
-               .Take(pageSize)
-                .ToListAsync();
-            var total = await _context.Accounts.CountAsync();
-            return new PageResult<Account>(accounts, pageSize, pageCurrent, total);
-        }
-
-        public async Task<IEnumerable<Account>> FindWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role)
-        {
-            IQueryable<Account> query = _context.Accounts;
+            IQueryable<Account> query = _context.Accounts.Include(a => a.Employee).Include(a => a.OwnerProperty).Include(a => a.Broker).Include(a => a.Role);
 
             if (!string.IsNullOrWhiteSpace(lastName))
             {
                 query = query.Where(a => a.LastName.Contains(lastName));
+            }
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                query = query.Where(a => a.Email.Contains(email));
             }
             if (!string.IsNullOrWhiteSpace(firstName))
             {
@@ -47,11 +48,15 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
             {
                 query = query.Where(a => a.EnumAccountStatus == status.Value);
             }
-            // if (role.HasValue)
-            // {
-            //     query = query.Where(a => a.Role == role.Value);
-            // }
-            query = query.OrderByDescending(a => a.Id); // mặc định là giảm dần, tức là cái mới nhất sẽ ở trên cùng
+            if (role.HasValue)
+            {
+                query = query.Where(a => a.Role.RoleName == role.Value);
+            }
+            if (gender.HasValue)
+            {
+                query = query.Where(a => a.Gender == gender.Value);
+            }
+            query = query.OrderByDescending(a => a.CreatedAt); // mặc định là giảm dần, tức là cái mới nhất sẽ ở trên cùng
             // Thay đổi thứ tự sắp xếp nếu cần thiết
             return await query.ToListAsync();
         }

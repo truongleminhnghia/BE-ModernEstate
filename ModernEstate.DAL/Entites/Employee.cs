@@ -15,7 +15,7 @@ namespace ModernEstate.DAL.Entites
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [Column("code", TypeName = "varchar(10)")]
+        [Column("code", TypeName = "varchar(30)")]
         public string? Code { get; set; }
 
         [Column("account_id")]
