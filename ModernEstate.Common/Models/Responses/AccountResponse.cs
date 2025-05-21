@@ -12,5 +12,8 @@ namespace ModernEstate.Common.Models.Responses
         public string? Avatar { get; set; }
         public RoleResponse? Role { get; set; }
         public EnumAccountStatus? EnumAccountStatus { get; set; }
+        public BrokerResponse? Broker { get; set; }
+        public EmployeeResponse? Employee { get; set; }
+        public OwnerPropertyResponse? OwnerProperty { get; set; }
     }
 }

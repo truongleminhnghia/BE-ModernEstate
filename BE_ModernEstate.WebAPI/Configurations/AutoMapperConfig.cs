@@ -14,7 +14,9 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddAutoMapper(typeof(ProjectMapper));
             services.AddAutoMapper(typeof(ProvideMapper));
             services.AddAutoMapper(typeof(ImageMapper));
-            services.AddAutoMapper(typeof(HistoryMapper));
+            services.AddAutoMapper(typeof(OwnerPropertyMapper));
+            services.AddAutoMapper(typeof(EmployeeMapper));
+            services.AddAutoMapper(typeof(BrokerMapper));
             return services;
         }
     }
