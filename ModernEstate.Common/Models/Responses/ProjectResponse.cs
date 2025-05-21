@@ -14,6 +14,14 @@ namespace ModernEstate.Common.Models.Responses
         public int TotalFloor { get; set; }
         public string? Title { get; set; }
         public float ProjectArea { get; set; }
+        public string[]? Attribute { get; set; }
+        public DateTime? TimeStart { get; set; }
+        public double? PriceMin { get; set; }
+        public double? PriceMax { get; set; }
+        public string? UnitArea { get; set; }
+        public EnumCurrency? UnitCurrency { get; set; }
+        public string? Description { get; set; }
+        public double? TotalInvestment { get; set; }
         public EnumProjectStatus Status { get; set; }
         public Guid AddressId { get; set; }
         public AddressResponse? Address { get; set; }
