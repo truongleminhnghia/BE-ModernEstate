@@ -1,4 +1,4 @@
-﻿
+﻿using System.Text.Json.Serialization;
 using BE_ModernEstate.WebAPI.Configurations;
 using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
 using BE_ModernEstate.WebAPI.Middlewares;
@@ -8,23 +8,13 @@ using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
-using PuppeteerSharp;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-//builder.WebHost.UseUrls("https://localhost:8080");
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
-
-// var connectionString =
-//     $"Server=localhost;Port=3306;User Id=root;Password=Nghia_2003;Database=db_local_ModernEstate;SslMode=Required;";
 
 var dbSection = builder.Configuration.GetSection("Database");
 var server = dbSection["Server"];
@@ -39,7 +29,8 @@ var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? database;
 var dbUser = Environment.GetEnvironmentVariable("DB_USER") ?? user;
 var dbPass = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? password;
 
-var connectionString = $"Server={dbHost};Port={dbPort};Database={dbName};User Id={dbUser};Password={dbPass};SslMode=Required;";
+var connectionString =
+    $"Server={dbHost};Port={dbPort};Database={dbName};User Id={dbUser};Password={dbPass};SslMode=Required;";
 
 builder.Services.AddDbContext<ApplicationDbConext>(options =>
 {
@@ -50,13 +41,12 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
             mySqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(10),
-                errorNumbersToAdd: null // Set this to null or an empty collection if no specific error numbers are needed.
+                errorNumbersToAdd: null
             )
     );
 });
 
-builder.Services.Configure<JwtSettings>(
-    builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddHttpContextAccessor();
 
@@ -66,7 +56,6 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddProjectDependencies();
 builder.Services.AddSwaggerDependencies();
 builder.Services.AddAutoMapperConfiguration();
-
 builder
     .Services.AddControllers()
     .AddJsonOptions(options =>
@@ -84,7 +73,6 @@ builder.Services.AddCors(options =>
                         .AllowAnyMethod()
                         .AllowAnyHeader());
 });
-
 var app = builder.Build();
 
 app.Lifetime.ApplicationStopped.Register(async () =>
@@ -94,27 +82,6 @@ app.Lifetime.ApplicationStopped.Register(async () =>
     await provider.DisposeAsync();
 });
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
-//     db.Database.Migrate();
-
-//     // Lấy tên enum (Admin, Manager, User)
-//     foreach (string name in Enum.GetNames<EnumRoleName>())
-//     {
-//         EnumRoleName roleName = (EnumRoleName)Enum.Parse(typeof(EnumRoleName), name);
-//         // Kiểm tra xem đã có RoleName = roleName chưa
-//         if (!db.Roles.Any(r => r.RoleName == roleName))
-//         {
-//             db.Roles.Add(new Role
-//             {
-//                 RoleName = roleName
-//             });
-//         }
-//     }
-
-//     db.SaveChanges();
-// }
 
 using (var scope = app.Services.CreateScope())
 {
@@ -156,9 +123,11 @@ app.UseMiddleware<ExceptionMiddleware>();
 // {
 app.UseSwagger();
 app.UseSwaggerUI();
+
 // }
 
 app.UseHttpsRedirection();
+
 // Authentication & Authorization
 app.UseMiddleware<JwtMiddleware>();
 app.UseAuthentication();

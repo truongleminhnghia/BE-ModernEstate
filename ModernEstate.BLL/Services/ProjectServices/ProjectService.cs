@@ -1,20 +1,17 @@
-
-
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using ModernEstate.Common.Exceptions;
+using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Responses;
+using ModernEstate.DAL;
+using ModernEstate.DAL.Entites;
 using ModernEstate.BLL.JWTServices;
 using ModernEstate.BLL.Services.AddressServices;
 using ModernEstate.BLL.Services.HistoryServices;
 using ModernEstate.BLL.Services.InvetorServices;
 using ModernEstate.Common.Enums;
-using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.Pages;
-using ModernEstate.Common.Models.Requests;
-using ModernEstate.Common.Models.Responses;
 using ModernEstate.Common.srcs;
-using ModernEstate.DAL;
-using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.BLL.Services.ProjectServices
 {

@@ -1,5 +1,4 @@
 
-
 using AutoMapper;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
