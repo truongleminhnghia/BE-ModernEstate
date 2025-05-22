@@ -155,7 +155,15 @@ namespace ModernEstate.DAL
                 {
                     // Rollback nếu có lỗi
                     await transaction.RollbackAsync();
+
                     throw new InvalidOperationException($"Transaction failed: {ex.Message}", ex);
+                
+                    // Log this:
+                    Console.WriteLine(ex);
+                    Console.WriteLine(ex.InnerException?.Message);
+                    Console.WriteLine(ex.InnerException?.InnerException?.Message);
+
+                    throw; // or return a useful error message to the client
                 }
             });
         }
