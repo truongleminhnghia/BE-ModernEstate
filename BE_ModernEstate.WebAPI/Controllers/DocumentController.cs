@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
@@ -12,7 +11,16 @@ namespace BE_ModernEstate.WebAPI.Controllers
     [Route("api/v1/documents")]
     public class DocumentController : ControllerBase
     {
+
+        private readonly IBrowserProvider _browserProvider;
+
+        public DocumentController(IBrowserProvider browserProvider)
+        {
+            _browserProvider = browserProvider;
+        }
+
         [HttpGet("modern-estate")]
+        [AllowAnonymous]
         public async Task<IActionResult> ModernEstatePdf()
         {
             // 1. HTML mẫu với CSS inline
@@ -62,25 +70,15 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 </html>
                 ";
 
-            // 2. Tải Chromium
-            var browserFetcher = new BrowserFetcher();
-            var revisionInfo = await browserFetcher.DownloadAsync();  // dùng bản mặc định
+            var browser = await _browserProvider.GetBrowserAsync();
 
-            // 3. Khởi Chromium headless
-            await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-            {
-                ExecutablePath = revisionInfo.GetExecutablePath(),
-                Headless = true
-            });
-
-            // 4. Mở trang và đổ nội dung HTML
-            using var page = await browser.NewPageAsync();
+            // 3. Mở tab, đổ content, xuất PDF
+            await using var page = await browser.NewPageAsync();
             await page.SetContentAsync(html, new NavigationOptions
             {
                 WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
             });
 
-            // 5. Xuất PDF (với nền background, margin 20px)
             var pdfBytes = await page.PdfDataAsync(new PdfOptions
             {
                 Format = PaperFormat.A4,
@@ -88,7 +86,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 MarginOptions = new MarginOptions { Top = "20px", Bottom = "20px", Left = "20px", Right = "20px" }
             });
 
-            // 6. Trả file về client
+            // 4. Trả file
             return File(pdfBytes, "application/pdf", "ModernEstate_Welcome.pdf");
         }
     }

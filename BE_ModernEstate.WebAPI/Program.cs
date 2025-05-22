@@ -1,5 +1,6 @@
 ﻿
 using BE_ModernEstate.WebAPI.Configurations;
+using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
 using BE_ModernEstate.WebAPI.Middlewares;
 using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
@@ -74,29 +75,7 @@ builder
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-
-var browserFetcher = new BrowserFetcher();
-var revisionInfo = await browserFetcher.DownloadAsync();
-
-await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-{
-    ExecutablePath = revisionInfo.GetExecutablePath(),
-
-    Headless = true,
-    Args = new[]
-    {
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu"
-    }
-});
-
-
-// 4. Mở trang, tạo PDF…
-var page = await browser.NewPageAsync();
-await page.GoToAsync("https://example.com");
-var pdf = await page.PdfDataAsync();
+builder.Services.AddSingleton<IBrowserProvider, PuppeteerBrowserProvider>();
 
 builder.Services.AddCors(options =>
 {
@@ -107,6 +86,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.Lifetime.ApplicationStopped.Register(async () =>
+{
+    // Đảm bảo đóng browser khi ứng dụng dừng
+    var provider = app.Services.GetRequiredService<IBrowserProvider>();
+    await provider.DisposeAsync();
+});
 
 // using (var scope = app.Services.CreateScope())
 // {
