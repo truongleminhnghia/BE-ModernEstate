@@ -73,30 +73,6 @@ builder
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-
-var browserFetcher = new BrowserFetcher();
-var revisionInfo = await browserFetcher.DownloadAsync();
-
-await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-{
-    ExecutablePath = revisionInfo.GetExecutablePath(),
-
-    Headless = true,
-    Args = new[]
-    {
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu"
-    }
-});
-
-
-// 4. Mở trang, tạo PDF…
-var page = await browser.NewPageAsync();
-await page.GoToAsync("https://example.com");
-var pdf = await page.PdfDataAsync();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowExpoApp",
