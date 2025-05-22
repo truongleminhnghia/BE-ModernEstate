@@ -83,27 +83,59 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// using (var scope = app.Services.CreateScope())
+// {
+//     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
+//     db.Database.Migrate();
+
+//     // Lấy tên enum (Admin, Manager, User)
+//     foreach (string name in Enum.GetNames<EnumRoleName>())
+//     {
+//         EnumRoleName roleName = (EnumRoleName)Enum.Parse(typeof(EnumRoleName), name);
+//         // Kiểm tra xem đã có RoleName = roleName chưa
+//         if (!db.Roles.Any(r => r.RoleName == roleName))
+//         {
+//             db.Roles.Add(new Role
+//             {
+//                 RoleName = roleName
+//             });
+//         }
+//     }
+
+//     db.SaveChanges();
+// }
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
     db.Database.Migrate();
 
-    // Lấy tên enum (Admin, Manager, User)
-    foreach (string name in Enum.GetNames<EnumRoleName>())
+    // Seed roles
+    foreach (var name in Enum.GetNames<EnumRoleName>())
     {
-        EnumRoleName roleName = (EnumRoleName)Enum.Parse(typeof(EnumRoleName), name);
-        // Kiểm tra xem đã có RoleName = roleName chưa
-        if (!db.Roles.Any(r => r.RoleName == roleName))
-        {
-            db.Roles.Add(new Role
-            {
-                RoleName = roleName
-            });
-        }
+        var roleEnum = Enum.Parse<EnumRoleName>(name);
+        if (!db.Roles.Any(r => r.RoleName == roleEnum))
+            db.Roles.Add(new Role { RoleName = roleEnum });
     }
-
     db.SaveChanges();
+
+    // Seed admin user nếu chưa có
+    var adminRole = db.Roles.Single(r => r.RoleName == EnumRoleName.ROLE_ADMIN);
+    bool exists = db.Accounts.Any(u => u.RoleId == adminRole.Id);
+    if (!exists)
+    {
+        var admin = new Account
+        {
+            Email = "admin@example.com",
+            Password = BCrypt.Net.BCrypt.HashPassword("123456789"),
+            RoleId = adminRole.Id,
+            EnumAccountStatus = EnumAccountStatus.ACTIVE,
+        };
+        db.Accounts.Add(admin);
+        db.SaveChanges();
+    }
 }
+
 
 
 app.UseMiddleware<ExceptionMiddleware>();
