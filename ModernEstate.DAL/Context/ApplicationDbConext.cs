@@ -46,5 +46,7 @@ namespace ModernEstate.DAL.Context
             //     .Property(o => o.EnumAccountStatus)
             //     .HasConversion<string>();
         }
+
+
     }
 }
