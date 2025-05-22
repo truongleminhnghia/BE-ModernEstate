@@ -76,17 +76,22 @@ builder
 
 
 var browserFetcher = new BrowserFetcher();
-
-// 2. Tải Chromium bản “mặc định”
-//    Kết quả là một RevisionInfo chứa Revision + ExecutablePath
 var revisionInfo = await browserFetcher.DownloadAsync();
 
-// 3. Khởi trình duyệt với đường dẫn vừa tải về
-var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
 {
     ExecutablePath = revisionInfo.GetExecutablePath(),
-    Headless = true
+
+    Headless = true,
+    Args = new[]
+    {
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu"
+    }
 });
+
 
 // 4. Mở trang, tạo PDF…
 var page = await browser.NewPageAsync();
