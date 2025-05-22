@@ -83,5 +83,7 @@ namespace ModernEstate.DAL.Context
         {
             base.OnModelCreating(modelBuilder);
         }
+
+
     }
 }
