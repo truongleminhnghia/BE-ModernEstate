@@ -23,8 +23,6 @@ namespace ModernEstate.BLL.Services.HistoryServices
             try
             {
                 history.ChangeDate = DateTime.UtcNow;
-                history.CreatedAt = DateTime.UtcNow;
-                history.UpdatedAt = DateTime.UtcNow;
                 await _unitOfWork.Histories.CreateAsync(history);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 return history;

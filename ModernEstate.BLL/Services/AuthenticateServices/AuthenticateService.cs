@@ -76,8 +76,6 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 account.RoleId = role.Id;
                 account.Role = role;
                 account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
-                account.CreatedAt = DateTime.UtcNow;
-                account.UpdatedAt = DateTime.UtcNow;
                 if (account.EnumAccountStatus == null) throw new AppException(ErrorCode.ACCOUNT_STATUS_NOT_NULL);
                 if (request.Password != request.ConfirmPassword) throw new AppException(ErrorCode.INVALID_PASSWORD);
                 account.Password = _passwordHasher.HashPassword(request.Password);

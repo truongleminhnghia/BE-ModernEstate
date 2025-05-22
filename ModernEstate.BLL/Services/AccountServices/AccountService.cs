@@ -82,8 +82,6 @@ namespace ModernEstate.BLL.Services.AccountServices
                 if (role == null) throw new AppException(ErrorCode.NOT_FOUND);
                 account.Role = role;
                 account.RoleId = role.Id;
-                account.CreatedAt = DateTime.UtcNow;
-                account.UpdatedAt = DateTime.UtcNow;
                 account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
                 account.Password = _passwordHasher.HashPassword(req.Password);
                 await _unitOfWork.Accounts.CreateAsync(account);
