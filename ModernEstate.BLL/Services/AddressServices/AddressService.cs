@@ -1,3 +1,4 @@
+
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using ModernEstate.Common.Exceptions;
@@ -14,11 +15,7 @@ namespace ModernEstate.BLL.Services.AddressServices
         private readonly IMapper _mapper;
         private readonly ILogger<AddressService> _logger;
 
-        public AddressService(
-            IUnitOfWork unitOfWork,
-            IMapper mapper,
-            ILogger<AddressService> logger
-        )
+        public AddressService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<AddressService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -32,9 +29,34 @@ namespace ModernEstate.BLL.Services.AddressServices
                 var entities = await _unitOfWork.Addresses.GetAllAsync();
                 return _mapper.Map<IEnumerable<AddressResponse>>(entities);
             }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to get all addresses");
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<Guid> CreateAddress(AddressRequest req)
+        {
+            try
+            {
+                var addressEntity = _mapper.Map<Address>(req);
+                Guid addressId = await _unitOfWork.Addresses.GetOrCreateAsync(addressEntity);
+                return addressId;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
@@ -109,9 +131,34 @@ namespace ModernEstate.BLL.Services.AddressServices
 
                 return true;
             }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to delete address id {id}");
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<AddressResponse?> GetById(Guid id)
+        {
+            try
+            {
+                var address = await _unitOfWork.Addresses.GetByIdAsync(id);
+                if (address == null) throw new AppException(ErrorCode.NOT_FOUND);
+                return _mapper.Map<AddressResponse>(address);
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }

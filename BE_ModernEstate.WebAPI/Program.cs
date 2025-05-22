@@ -1,35 +1,20 @@
 ﻿using System.Text.Json.Serialization;
 using BE_ModernEstate.WebAPI.Configurations;
+using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
+using BE_ModernEstate.WebAPI.Middlewares;
+using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
-using ModernEstate.BLL.Services.AddressServices;
-using ModernEstate.BLL.Services.CategoryServices;
-using ModernEstate.BLL.Services.FavoriteServices;
-using ModernEstate.BLL.Services.NewServices;
-using ModernEstate.BLL.Services.PackageServices;
-using ModernEstate.BLL.Services.ProjectServices;
-using ModernEstate.BLL.Services.ProvideServices;
-using ModernEstate.BLL.Services.ServiceServices;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
-using ShoppEcommerce_WebApp.WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-//builder.WebHost.UseUrls("https://localhost:8080");
-
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
-
-// var connectionString =
-//     $"Server=localhost;Port=3306;User Id=root;Password=Nghia_2003;Database=db_local_ModernEstate;SslMode=Required;";
 
 var dbSection = builder.Configuration.GetSection("Database");
 var server = dbSection["Server"];
@@ -56,7 +41,7 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
             mySqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(10),
-                errorNumbersToAdd: null // Set this to null or an empty collection if no specific error numbers are needed.
+                errorNumbersToAdd: null
             )
     );
 });
@@ -71,14 +56,6 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddProjectDependencies();
 builder.Services.AddSwaggerDependencies();
 builder.Services.AddAutoMapperConfiguration();
-builder.Services.AddScoped<IPackageService, PackageService>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
-builder.Services.AddScoped<IAddressService, AddressService>();
-builder.Services.AddScoped<IProvideService, ProvideService>();
-builder.Services.AddScoped<IServiceService, ServiceService>();
-builder.Services.AddScoped<INewService, NewService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder
     .Services.AddControllers()
     .AddJsonOptions(options =>
@@ -87,7 +64,57 @@ builder
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+builder.Services.AddSingleton<IBrowserProvider, PuppeteerBrowserProvider>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowExpoApp",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 var app = builder.Build();
+
+app.Lifetime.ApplicationStopped.Register(async () =>
+{
+    // Đảm bảo đóng browser khi ứng dụng dừng
+    var provider = app.Services.GetRequiredService<IBrowserProvider>();
+    await provider.DisposeAsync();
+});
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
+    db.Database.Migrate();
+
+    // Seed roles
+    foreach (var name in Enum.GetNames<EnumRoleName>())
+    {
+        var roleEnum = Enum.Parse<EnumRoleName>(name);
+        if (!db.Roles.Any(r => r.RoleName == roleEnum))
+            db.Roles.Add(new Role { RoleName = roleEnum });
+    }
+    db.SaveChanges();
+
+    // Seed admin user nếu chưa có
+    var adminRole = db.Roles.Single(r => r.RoleName == EnumRoleName.ROLE_ADMIN);
+    bool exists = db.Accounts.Any(u => u.RoleId == adminRole.Id);
+    if (!exists)
+    {
+        var admin = new Account
+        {
+            Email = "admin@example.com",
+            Password = BCrypt.Net.BCrypt.HashPassword("123456789"),
+            RoleId = adminRole.Id,
+            EnumAccountStatus = EnumAccountStatus.ACTIVE,
+        };
+        db.Accounts.Add(admin);
+        db.SaveChanges();
+    }
+}
+
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -105,6 +132,8 @@ app.UseHttpsRedirection();
 app.UseMiddleware<JwtMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors("AllowExpoApp");
 
 app.MapControllers();
 

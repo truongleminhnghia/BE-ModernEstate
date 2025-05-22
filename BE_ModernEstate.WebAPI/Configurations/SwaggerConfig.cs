@@ -8,7 +8,6 @@ namespace BE_ModernEstate.WebAPI.Configurations
         {
             services.AddSwaggerGen(c =>
             {
-                // Định nghĩa Swagger API documentation
                 c.SwaggerDoc(
                     "v1",
                     new OpenApiInfo
@@ -29,17 +28,6 @@ namespace BE_ModernEstate.WebAPI.Configurations
                         },
                     }
                 );
-
-                // Định nghĩa Bearer token security scheme
-                // c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                // {
-                //     Name = "Authorization",
-                //     Type = SecuritySchemeType.ApiKey,
-                //     Scheme = "Bearer",
-                //     BearerFormat = "JWT",
-                //     In = ParameterLocation.Header,
-                //     Description = "JWT Authorization header using the Bearer scheme."
-                // });
                 c.AddSecurityDefinition(
                     "Bearer",
                     new OpenApiSecurityScheme
@@ -50,20 +38,6 @@ namespace BE_ModernEstate.WebAPI.Configurations
                         Type = SecuritySchemeType.ApiKey,
                     }
                 );
-                // c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                // {
-                //     {
-                //         new OpenApiSecurityScheme
-                //         {
-                //             Reference = new OpenApiReference
-                //             {
-                //                 Type = ReferenceType.SecurityScheme,
-                //                 Id = "Bearer"
-                //             }
-                //         },
-                //         new string[] { }
-                //     }
-                // });
                 c.AddSecurityRequirement(
                     new OpenApiSecurityRequirement
                     {

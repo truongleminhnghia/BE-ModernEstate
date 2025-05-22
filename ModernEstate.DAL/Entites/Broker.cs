@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ModernEstate.DAL.Entites
 {
     [Table("broker")]
-    [Index(nameof(Code), Name = "IX_Broker_Code")]
+    [Index(nameof(Code), Name = "IX_Broker_Code", IsUnique = true)]
     [Index(nameof(AccountId), Name = "IX_Broker_AccountId")]
     public class Broker : BaseEntity
     {
@@ -15,7 +15,7 @@ namespace ModernEstate.DAL.Entites
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [Column("code", TypeName = "varchar(10)")]
+        [Column("code", TypeName = "varchar(30)")]
         [Required]
         public string? Code { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using ModernEstate.BLL.Services.AccountServices;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Entites;
 using System.IdentityModel.Tokens.Jwt;
@@ -51,7 +52,6 @@ namespace ModernEstate.BLL.JWTServices
                 new Claim("accountId", _account.Id.ToString()),
                 new Claim("email", _account.Email),
                 new Claim(ClaimTypes.Role, _account.Role.RoleName.ToString()),
-                // new Claim("role", _account.Role.ToString())
             };
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -71,6 +71,24 @@ namespace ModernEstate.BLL.JWTServices
             return GetUserClaims().FindFirst("accountId")?.Value;
         }
 
+        public Guid GetAccountIdGuid()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            if (user == null || !user.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException("User is not authenticated");
+
+            // thường claim NameIdentifier hoặc "sub"
+            var raw = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                   ?? user.FindFirst("sub")?.Value
+                   ?? throw new UnauthorizedAccessException("Claim 'sub' hoặc NameIdentifier không tồn tại");
+
+            if (!Guid.TryParse(raw, out var accountId))
+                throw new UnauthorizedAccessException("AccountId trong token không đúng định dạng GUID");
+
+            return accountId;
+        }
+
         public string GetEmail()
         {
             return GetUserClaims().FindFirst("email")?.Value;
@@ -78,19 +96,27 @@ namespace ModernEstate.BLL.JWTServices
 
         public string GetRole()
         {
-            return GetUserClaims().FindFirst("roleName")?.Value;
+            return GetUserClaims().FindFirst(ClaimTypes.Role)?.Value;
         }
 
-        public string GetTokenId()
+
+        public DateTime GetExpire(string token)
         {
-            return GetUserClaims().FindFirst("tokenId")?.Value;
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token)) return default;
+
+            var jwtToken = handler.ReadJwtToken(token);
+            var exp = jwtToken.Payload.Exp;
+            return exp.HasValue
+                ? DateTimeOffset.FromUnixTimeSeconds(exp.Value).UtcDateTime
+                : default;
         }
 
         public int? ValidateToken(string token)
         {
             if (token == null)
                 return null;
-            var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+            var secretKey = _jwtSettings.SecretKey;
             if (string.IsNullOrEmpty(secretKey))
             {
                 throw new InvalidOperationException("JWT environment variables are not set properly.");
@@ -116,6 +142,16 @@ namespace ModernEstate.BLL.JWTServices
             {
                 return null;
             }
+        }
+
+        public string RefeshToken(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetTokenId()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -2,11 +2,13 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("property")]
+    [Index(nameof(Code), IsUnique = true)]
     public class Property : BaseEntity
     {
         [Key]
@@ -27,11 +29,11 @@ namespace ModernEstate.DAL.Entites
 
         [Column("original_price", TypeName = "decimal(18,2)")]
         [Required]
-        public decimal OriginalPrice { get; set; }
+        public double OriginalPrice { get; set; }
 
         [Column("sale_price", TypeName = "decimal(18,2)")]
         [Required]
-        public decimal SalePrice { get; set; }
+        public double SalePrice { get; set; }
 
         [Column("price_text", TypeName = "varchar(100)")]
         public string? PriceText { get; set; }
@@ -80,12 +82,6 @@ namespace ModernEstate.DAL.Entites
         [Column("attribute", TypeName = "JSON")]
         [Description("List of attributes of the property")]
         public string[]? Attribute { get; set; }
-
-        [Column("type_transaction", TypeName = "varchar(100)")]
-        [Required]
-        [Description("Type of transaction for the property")]
-        [EnumDataType(typeof(EnumTypeTransaction))]
-        public EnumTypeTransaction TypeTransaction { get; set; }
 
         [Column("address_id")]
         [Required]

@@ -2,8 +2,10 @@ namespace ModernEstate.Common.Enums
 {
     public enum EnumStatusProperty
     {
+        Đã_Bán,
+        Đã_Cho_Thuê,
         Đang_Giao_Dịch,
-        Giao_Dịch_Thành_Công,
-        Đang_Đăng_Bài
+        Đang_Thương_Lượng,
+        NO
     }
 }

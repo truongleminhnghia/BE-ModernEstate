@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net.NetworkInformation;
 using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
@@ -50,9 +51,15 @@ namespace ModernEstate.DAL.Entites
         [Column("project_id")]
         [Description("ID of the project associated with the history")]
         public Guid? ProjectId { get; set; }
-        [ForeignKey(nameof(ProjectId))]
 
+        [ForeignKey(nameof(ProjectId))]
         [Description("Navigation property for the associated project")]
         public Project? Project { get; set; }
+
+        [Column("post_id")]
+        public Guid? PostId { get; set; }
+
+        [ForeignKey(nameof(PostId))]
+        public Post? Post { get; set; }
     }
 }

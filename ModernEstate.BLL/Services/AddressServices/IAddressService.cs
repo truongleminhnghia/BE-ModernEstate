@@ -10,5 +10,7 @@ namespace ModernEstate.BLL.Services.AddressServices
         Task<AddressResponse> CreateAsync(AddressRequest request);
         Task<bool> UpdateAsync(Guid id, AddressRequest request);
         Task<bool> DeleteAsync(Guid id);
+        Task<Guid> CreateAddress(AddressRequest req);
+        Task<AddressResponse?> GetById(Guid id);
     }
 }

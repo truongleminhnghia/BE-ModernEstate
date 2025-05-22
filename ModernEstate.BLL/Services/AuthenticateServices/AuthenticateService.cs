@@ -39,10 +39,12 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 var token = _jwtService.GenerateJwtToken(account);
                 if (string.IsNullOrEmpty(token)) throw new AppException(ErrorCode.TOKEN_NOT_NULL);
                 var currentAccount = _mapper.Map<AccountCurrent>(account);
+                var expiredAt = _jwtService.GetExpire(token);
                 var authenticateResponse = new AuthenticateResponse
                 {
                     Token = token,
-                    AccountCurrent = currentAccount
+                    AccountCurrent = currentAccount,
+                    ExpiredAt = expiredAt
                 };
                 return authenticateResponse;
             }
@@ -74,8 +76,6 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 account.RoleId = role.Id;
                 account.Role = role;
                 account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
-                account.CreatedAt = DateTime.UtcNow;
-                account.UpdatedAt = DateTime.UtcNow;
                 if (account.EnumAccountStatus == null) throw new AppException(ErrorCode.ACCOUNT_STATUS_NOT_NULL);
                 if (request.Password != request.ConfirmPassword) throw new AppException(ErrorCode.INVALID_PASSWORD);
                 account.Password = _passwordHasher.HashPassword(request.Password);
