@@ -7,7 +7,6 @@ using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
-using PuppeteerSharp;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,25 +73,6 @@ builder
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-
-var browserFetcher = new BrowserFetcher();
-
-// 2. Tải Chromium bản “mặc định”
-//    Kết quả là một RevisionInfo chứa Revision + ExecutablePath
-var revisionInfo = await browserFetcher.DownloadAsync();
-
-// 3. Khởi trình duyệt với đường dẫn vừa tải về
-var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-{
-    ExecutablePath = revisionInfo.GetExecutablePath(),
-    Headless = true
-});
-
-// 4. Mở trang, tạo PDF…
-var page = await browser.NewPageAsync();
-await page.GoToAsync("https://example.com");
-var pdf = await page.PdfDataAsync();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowExpoApp",
@@ -103,59 +83,27 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
-//     db.Database.Migrate();
-
-//     // Lấy tên enum (Admin, Manager, User)
-//     foreach (string name in Enum.GetNames<EnumRoleName>())
-//     {
-//         EnumRoleName roleName = (EnumRoleName)Enum.Parse(typeof(EnumRoleName), name);
-//         // Kiểm tra xem đã có RoleName = roleName chưa
-//         if (!db.Roles.Any(r => r.RoleName == roleName))
-//         {
-//             db.Roles.Add(new Role
-//             {
-//                 RoleName = roleName
-//             });
-//         }
-//     }
-
-//     db.SaveChanges();
-// }
-
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
     db.Database.Migrate();
 
-    // Seed roles
-    foreach (var name in Enum.GetNames<EnumRoleName>())
+    // Lấy tên enum (Admin, Manager, User)
+    foreach (string name in Enum.GetNames<EnumRoleName>())
     {
-        var roleEnum = Enum.Parse<EnumRoleName>(name);
-        if (!db.Roles.Any(r => r.RoleName == roleEnum))
-            db.Roles.Add(new Role { RoleName = roleEnum });
-    }
-    db.SaveChanges();
-
-    // Seed admin user nếu chưa có
-    var adminRole = db.Roles.Single(r => r.RoleName == EnumRoleName.ROLE_ADMIN);
-    bool exists = db.Accounts.Any(u => u.RoleId == adminRole.Id);
-    if (!exists)
-    {
-        var admin = new Account
+        EnumRoleName roleName = (EnumRoleName)Enum.Parse(typeof(EnumRoleName), name);
+        // Kiểm tra xem đã có RoleName = roleName chưa
+        if (!db.Roles.Any(r => r.RoleName == roleName))
         {
-            Email = "admin@example.com",
-            Password = BCrypt.Net.BCrypt.HashPassword("123456789"),
-            RoleId = adminRole.Id,
-            EnumAccountStatus = EnumAccountStatus.ACTIVE,
-        };
-        db.Accounts.Add(admin);
-        db.SaveChanges();
+            db.Roles.Add(new Role
+            {
+                RoleName = roleName
+            });
+        }
     }
-}
 
+    db.SaveChanges();
+}
 
 
 app.UseMiddleware<ExceptionMiddleware>();

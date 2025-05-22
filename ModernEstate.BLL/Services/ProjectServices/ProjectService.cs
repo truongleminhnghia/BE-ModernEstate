@@ -110,6 +110,8 @@ namespace ModernEstate.BLL.Services.ProjectServices
                 project.Code = await _utils.GenerateUniqueBrokerCodeAsync("P_");
                 // project.Code = "PC1234";
                 project.InvetorId = inventorExisting.Id;
+                project.CreatedAt = DateTime.UtcNow;
+                project.UpdatedAt = DateTime.UtcNow;
                 await _unitOfWork.Projects.CreateAsync(project);
                 History history = await setupHistory(EnumHistoryChangeType.INSERT, project.Id, "Create proejct");
                 project.Histories.Add(history);
