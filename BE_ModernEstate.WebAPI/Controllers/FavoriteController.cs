@@ -24,9 +24,11 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] Guid? account_id,
+                                                [FromQuery] int page_current = 1,
+                                                [FromQuery] int page_size = 10)
         {
-            var favorites = await _favoriteService.GetAllAsync();
+            var favorites = await _favoriteService.GetAllAsync(account_id, page_current, page_size);
             return Ok(
                 new ApiResponse
                 {
@@ -67,7 +69,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ROLE_STAFF, ROLE_CUSTOMER")]
+        [Authorize(Roles = "ROLE_STAFF, ROLE_CUSTOMER, ROLE_BROKER, ROLE_ADMIN, ROLE_PROPERTY_OWNER")]
         public async Task<IActionResult> Create([FromBody] FavoriteRequest request)
         {
             var created = await _favoriteService.CreateAsync(request);

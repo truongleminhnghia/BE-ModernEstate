@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using ModernEstate.Common.Exceptions;
+using ModernEstate.Common.Models.Pages;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
@@ -25,16 +26,27 @@ namespace ModernEstate.BLL.Services.FavoriteServices
             _logger = logger;
         }
 
-        public async Task<IEnumerable<FavoriteResponse>> GetAllAsync()
+        public async Task<PageResult<FavoriteResponse>> GetAllAsync(Guid? accountId, int pageCurrent, int pageSize)
         {
             try
             {
-                var entities = await _unitOfWork.Favorites.GetAllAsync();
-                return _mapper.Map<IEnumerable<FavoriteResponse>>(entities);
+                var result = await _unitOfWork.Favorites.FindWithParams(accountId);
+                if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
+                var pagedResult = result.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
+                var total = result.Count();
+                var data = _mapper.Map<List<FavoriteResponse>>(pagedResult);
+                if (data == null || !data.Any()) throw new AppException(ErrorCode.LIST_EMPTY);
+                var pageResult = new PageResult<FavoriteResponse>(data, pageSize, pageCurrent, total);
+                return pageResult;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to get all favorites");
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
@@ -43,7 +55,7 @@ namespace ModernEstate.BLL.Services.FavoriteServices
         {
             try
             {
-                var entity = await _unitOfWork.Favorites.GetByIdAsync(id);
+                var entity = await _unitOfWork.Favorites.FindById(id);
                 if (entity == null)
                     return null;
                 return _mapper.Map<FavoriteResponse>(entity);
