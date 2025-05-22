@@ -1,14 +1,13 @@
 
 
 using ModernEstate.Common.Models.Requests;
-using ModernEstate.Common.Models.Responses;
+using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.BLL.Services.NewServices
 {
     public interface INewService
     {
-        Task<NewsCreateResponse> CreateAsync(NewsRequest news);
-        Task<bool> UpdateTitle(string name, Guid id);
+        Task<bool> CreateAsync(NewsRequest news);
 
     }
 }

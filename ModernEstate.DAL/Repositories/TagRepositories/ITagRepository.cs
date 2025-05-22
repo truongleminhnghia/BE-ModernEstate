@@ -11,7 +11,7 @@ namespace ModernEstate.DAL.Repositories.TagRepositories
 {
     public interface ITagRepository : IGenericRepository<Tag>
     {
-        Task<Tag> FindByTitle(string title);
+      
     }
    
 }

@@ -9,8 +9,7 @@ namespace ModernEstate.BLL.Mappers
     {
         public NewsMapper() 
         {
-            CreateMap<NewsRequest, New>()
-                .ForMember(dest => dest.NewTags, opt => opt.Ignore());
+            CreateMap<NewsRequest, New>();
         }
         
     }

@@ -22,39 +22,14 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] NewsRequest news)
         {
-            
             var created = await _service.CreateAsync(news);
-            if (created.Success)
-                return Ok(new ApiResponse
-                {
-                    Code = StatusCodes.Status200OK,
-                    Success = true,
-                    Message = created.Message
-                });
-            else return BadRequest(new ApiResponse
+            return Ok(new ApiResponse
             {
-                Code = StatusCodes.Status400BadRequest,
-                Success = false,
-                Message = created.Message
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Create news successful",
+                Data = null
             });
         }
-
-        [HttpPut ("{id}")]
-        public async Task<IActionResult> Update([FromBody] String name, Guid id)
-        {
-            var created = await _service.UpdateTitle(name, id);
-            if (created)
-                return Ok(new ApiResponse
-                {
-                    Code = StatusCodes.Status200OK,
-                    Success = true,
-                });
-            else return BadRequest(new ApiResponse
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Success = false,
-            });
-        }
-
     }
 }

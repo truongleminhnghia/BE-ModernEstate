@@ -42,7 +42,7 @@ namespace ModernEstate.DAL.Entites
 
         [Column("publish_date", TypeName = "datetime")]
         [Required]
-        public DateTime PublishDate { get; set; } = DateTime.Now;
+        public DateTime PublishDate { get; set; }
 
         [Column("account_id")]
         public Guid? AccountId { get; set; }
@@ -55,6 +55,7 @@ namespace ModernEstate.DAL.Entites
         public Guid CategoryId { get; set; }
         [ForeignKey(nameof(CategoryId))]
         public Category? Category { get; set; }
+
         public virtual ICollection<NewTag>? NewTags { get; set; }
     }
 }
