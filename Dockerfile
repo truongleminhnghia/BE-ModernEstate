@@ -57,6 +57,7 @@ RUN apt-get update \
     libxrender1 \
     libxss1 \
     libxtst6 \
+    **libgbm1** \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/out .
