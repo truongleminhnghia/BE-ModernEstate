@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.CategoryServices;
 using ModernEstate.Common.Models.ApiResponse;
@@ -38,6 +39,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var category = await _categoryService.GetByIdAsync(id);

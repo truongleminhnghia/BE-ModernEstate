@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.ProvideServices;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
@@ -62,6 +63,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> Create([FromBody] ProvideRequest request)
         {
             var created = await _provideService.CreateAsync(request);

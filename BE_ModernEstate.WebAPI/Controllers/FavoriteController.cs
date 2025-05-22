@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.FavoriteServices;
 using ModernEstate.Common.Models.ApiResponse;
@@ -66,6 +67,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ROLE_STAFF, ROLE_CUSTOMER")]
         public async Task<IActionResult> Create([FromBody] FavoriteRequest request)
         {
             var created = await _favoriteService.CreateAsync(request);
