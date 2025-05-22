@@ -7,7 +7,7 @@ using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
-using QuestPDF.Infrastructure;
+using PuppeteerSharp;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,7 +74,24 @@ builder
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-QuestPDF.Settings.License = LicenseType.Community;
+
+var browserFetcher = new BrowserFetcher();
+
+// 2. Tải Chromium bản “mặc định”
+//    Kết quả là một RevisionInfo chứa Revision + ExecutablePath
+var revisionInfo = await browserFetcher.DownloadAsync();
+
+// 3. Khởi trình duyệt với đường dẫn vừa tải về
+var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+{
+    ExecutablePath = revisionInfo.GetExecutablePath(),
+    Headless = true
+});
+
+// 4. Mở trang, tạo PDF…
+var page = await browser.NewPageAsync();
+await page.GoToAsync("https://example.com");
+var pdf = await page.PdfDataAsync();
 
 builder.Services.AddCors(options =>
 {
