@@ -72,5 +72,14 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
             _context.Accounts.Remove(account);
             return true;
         }
+
+        public async Task<Account?> FindByPhone(string phone)
+        {
+            return await _context.Accounts.Include(a => a.Role)
+                                            .Include(a => a.Employee)
+                                            .Include(a => a.Broker)
+                                            .Include(a => a.OwnerProperty)
+                                            .FirstOrDefaultAsync(ac => ac.Phone.Equals(phone));
+        }
     }
 }

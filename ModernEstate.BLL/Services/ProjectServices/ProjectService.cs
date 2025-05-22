@@ -107,8 +107,8 @@ namespace ModernEstate.BLL.Services.ProjectServices
                 }
                 var project = _mapper.Map<Project>(request);
                 project.AddressId = addressId;
-                // project.Code = await _utils.GenerateUniqueBrokerCodeAsync("P_");
-                project.Code = "PC1234";
+                project.Code = await _utils.GenerateUniqueBrokerCodeAsync("P_");
+                // project.Code = "PC1234";
                 project.InvetorId = inventorExisting.Id;
                 project.CreatedAt = DateTime.UtcNow;
                 project.UpdatedAt = DateTime.UtcNow;

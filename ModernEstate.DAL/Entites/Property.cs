@@ -29,11 +29,11 @@ namespace ModernEstate.DAL.Entites
 
         [Column("original_price", TypeName = "decimal(18,2)")]
         [Required]
-        public decimal OriginalPrice { get; set; }
+        public double OriginalPrice { get; set; }
 
         [Column("sale_price", TypeName = "decimal(18,2)")]
         [Required]
-        public decimal SalePrice { get; set; }
+        public double SalePrice { get; set; }
 
         [Column("price_text", TypeName = "varchar(100)")]
         public string? PriceText { get; set; }

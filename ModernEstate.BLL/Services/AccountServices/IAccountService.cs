@@ -9,6 +9,9 @@ namespace ModernEstate.BLL.Services.AccountServices
     {
         public Task<bool> CreateAccount(AccountRequest req);
         public Task<AccountResponse> GetById(Guid id);
+        Task<Guid> CreateAccountBrokerOrOwner(AccountRequest req);
+        public Task<AccountResponse> GetByEmail(string email);
+        public Task<AccountResponse> GetByPhone(string phone);
         public Task<bool> UpdateAccount(UpdateAccountRequest req, Guid id);
         public Task<bool> UpdateAccountStatus(Guid id);
         Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email, int pageCurrent, int pageSize);

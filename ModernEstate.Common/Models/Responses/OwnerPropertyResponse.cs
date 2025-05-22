@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace ModernEstate.Common.Models.Responses
 {
@@ -9,5 +6,6 @@ namespace ModernEstate.Common.Models.Responses
     {
         public Guid Id { get; set; }
         public string? Code { get; set; }
+        public AccountResponse? Account { get; set; }
     }
 }
