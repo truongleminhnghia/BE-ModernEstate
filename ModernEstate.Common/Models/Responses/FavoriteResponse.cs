@@ -9,7 +9,6 @@ namespace ModernEstate.Common.Models.Responses
     public class FavoriteResponse
     {
         public Guid Id { get; set; }
-        public Guid AccountId { get; set; }
         public Guid PropertyId { get; set; }
     }
 }

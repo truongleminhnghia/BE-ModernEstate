@@ -1,35 +1,40 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.AddressServices;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
 
 namespace BE_ModernEstate.WebAPI.Controllers
 {
-    [Route("api/v1/addresses")]
     [ApiController]
+    [Route("api/v1/addresses")]
     public class AddressController : ControllerBase
     {
-        private readonly IAddressService _addressService;
+        private readonly IAddressService _svc;
         private readonly ILogger<AddressController> _logger;
 
-        public AddressController(IAddressService addressService, ILogger<AddressController> logger)
+        public AddressController(IAddressService svc, ILogger<AddressController> logger)
         {
-            _addressService = addressService;
+            _svc = svc;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetWithParams(
+            [FromQuery] string? city,
+            [FromQuery] string? district,
+            [FromQuery] string? ward,
+            [FromQuery(Name = "page_current")] int pageCurrent = 1,
+            [FromQuery(Name = "page_size")] int pageSize = 10
+        )
         {
-            var addresses = await _addressService.GetAllAsync();
+            var page = await _svc.GetWithParamsAsync(city, district, ward, pageCurrent, pageSize);
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched addresses successfully",
-                    Data = addresses,
+                    Message = "Addresses retrieved successfully",
+                    Data = page,
                 }
             );
         }
@@ -37,8 +42,8 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var address = await _addressService.GetByIdAsync(id);
-            if (address == null)
+            var dto = await _svc.GetByIdAsync(id);
+            if (dto == null)
             {
                 _logger.LogWarning($"Address not found with id {id}");
                 return NotFound(
@@ -51,13 +56,14 @@ namespace BE_ModernEstate.WebAPI.Controllers
                     }
                 );
             }
+
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched address successfully",
-                    Data = address,
+                    Message = "Address retrieved successfully",
+                    Data = dto,
                 }
             );
         }
@@ -65,7 +71,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddressRequest request)
         {
-            var created = await _addressService.CreateAsync(request);
+            var created = await _svc.CreateAsync(request);
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = created.Id },
@@ -82,8 +88,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] AddressRequest request)
         {
-            var success = await _addressService.UpdateAsync(id, request);
-            if (!success)
+            if (!await _svc.UpdateAsync(id, request))
             {
                 _logger.LogWarning($"Failed to update address with id {id} - not found");
                 return NotFound(
@@ -102,8 +107,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var success = await _addressService.DeleteAsync(id);
-            if (!success)
+            if (!await _svc.DeleteAsync(id))
             {
                 _logger.LogWarning($"Failed to delete address with id {id} - not found");
                 return NotFound(

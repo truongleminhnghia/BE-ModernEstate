@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.ServiceServices;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
 
@@ -20,16 +20,20 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetWithParams(
+            [FromQuery] EnumTypeService? serviceType,
+            [FromQuery(Name = "page_current")] int pageCurrent = 1,
+            [FromQuery(Name = "page_size")] int pageSize = 10
+        )
         {
-            var services = await _serviceService.GetAllAsync();
+            var page = await _serviceService.GetWithParamsAsync(serviceType, pageCurrent, pageSize);
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched services successfully",
-                    Data = services,
+                    Message = "Services retrieved successfully",
+                    Data = page,
                 }
             );
         }
@@ -37,8 +41,8 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var service = await _serviceService.GetByIdAsync(id);
-            if (service == null)
+            var dto = await _serviceService.GetByIdAsync(id);
+            if (dto == null)
             {
                 _logger.LogWarning($"Service not found with id {id}");
                 return NotFound(
@@ -51,13 +55,14 @@ namespace BE_ModernEstate.WebAPI.Controllers
                     }
                 );
             }
+
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched service successfully",
-                    Data = service,
+                    Message = "Service retrieved successfully",
+                    Data = dto,
                 }
             );
         }

@@ -12,7 +12,6 @@ namespace ModernEstate.DAL.Repositories.ServiceRepositories
 {
     public interface IServiceRepository : IGenericRepository<Service>
     {
-       
+        Task<IEnumerable<Service>> FindServicesAsync(EnumTypeService? serviceType);
     }
-    
 }

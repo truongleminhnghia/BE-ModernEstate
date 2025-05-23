@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.FavoriteServices;
 using ModernEstate.Common.Models.ApiResponse;
@@ -11,29 +10,31 @@ namespace BE_ModernEstate.WebAPI.Controllers
     [Route("api/v1/favorites")]
     public class FavoriteController : ControllerBase
     {
-        private readonly IFavoriteService _favoriteService;
+        private readonly IFavoriteService _svc;
         private readonly ILogger<FavoriteController> _logger;
 
-        public FavoriteController(
-            IFavoriteService favoriteService,
-            ILogger<FavoriteController> logger
-        )
+        public FavoriteController(IFavoriteService svc, ILogger<FavoriteController> logger)
         {
-            _favoriteService = favoriteService;
+            _svc = svc;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetWithParams(
+            [FromQuery] Guid? accountId,
+            [FromQuery] Guid? propertyId,
+            [FromQuery(Name = "page_current")] int pageCurrent = 1,
+            [FromQuery(Name = "page_size")] int pageSize = 10
+        )
         {
-            var favorites = await _favoriteService.GetAllAsync();
+            var page = await _svc.GetWithParamsAsync(accountId, propertyId, pageCurrent, pageSize);
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched favorites successfully",
-                    Data = favorites,
+                    Message = "Favorites retrieved successfully",
+                    Data = page,
                 }
             );
         }
@@ -41,8 +42,8 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var favorite = await _favoriteService.GetByIdAsync(id);
-            if (favorite == null)
+            var dto = await _svc.GetByIdAsync(id);
+            if (dto == null)
             {
                 _logger.LogWarning($"Favorite not found with id {id}");
                 return NotFound(
@@ -55,13 +56,14 @@ namespace BE_ModernEstate.WebAPI.Controllers
                     }
                 );
             }
+
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched favorite successfully",
-                    Data = favorite,
+                    Message = "Favorite retrieved successfully",
+                    Data = dto,
                 }
             );
         }
@@ -70,7 +72,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [Authorize(Roles = "ROLE_STAFF, ROLE_CUSTOMER")]
         public async Task<IActionResult> Create([FromBody] FavoriteRequest request)
         {
-            var created = await _favoriteService.CreateAsync(request);
+            var created = await _svc.CreateAsync(request);
             return CreatedAtAction(
                 nameof(GetById),
                 new { id = created.Id },
@@ -87,8 +89,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] FavoriteRequest request)
         {
-            var success = await _favoriteService.UpdateAsync(id, request);
-            if (!success)
+            if (!await _svc.UpdateAsync(id, request))
             {
                 _logger.LogWarning($"Failed to update favorite with id {id} - not found");
                 return NotFound(
@@ -107,8 +108,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var success = await _favoriteService.DeleteAsync(id);
-            if (!success)
+            if (!await _svc.DeleteAsync(id))
             {
                 _logger.LogWarning($"Failed to delete favorite with id {id} - not found");
                 return NotFound(
