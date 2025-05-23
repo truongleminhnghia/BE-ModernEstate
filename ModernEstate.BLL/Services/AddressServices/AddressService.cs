@@ -1,8 +1,3 @@
-// ModernEstate.BLL.Services.AddressServices/AddressService.cs
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using ModernEstate.Common.Exceptions;
