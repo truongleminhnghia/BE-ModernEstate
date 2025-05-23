@@ -10,5 +10,6 @@ namespace ModernEstate.Common.Models.Responses
     {
         public Guid Id { get; set; }
         public Guid PropertyId { get; set; }
+        public PropertyResponse? Property { get; set; }
     }
 }

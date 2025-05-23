@@ -27,7 +27,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
             [FromQuery(Name = "page_size")] int pageSize = 10
         )
         {
-            var page = await _svc.GetWithParamsAsync(accountId, propertyId, pageCurrent, pageSize);
+            var page = await _svc.GetAllAsync(accountId, propertyId, pageCurrent, pageSize);
             return Ok(
                 new ApiResponse
                 {
@@ -69,7 +69,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ROLE_STAFF, ROLE_CUSTOMER")]
+        [Authorize(Roles = "ROLE_STAFF, ROLE_CUSTOMER, ROLE_BROKER, ROLE_ADMIN, ROLE_PROPERTY_OWNER")]
         public async Task<IActionResult> Create([FromBody] FavoriteRequest request)
         {
             var created = await _svc.CreateAsync(request);

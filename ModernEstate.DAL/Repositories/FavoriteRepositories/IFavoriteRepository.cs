@@ -5,6 +5,7 @@ namespace ModernEstate.DAL.Repositories.FavoriteRepositories
 {
     public interface IFavoriteRepository : IGenericRepository<Favorite>
     {
-        Task<IEnumerable<Favorite>> FindFavoritesAsync(Guid? accountId, Guid? propertyId);
+        Task<Favorite?> FindById(Guid id);
+        Task<IEnumerable<Favorite>> FindWithParams(Guid? accountId, Guid? propertyId);
     }
 }
