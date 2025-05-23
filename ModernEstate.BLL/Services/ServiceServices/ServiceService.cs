@@ -1,6 +1,8 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
+using ModernEstate.Common.Models.Pages;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
@@ -29,8 +31,8 @@ namespace ModernEstate.BLL.Services.ServiceServices
         {
             try
             {
-                var Services = await _unitOfWork.Services.GetAllAsync();
-                return _mapper.Map<IEnumerable<ServiceResponse>>(Services);
+                var entities = await _unitOfWork.Services.GetAllAsync();
+                return _mapper.Map<IEnumerable<ServiceResponse>>(entities);
             }
             catch (Exception ex)
             {
@@ -39,33 +41,17 @@ namespace ModernEstate.BLL.Services.ServiceServices
             }
         }
 
-        public async Task<ServiceResponse?> GetByIdAsync(Guid id)
-        {
-            try
-            {
-                var Services = await _unitOfWork.Services.GetByIdAsync(id);
-                if (Services == null)
-                    return null;
-                return _mapper.Map<ServiceResponse>(Services);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Failed to get service by id {id}");
-                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-            }
-        }
-
         public async Task<ServiceResponse> CreateAsync(ServiceRequest request)
         {
             try
             {
-                var Services = _mapper.Map<Service>(request);
-                Services.Id = Guid.NewGuid();
+                var entity = _mapper.Map<Service>(request);
+                entity.Id = Guid.NewGuid();
 
-                await _unitOfWork.Services.CreateAsync(Services);
+                await _unitOfWork.Services.CreateAsync(entity);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
-                return _mapper.Map<ServiceResponse>(Services);
+                return _mapper.Map<ServiceResponse>(entity);
             }
             catch (Exception ex)
             {
@@ -74,17 +60,32 @@ namespace ModernEstate.BLL.Services.ServiceServices
             }
         }
 
+        public async Task<ServiceResponse?> GetByIdAsync(Guid id)
+        {
+            try
+            {
+                var entity = await _unitOfWork.Services.GetByIdAsync(id);
+                if (entity == null)
+                    return null;
+                return _mapper.Map<ServiceResponse>(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to get service by id {id}");
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
         public async Task<bool> UpdateAsync(Guid id, ServiceRequest request)
         {
             try
             {
-                var Services = await _unitOfWork.Services.GetByIdAsync(id);
-                if (Services == null)
+                var entity = await _unitOfWork.Services.GetByIdAsync(id);
+                if (entity == null)
                     return false;
 
-                _mapper.Map(request, Services);
-
-                _unitOfWork.Services.Update(Services);
+                _mapper.Map(request, entity);
+                _unitOfWork.Services.Update(entity);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
                 return true;
@@ -100,11 +101,11 @@ namespace ModernEstate.BLL.Services.ServiceServices
         {
             try
             {
-                var Services = await _unitOfWork.Services.GetByIdAsync(id);
-                if (Services == null)
+                var entity = await _unitOfWork.Services.GetByIdAsync(id);
+                if (entity == null)
                     return false;
 
-                _unitOfWork.Services.Delete(Services);
+                _unitOfWork.Services.Delete(entity);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
 
                 return true;
@@ -112,6 +113,34 @@ namespace ModernEstate.BLL.Services.ServiceServices
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to delete service id {id}");
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<PageResult<ServiceResponse>> GetWithParamsAsync(
+            EnumTypeService? serviceType,
+            int pageCurrent,
+            int pageSize
+        )
+        {
+            try
+            {
+                var all = await _unitOfWork.Services.FindServicesAsync(serviceType);
+                if (!all.Any())
+                    throw new AppException(ErrorCode.LIST_EMPTY);
+
+                var paged = all.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
+
+                var dtos = _mapper.Map<System.Collections.Generic.List<ServiceResponse>>(paged);
+                return new PageResult<ServiceResponse>(dtos, pageSize, pageCurrent, all.Count());
+            }
+            catch (AppException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get services with params");
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }

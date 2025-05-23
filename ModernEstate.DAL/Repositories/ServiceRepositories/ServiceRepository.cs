@@ -14,8 +14,17 @@ namespace ModernEstate.DAL.Repositories.ServiceRepositories
 {
     public class ServiceRepository : GenericRepository<Service>, IServiceRepository
     {
-        public ServiceRepository(ApplicationDbConext context) : base(context) { }
+        public ServiceRepository(ApplicationDbConext context)
+            : base(context) { }
 
+        public async Task<IEnumerable<Service>> FindServicesAsync(EnumTypeService? serviceType)
+        {
+            IQueryable<Service> query = _context.Services;
+
+            if (serviceType.HasValue)
+                query = query.Where(s => s.TypeService == serviceType.Value);
+
+            return await query.OrderByDescending(s => s.CreatedAt).ToListAsync();
+        }
     }
-    
 }

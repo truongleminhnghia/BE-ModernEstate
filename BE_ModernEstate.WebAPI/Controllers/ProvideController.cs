@@ -63,7 +63,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
+        //[Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> Create([FromBody] ProvideRequest request)
         {
             var created = await _provideService.CreateAsync(request);

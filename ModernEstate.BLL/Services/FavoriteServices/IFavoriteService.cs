@@ -6,10 +6,16 @@ namespace ModernEstate.BLL.Services.FavoriteServices
 {
     public interface IFavoriteService
     {
-        Task<PageResult<FavoriteResponse>> GetAllAsync(Guid? accountId, int pageCurrent, int pageSize);
+        Task<PageResult<FavoriteResponse>> GetAllAsync(Guid? accountId, Guid? propertyId, int pageCurrent, int pageSize);
         Task<FavoriteResponse?> GetByIdAsync(Guid id);
         Task<FavoriteResponse> CreateAsync(FavoriteRequest request);
         Task<bool> UpdateAsync(Guid id, FavoriteRequest request);
         Task<bool> DeleteAsync(Guid id);
+        // Task<PageResult<FavoriteResponse>> GetWithParamsAsync(
+        //     Guid? accountId,
+        //     Guid? propertyId,
+        //     int pageCurrent,
+        //     int pageSize
+        // );
     }
 }

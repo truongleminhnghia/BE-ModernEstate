@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.CategoryServices;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
 
@@ -11,29 +11,31 @@ namespace BE_ModernEstate.WebAPI.Controllers
     [Route("api/v1/categories")]
     public class CategoryController : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
+        private readonly ICategoryService _svc;
         private readonly ILogger<CategoryController> _logger;
 
-        public CategoryController(
-            ICategoryService categoryService,
-            ILogger<CategoryController> logger
-        )
+        public CategoryController(ICategoryService svc, ILogger<CategoryController> logger)
         {
-            _categoryService = categoryService;
+            _svc = svc;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
+        public async Task<IActionResult> GetWithParams(
+            [FromQuery] EnumCategoryName? categoryName,
+            [FromQuery(Name = "page_current")] int pageCurrent = 1,
+            [FromQuery(Name = "page_size")] int pageSize = 10
+        )
         {
-            var categories = await _categoryService.GetAllAsync();
+            var page = await _svc.GetWithParamsAsync(categoryName, pageCurrent, pageSize);
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched categories successfully",
-                    Data = categories,
+                    Message = "Categories retrieved successfully",
+                    Data = page,
                 }
             );
         }
@@ -42,8 +44,8 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var category = await _categoryService.GetByIdAsync(id);
-            if (category == null)
+            var dto = await _svc.GetByIdAsync(id);
+            if (dto == null)
             {
                 _logger.LogWarning($"Category not found with id {id}");
                 return NotFound(
@@ -56,39 +58,41 @@ namespace BE_ModernEstate.WebAPI.Controllers
                     }
                 );
             }
+
             return Ok(
                 new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "Fetched category successfully",
-                    Data = category,
+                    Message = "Category retrieved successfully",
+                    Data = dto,
                 }
             );
         }
 
         [HttpPost]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> Create([FromBody] CategoryRequest request)
         {
-            var created = await _categoryService.CreateAsync(request);
+            var dto = await _svc.CreateAsync(request);
             return CreatedAtAction(
                 nameof(GetById),
-                new { id = created.Id },
+                new { id = dto.Id },
                 new ApiResponse
                 {
                     Code = StatusCodes.Status201Created,
                     Success = true,
                     Message = "Category created successfully",
-                    Data = created,
+                    Data = dto,
                 }
             );
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> Update(Guid id, [FromBody] CategoryRequest request)
         {
-            var success = await _categoryService.UpdateAsync(id, request);
-            if (!success)
+            if (!await _svc.UpdateAsync(id, request))
             {
                 _logger.LogWarning($"Failed to update category with id {id} - not found");
                 return NotFound(
@@ -101,14 +105,15 @@ namespace BE_ModernEstate.WebAPI.Controllers
                     }
                 );
             }
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var success = await _categoryService.DeleteAsync(id);
-            if (!success)
+            if (!await _svc.DeleteAsync(id))
             {
                 _logger.LogWarning($"Failed to delete category with id {id} - not found");
                 return NotFound(
@@ -121,6 +126,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
                     }
                 );
             }
+
             return NoContent();
         }
     }
