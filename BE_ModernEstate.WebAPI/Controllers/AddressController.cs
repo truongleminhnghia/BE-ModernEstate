@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.AddressServices;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
@@ -19,6 +20,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF, ROLE_CUSTOMER")]
         public async Task<IActionResult> GetWithParams(
             [FromQuery] string? city,
             [FromQuery] string? district,
@@ -40,6 +42,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF, ROLE_CUSTOMER")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var dto = await _svc.GetByIdAsync(id);
@@ -69,6 +72,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF, ROLE_CUSTOMER")]
         public async Task<IActionResult> Create([FromBody] AddressRequest request)
         {
             var created = await _svc.CreateAsync(request);
@@ -86,6 +90,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF,  ROLE_CUSTOMER")]
         public async Task<IActionResult> Update(Guid id, [FromBody] AddressRequest request)
         {
             if (!await _svc.UpdateAsync(id, request))
@@ -105,6 +110,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF, ROLE_CUSTOMER")]
         public async Task<IActionResult> Delete(Guid id)
         {
             if (!await _svc.DeleteAsync(id))
