@@ -19,11 +19,11 @@ namespace ModernEstate.DAL.Repositories.NewRepositories
         public async Task<New?> GetByIdWithDetailsAsync(Guid id)
         {
             return await _context.Set<New>()
-                .Include(n => n.Account)
-                .Include(n => n.Category)
-                .Include(n => n.NewTags!)
-                    .ThenInclude(nt => nt.Tag)
-                .FirstOrDefaultAsync(n => n.Id == id);
+        .Include(n => n.Account)
+        .Include(n => n.Category)
+        .Include(n => n.NewTags!)
+            .ThenInclude(nt => nt.Tag)
+        .FirstOrDefaultAsync(n => n.Id == id);
         }
     }
 }

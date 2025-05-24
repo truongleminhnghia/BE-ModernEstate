@@ -16,11 +16,9 @@ namespace ModernEstate.Common.Models.Responses
         public string? Content { get; set; }
         public string? ImageUrl { get; set; }
         public DateTime PublishDate { get; set; }
-
-        public Guid? AccountId { get; set; }
-        public AccountResponse? Account { get; set; }      // full Account object
-
-        public Guid CategoryId { get; set; }
+        public AccountResponse? Account { get; set; }   
+        public CategoryResponse? Category { get; set; }    
+        public List<TagResponse>? Tags { get; set; }      
 
     }
 }
