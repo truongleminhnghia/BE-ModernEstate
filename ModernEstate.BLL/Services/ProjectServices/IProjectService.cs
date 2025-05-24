@@ -1,8 +1,8 @@
+using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Responses;
 
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Pages;
-using ModernEstate.Common.Models.Requests;
-using ModernEstate.Common.Models.Responses;
 
 namespace ModernEstate.BLL.Services.ProjectServices
 {

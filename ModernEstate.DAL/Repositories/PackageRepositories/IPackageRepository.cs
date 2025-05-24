@@ -12,6 +12,6 @@ namespace ModernEstate.DAL.Repositories.PackageRepositories
 {
     public interface IPackageRepository : IGenericRepository<Package>
     {
-
+        Task<IEnumerable<Package>> FindPackagesAsync(EnumTypePackage? typePackage);
     }
 }
