@@ -2,6 +2,11 @@
 
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using ModernEstate.BLL.Services.AccountServices;
+using ModernEstate.Common.Exceptions;
+using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
@@ -14,12 +19,14 @@ namespace ModernEstate.BLL.Services.NewServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<NewService> _logger;
 
-        public NewService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public NewService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ILogger<NewService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         public async Task<NewsCreateResponse> CreateAsync(NewsRequest newsRequest)
@@ -40,8 +47,6 @@ namespace ModernEstate.BLL.Services.NewServices
             }
             
             var news = _mapper.Map<New>(newsRequest);
-            news.CreatedAt = DateTime.Now;
-            news.UpdatedAt = DateTime.Now;
             news.AccountId = accountId;
             var tagEntities = new List<Tag>();
             foreach (var tagName in newsRequest.TagNames.Distinct())
@@ -73,14 +78,71 @@ namespace ModernEstate.BLL.Services.NewServices
             return NewsCreateResponse.Ok("Create news successful");
         }
 
-        public async Task<bool> UpdateTitle(string name, Guid id)
+        public async Task<ApiResponse> UpdateAsync(Guid id, NewsRequest request)
         {
             var news = await _unitOfWork.News.GetByIdAsync(id);
-            news.Title = name;
-            news.UpdatedAt = DateTime.Now;
-            await _unitOfWork.News.UpdateAsync(news);
+            if (news == null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = "News not found"
+                };
+            }
+            var newsExist = await _unitOfWork.News.FindByTitle(request.Title);
+            if (newsExist != null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = "A news article with the same title already exists."
+                };
+            }
+            var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId);
+            if (category == null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = "Invalid category."
+                };
+            }
+
+            _mapper.Map(request, news);
+
+            _unitOfWork.News.Update(news);
             await _unitOfWork.SaveChangesAsync();
-            return true;
+
+            return new ApiResponse
+            {
+                Success = true,
+                Message = "News updated successfully"
+            };
+
         }
+        public async Task<NewsResponse> GetByIdAsync(Guid id)
+        {
+            try
+            {
+                var news = await _unitOfWork.News.GetByIdWithDetailsAsync(id);
+
+
+                if (news == null)
+                    throw new KeyNotFoundException("News not found.");
+
+                return _mapper.Map<NewsResponse>(news);
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.NOT_FOUND);
+            }
+        }
+
     }
 }

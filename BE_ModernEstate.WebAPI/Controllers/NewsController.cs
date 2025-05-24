@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.NewServices;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Responses;
 
 namespace BE_ModernEstate.WebAPI.Controllers
 {
@@ -22,7 +23,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] NewsRequest news)
         {
-            
+
             var created = await _service.CreateAsync(news);
             if (created.Success)
                 return Ok(new ApiResponse
@@ -39,22 +40,60 @@ namespace BE_ModernEstate.WebAPI.Controllers
             });
         }
 
-        [HttpPut ("{id}")]
-        public async Task<IActionResult> Update([FromBody] String name, Guid id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] NewsRequest news)
         {
-            var created = await _service.UpdateTitle(name, id);
-            if (created)
+            var result = await _service.UpdateAsync(id, news);
+            if (result.Success)
                 return Ok(new ApiResponse
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
+                    Message = result.Message
                 });
-            else return BadRequest(new ApiResponse
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Success = false,
-            });
+            else
+                return BadRequest(new ApiResponse
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = result.Message
+                });
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            try
+            {
+                var result = await _service.GetByIdAsync(id);
+                return Ok(new ApiResponse
+                {
+                    Code = StatusCodes.Status200OK,
+                    Success = true,
+                    Message = "Successfully",
+                    Data = result
+                });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new ApiResponse
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Success = false,
+                    Message = "News not found."
+                });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = $"Error: {ex.Message}"
+                });
+            }
+
+        }
     }
 }
