@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ModernEstate.Common.Models.Responses
+﻿namespace ModernEstate.Common.Models.Responses
 {
     public class CashPaymentResponse
     {
