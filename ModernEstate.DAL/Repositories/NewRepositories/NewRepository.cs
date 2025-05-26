@@ -27,7 +27,7 @@ namespace ModernEstate.DAL.Repositories.NewRepositories
         .FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public async Task<IEnumerable<New>> FindNewsAsync(string? title, EnumStatusNew? status, EnumCategoryName? categoryName)
+        public async Task<IEnumerable<New>> FindNewsAsync(string? title, EnumStatusNew? status, EnumCategoryName? categoryName, string? tagNames)
         {
             var query = _context.News
                 .Include(n => n.Account)
@@ -43,6 +43,12 @@ namespace ModernEstate.DAL.Repositories.NewRepositories
 
             if (categoryName.HasValue)
                 query = query.Where(n => n.Category != null && n.Category.CategoryName == categoryName.Value);
+
+            if (!string.IsNullOrWhiteSpace(tagNames))
+            {
+                var tags = tagNames.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                query = query.Where(n => n.NewTags!.Any(nt => tags.Contains(nt.Tag!.TagName!)));
+            }
 
             return await query.OrderByDescending(n => n.PublishDate).ToListAsync();
         }

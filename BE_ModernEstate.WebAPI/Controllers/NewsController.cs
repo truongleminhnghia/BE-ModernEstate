@@ -127,15 +127,17 @@ namespace BE_ModernEstate.WebAPI.Controllers
             }
         }
 
-        [HttpGet("filter")]
-        public async Task<IActionResult> GetFilteredNews(
+        [HttpGet]
+        public async Task<IActionResult> GetAllWithParam(
     [FromQuery] string? title,
     [FromQuery] EnumStatusNew? status,
     [FromQuery] EnumCategoryName? categoryName,
+    [FromQuery] string? tags,
     [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 10)
+    [FromQuery] int pageSize = 10,
+    )
         {
-            var result = await _service.GetWithParamsAsync(title, status, categoryName, page, pageSize);
+            var result = await _service.GetWithParamsAsync(title, status, categoryName, tags, page, pageSize);
             return Ok(new ApiResponse
             {
                 Code = 200,

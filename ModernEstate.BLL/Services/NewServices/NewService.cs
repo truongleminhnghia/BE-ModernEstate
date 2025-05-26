@@ -171,13 +171,14 @@ namespace ModernEstate.BLL.Services.NewServices
     string? title,
     EnumStatusNew? status,
     EnumCategoryName? categoryName,
+    string? tags,
     int pageCurrent,
     int pageSize
 )
         {
             try
             {
-                var all = await _unitOfWork.News.FindNewsAsync(title, status, categoryName);
+                var all = await _unitOfWork.News.FindNewsAsync(title, status, categoryName, tags);
                 if (!all.Any())
                     throw new AppException(ErrorCode.LIST_EMPTY);
 

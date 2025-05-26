@@ -18,6 +18,7 @@ namespace ModernEstate.BLL.Services.NewServices
                                                             string? title,
                                                             EnumStatusNew? status,
                                                             EnumCategoryName? categoryName,
+                                                            string? tagName,
                                                             int pageCurrent,
                                                             int pageSize
                                                         );
