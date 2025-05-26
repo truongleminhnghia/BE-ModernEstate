@@ -1,8 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using ModernEstate.BLL.Services.AuthenticateServices;
+using ModernEstate.Common.Enums;
+using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Settings;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace BE_ModernEstate.WebAPI.Controllers
 {
@@ -42,6 +49,22 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Data = null
             });
         }
+
+        [HttpGet("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromQuery] string token)
+        {
+            try
+            {
+                await _authenticateService.VerifyEmailAsync(token);
+                return Ok("Xác minh email thành công.");
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
 
         [HttpPost("change-password/{id}")]
         [Authorize(Roles = "ROLE_CUSTOMER, ROLE_BROKER, ROLE_ADMIN, ROLE_STAFF, ROLE_PROPERTY_OWNER")]
