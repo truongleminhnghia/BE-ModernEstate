@@ -138,5 +138,29 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Data = result
             });
         }
+
+        [HttpDelete("{idd}")]
+        [Authorize(Roles = "ROLE_ADMIN")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _accountService.UpdateAccountStatus(id);
+            if (!result)
+            {
+                return NotFound(new ApiResponse
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Success = false,
+                    Message = "Account not found",
+                    Data = null
+                });
+            }
+            return Ok(new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Account deleted successfully",
+                Data = result
+            });
+        }
     }
 }
