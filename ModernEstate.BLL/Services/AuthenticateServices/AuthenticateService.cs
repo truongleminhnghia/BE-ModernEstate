@@ -1,13 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using ModernEstate.BLL.JWTServices;
-using ModernEstate.Common.Enums;
-using ModernEstate.Common.Models.AuthenticateResponse;
-using ModernEstate.DAL.Entites;
-using ModernEstate.DAL;
+using Microsoft.IdentityModel.Tokens;
 using ModernEstate.BLL.HashPasswords;
-using ModernEstate.Common.Models.Requests;
+using ModernEstate.BLL.JWTServices;
+using ModernEstate.BLL.Services.EmailServices;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
+using ModernEstate.Common.Models.AuthenticateResponse;
+using ModernEstate.Common.Models.Requests;
+using ModernEstate.DAL;
+using ModernEstate.DAL.Entites;
+using System.Security.Claims;
 
 namespace ModernEstate.BLL.Services.AuthenticateServices
 {
@@ -17,15 +20,43 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
         private readonly IJwtService _jwtService;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
         private readonly ILogger<AuthenticateService> _logger;
 
-        public AuthenticateService(IUnitOfWork unitOfWork, IJwtService jwtService, IPasswordHasher passwordHasher, IMapper mapper, ILogger<AuthenticateService> logger)
+        public AuthenticateService(IUnitOfWork unitOfWork, IJwtService jwtService, IPasswordHasher passwordHasher, IMapper mapper, ILogger<AuthenticateService> logger, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _passwordHasher = passwordHasher;
             _mapper = mapper;
             _logger = logger;
+            _emailService = emailService;
+        }
+
+        public async Task<bool> ChangePassword(string oldPassword, string newPassword, Guid id)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id.ToString())) throw new AppException(ErrorCode.UNAUTHORIZED);
+                var account = await _unitOfWork.Accounts.GetByIdAsync(id);
+                if (account == null) throw new AppException(ErrorCode.NOT_FOUND);
+                bool checkPassword = _passwordHasher.VerifyPassword(oldPassword, account.Password);
+                if (!checkPassword) throw new AppException(ErrorCode.INVALID_PASSWORD);
+                account.Password = _passwordHasher.HashPassword(newPassword);
+                await _unitOfWork.Accounts.UpdateAsync(account);
+                await _unitOfWork.SaveChangesWithTransactionAsync();
+                return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
         }
 
         public async Task<AuthenticateResponse> Login(string email, string password)
@@ -33,7 +64,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             try
             {
                 Account? account = await _unitOfWork.Accounts.GetByEmail(email);
-                if (account == null) throw new AppException(ErrorCode.EMAIL_DOT_NOT_EXISTS);
+                if (account == null) throw new AppException(ErrorCode.EMAIL_DO_NOT_EXISTS);
                 bool checkPassword = _passwordHasher.VerifyPassword(password, account.Password);
                 if (!checkPassword) throw new AppException(ErrorCode.INVALID_PASSWORD);
                 var token = _jwtService.GenerateJwtToken(account);
@@ -89,6 +120,12 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 // };
                 // await _unitOfWork.Customers.CreateAsync(customer);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
+                string token = _jwtService.GenerateEmailVerificationToken(account.Email!);
+
+                string verifyUrl = $"https://modernestate.vercel.app/login?token={token}";
+                
+
+                await _emailService.SendEmailAsync(account.Email!, "Xác minh email", verifyUrl);
                 _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", request.Email, account.Role);
                 return true;
             }
@@ -103,5 +140,37 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
+
+        public async Task VerifyEmailAsync(string token)
+        {
+            try
+            {
+                var principal = _jwtService.ValidateTokenClaimsPrincipal(token);
+                var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (email == null)
+                    throw new AppException(ErrorCode.EMAIL_DO_NOT_EXISTS);
+
+                var account = await _unitOfWork.Accounts.GetByEmail(email);
+                if (account == null)
+                    throw new AppException(ErrorCode.INVALID_ACCOUNT_ROLE);
+
+                if (account.EnumAccountStatus == EnumAccountStatus.ACTIVE)
+                    return; 
+
+                account.EnumAccountStatus = EnumAccountStatus.ACTIVE;
+                await _unitOfWork.SaveChangesWithTransactionAsync();
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+            catch (Exception)
+            {
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+
     }
 }
