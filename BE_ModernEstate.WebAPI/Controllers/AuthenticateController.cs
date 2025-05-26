@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.AuthenticateServices;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
@@ -38,6 +39,20 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Code = StatusCodes.Status200OK,
                 Success = true,
                 Message = "Register successful",
+                Data = null
+            });
+        }
+
+        [HttpPost("change-password/{id}")]
+        [Authorize(Roles = "ROLE_CUSTOMER, ROLE_BROKER, ROLE_ADMIN, ROLE_STAFF, ROLE_PROPERTY_OWNER")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, Guid id)
+        {
+            var result = await _authenticateService.ChangePassword(request.OldPassword, request.NewPassword, id);
+            return Ok(new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Change password successful",
                 Data = null
             });
         }

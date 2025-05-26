@@ -28,6 +28,32 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             _logger = logger;
         }
 
+        public async Task<bool> ChangePassword(string oldPassword, string newPassword, Guid id)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id.ToString())) throw new AppException(ErrorCode.UNAUTHORIZED);
+                var account = await _unitOfWork.Accounts.GetByIdAsync(id);
+                if (account == null) throw new AppException(ErrorCode.NOT_FOUND);
+                bool checkPassword = _passwordHasher.VerifyPassword(oldPassword, account.Password);
+                if (!checkPassword) throw new AppException(ErrorCode.INVALID_PASSWORD);
+                account.Password = _passwordHasher.HashPassword(newPassword);
+                await _unitOfWork.Accounts.UpdateAsync(account);
+                await _unitOfWork.SaveChangesWithTransactionAsync();
+                return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
         public async Task<AuthenticateResponse> Login(string email, string password)
         {
             try
