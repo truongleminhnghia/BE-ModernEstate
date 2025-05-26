@@ -23,5 +23,15 @@ namespace ModernEstate.DAL.Entites
         [Column("message", TypeName = "text")]
         [Required]
         public string? Message { get; set; }
+
+        [Column("property_id")]
+        public Guid? PropertyId { get; set; }
+        [ForeignKey("PropertyId")]
+        public Property? Property { get; set; }
+
+        [Column("project_id")]
+        public Guid? ProjectId { get; set; }
+        [ForeignKey("ProjectId")]
+        public Project? Project { get; set; }
     }
 }

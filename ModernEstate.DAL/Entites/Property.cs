@@ -96,6 +96,7 @@ namespace ModernEstate.DAL.Entites
         [ForeignKey(nameof(OwnerId))]
         public OwnerProperty? Owner { get; set; }
 
+        public virtual ICollection<Support>? Supports { get; set; }
         public virtual ICollection<Image>? PropertyImages { get; set; }
         public virtual ICollection<History>? Histories { get; set; }
         public virtual ICollection<Post>? Posts { get; set; }

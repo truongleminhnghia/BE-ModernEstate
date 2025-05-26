@@ -15,6 +15,6 @@ namespace ModernEstate.Common.Models.Requests
         public PropertyRequest? Property { get; set; }
         public Guid? ContactId { get; set; }
         public ContactRequest? Contact { get; set; }
-        public SupportRequest? Support { get; set; }
+        public PostPackageReuqest? PostPackage { get; set; }
     }
 }

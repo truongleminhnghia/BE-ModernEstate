@@ -97,6 +97,7 @@ namespace ModernEstate.DAL.Entites
         [Description("Navigation property for the associated Invetor")]
         public Invetor? Invetor { get; set; }
 
+        public virtual ICollection<Support>? Supports { get; set; }
         public virtual ICollection<Property>? Properties { get; set; }
         public virtual ICollection<History>? Histories { get; set; }
         public virtual ICollection<Image>? Images { get; set; }
