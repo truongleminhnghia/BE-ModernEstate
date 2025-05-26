@@ -182,12 +182,12 @@ namespace BE_ModernEstate.WebAPI.Controllers
 
                 if (result.Success)
                 {
-                    // Redirect to success page
+                    // Chuyển hướng đến trang thành công
                     return Redirect($"/payment/success?transactionId={result.TransactionId}");
                 }
                 else
                 {
-                    // Redirect to failure page
+                    // Chuyển hướng đến trang lỗi
                     return Redirect($"/payment/failed?message={result.Message}");
                 }
             }
