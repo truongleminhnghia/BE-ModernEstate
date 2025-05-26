@@ -127,6 +127,25 @@ namespace BE_ModernEstate.WebAPI.Controllers
             }
         }
 
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetFilteredNews(
+    [FromQuery] string? title,
+    [FromQuery] EnumStatusNew? status,
+    [FromQuery] EnumCategoryName? categoryName,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10)
+        {
+            var result = await _service.GetWithParamsAsync(title, status, categoryName, page, pageSize);
+            return Ok(new ApiResponse
+            {
+                Code = 200,
+                Success = true,
+                Message = "Filtered news retrieved successfully",
+                Data = result
+            });
+        }
+
+
 
 
     }

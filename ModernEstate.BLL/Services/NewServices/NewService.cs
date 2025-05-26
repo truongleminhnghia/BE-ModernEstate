@@ -9,6 +9,7 @@ using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.ApiResponse;
+using ModernEstate.Common.Models.Pages;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
@@ -166,6 +167,38 @@ namespace ModernEstate.BLL.Services.NewServices
             return news.StatusNew;
         }
 
+        public async Task<PageResult<NewsResponse>> GetWithParamsAsync(
+    string? title,
+    EnumStatusNew? status,
+    EnumCategoryName? categoryName,
+    int pageCurrent,
+    int pageSize
+)
+        {
+            try
+            {
+                var all = await _unitOfWork.News.FindNewsAsync(title, status, categoryName);
+                if (!all.Any())
+                    throw new AppException(ErrorCode.LIST_EMPTY);
+
+                var paged = all
+                    .Skip((pageCurrent - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                var dtoList = _mapper.Map<List<NewsResponse>>(paged);
+                return new PageResult<NewsResponse>(dtoList, pageSize, pageCurrent, all.Count());
+            }
+            catch (AppException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get news with parameters");
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
 
     }
 }
