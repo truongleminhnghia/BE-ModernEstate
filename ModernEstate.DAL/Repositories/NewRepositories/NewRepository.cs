@@ -27,7 +27,8 @@ namespace ModernEstate.DAL.Repositories.NewRepositories
         .FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public async Task<IEnumerable<New>> FindNewsAsync(string? title, EnumStatusNew? status, EnumCategoryName? categoryName, string? tagNames)
+        public async Task<IEnumerable<New>> FindNewsAsync(string? title, EnumStatusNew? status, EnumCategoryName? categoryName, string? tagNames, DateTime? startDate,
+    DateTime? endDate, string sortBy = "title", bool sortDescending = false)
         {
             var query = _context.News
                 .Include(n => n.Account)
@@ -50,7 +51,33 @@ namespace ModernEstate.DAL.Repositories.NewRepositories
                 query = query.Where(n => n.NewTags!.Any(nt => tags.Contains(nt.Tag!.TagName!)));
             }
 
-            return await query.OrderByDescending(n => n.PublishDate).ToListAsync();
+            if (startDate.HasValue)
+                query = query.Where(n => n.PublishDate >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(n => n.PublishDate <= endDate.Value);
+
+
+            switch (sortBy?.ToLower())
+            {
+                case "title":
+                    query = sortDescending ? query.OrderByDescending(n => n.Title) : query.OrderBy(n => n.Title);
+                    break;
+                case "statusnew":
+                    query = sortDescending ? query.OrderByDescending(n => n.StatusNew) : query.OrderBy(n => n.StatusNew);
+                    break;
+                case "categoryname":
+                    query = sortDescending ? query.OrderByDescending(n => n.Category!.CategoryName) : query.OrderBy(n => n.Category!.CategoryName);
+                    break;
+                case "publishdate":
+                    query = sortDescending ? query.OrderByDescending(n => n.PublishDate) : query.OrderBy(n => n.PublishDate);
+                    break;
+                default:
+
+                    query = query.OrderBy(n => n.Title);
+                    break;
+            }
+            return await query.ToListAsync();
         }
 
     }

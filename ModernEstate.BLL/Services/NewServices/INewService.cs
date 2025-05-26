@@ -20,7 +20,11 @@ namespace ModernEstate.BLL.Services.NewServices
                                                             EnumCategoryName? categoryName,
                                                             string? tagName,
                                                             int pageCurrent,
-                                                            int pageSize
+                                                            int pageSize,
+                                                            DateTime? startDate,
+                                                            DateTime? endDate,
+                                                            string sortBy = "title", 
+                                                            bool sortDescending = false
                                                         );
 
 

@@ -130,14 +130,18 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllWithParam(
     [FromQuery] string? title,
-    [FromQuery] EnumStatusNew? status,
+    [FromQuery] EnumStatusNew? statusNew,
     [FromQuery] EnumCategoryName? categoryName,
     [FromQuery] string? tags,
+    [FromQuery] DateTime? startPublishDate,
+    [FromQuery] DateTime? endPulishDate,
     [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 10
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string sortBy = "title",
+    [FromQuery] bool sortDescending = false
     )
         {
-            var result = await _service.GetWithParamsAsync(title, status, categoryName, tags, page, pageSize);
+            var result = await _service.GetWithParamsAsync(title, statusNew, categoryName, tags, page, pageSize, startPublishDate, endPulishDate, sortBy, sortDescending);
             return Ok(new ApiResponse
             {
                 Code = 200,

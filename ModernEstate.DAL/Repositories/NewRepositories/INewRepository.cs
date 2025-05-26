@@ -9,7 +9,8 @@ namespace ModernEstate.DAL.Repositories.NewRepositories
     {
         Task<New> FindByTitle(string title);
         Task<New?> GetByIdWithDetailsAsync(Guid id);
-        Task<IEnumerable<New>> FindNewsAsync(string? title, EnumStatusNew? status, EnumCategoryName? categoryName, string? tagNames);
+        Task<IEnumerable<New>> FindNewsAsync(string? title, EnumStatusNew? status, EnumCategoryName? categoryName, string? tagNames, DateTime? startDate,
+    DateTime? endDate, string sortBy = "title", bool sortDescending = false);
 
 
     }

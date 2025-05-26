@@ -173,12 +173,16 @@ namespace ModernEstate.BLL.Services.NewServices
     EnumCategoryName? categoryName,
     string? tags,
     int pageCurrent,
-    int pageSize
+    int pageSize,
+    DateTime? startDate,
+    DateTime? endDate,
+    string sortBy = "title",
+    bool sortDescending = false
 )
         {
             try
             {
-                var all = await _unitOfWork.News.FindNewsAsync(title, status, categoryName, tags);
+                var all = await _unitOfWork.News.FindNewsAsync(title, status, categoryName, tags,startDate,endDate, sortBy, sortDescending);
                 if (!all.Any())
                     throw new AppException(ErrorCode.LIST_EMPTY);
 
