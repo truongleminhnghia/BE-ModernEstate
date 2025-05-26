@@ -134,7 +134,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
     [FromQuery] EnumCategoryName? categoryName,
     [FromQuery] string? tags,
     [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 10,
+    [FromQuery] int pageSize = 10
     )
         {
             var result = await _service.GetWithParamsAsync(title, status, categoryName, tags, page, pageSize);
