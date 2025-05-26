@@ -1,9 +1,4 @@
-
-
 namespace ModernEstate.BLL.Services.TransactionServices
 {
-    public class TransactionService : ITransactionService
-    {
-
-    }
+    public class TransactionService : ITransactionService { }
 }

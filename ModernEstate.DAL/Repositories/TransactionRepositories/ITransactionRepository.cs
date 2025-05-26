@@ -10,9 +10,5 @@ using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.DAL.Repositories.TransactionRepositories
 {
-    public interface ITransactionRepository : IGenericRepository<Transaction>
-    {
-        
-    }
-   
+    public interface ITransactionRepository : IGenericRepository<Transaction> { }
 }
