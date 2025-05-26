@@ -36,6 +36,8 @@ namespace ModernEstate.BLL.Services.InvetorServices
                     throw new AppException(ErrorCode.HAS_EXISTED);
                 var invetor = _mapper.Map<Invetor>(req);
                 invetor.Code = await _utils.GenerateUniqueBrokerCodeAsync("INV_");
+                invetor.CreatedAt = DateTime.UtcNow;
+                invetor.UpdatedAt = DateTime.UtcNow;
                 await _unitOfWork.Invetors.CreateAsync(invetor);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 return invetor;
