@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.NewServices;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
@@ -95,5 +96,38 @@ namespace BE_ModernEstate.WebAPI.Controllers
             }
 
         }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> ToggleDelete(Guid id)
+        {
+            try
+            {
+                var result = await _service.ToggleStatusAsync(id);
+
+                var message = result == EnumStatusNew.ARCHIVED
+                    ? "News has been archived successfully"
+                    : "News has been published successfully";
+
+                return Ok(new ApiResponse
+                {
+                    Code = StatusCodes.Status200OK,
+                    Success = true,
+                    Message = message
+                });
+            }
+            
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse
+                {
+                    Code = StatusCodes.Status500InternalServerError,
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
+
+
     }
 }

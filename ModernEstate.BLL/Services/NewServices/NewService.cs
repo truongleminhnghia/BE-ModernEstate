@@ -1,21 +1,21 @@
 using AutoMapper;
-using Microsoft.Extensions.Logging;
-using ModernEstate.Common.Exceptions;
-using ModernEstate.Common.Models.Requests;
-using ModernEstate.Common.Models.Responses;
-using ModernEstate.DAL;
-using ModernEstate.DAL.Entites;
-
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using ModernEstate.BLL.Services.AccountServices;
+using ModernEstate.Common.Enums;
+using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Responses;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
+using ModernEstate.DAL;
+using ModernEstate.DAL.Entites;
 using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.BLL.Services.NewServices
@@ -149,6 +149,23 @@ namespace ModernEstate.BLL.Services.NewServices
                 throw new AppException(ErrorCode.NOT_FOUND);
             }
         }
+
+        public async Task<EnumStatusNew> ToggleStatusAsync(Guid id)
+        {
+            var news = await _unitOfWork.News.GetByIdAsync(id);
+            if (news == null)
+                throw new Exception("News not found");
+
+            news.StatusNew = news.StatusNew == EnumStatusNew.PUBLISHED
+                ? EnumStatusNew.ARCHIVED
+                : EnumStatusNew.PUBLISHED;
+
+            _unitOfWork.News.Update(news);
+            await _unitOfWork.SaveChangesAsync();
+
+            return news.StatusNew;
+        }
+
 
     }
 }

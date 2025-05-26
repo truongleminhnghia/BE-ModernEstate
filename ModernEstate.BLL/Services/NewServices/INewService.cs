@@ -5,6 +5,7 @@ using ModernEstate.Common.Models.Responses;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
+using ModernEstate.Common.Enums;
 
 namespace ModernEstate.BLL.Services.NewServices
 {
@@ -13,6 +14,8 @@ namespace ModernEstate.BLL.Services.NewServices
         Task<NewsCreateResponse> CreateAsync(NewsRequest news);
         Task<ApiResponse> UpdateAsync(Guid id, NewsRequest request);
         Task<NewsResponse> GetByIdAsync(Guid id);
+        Task<EnumStatusNew> ToggleStatusAsync(Guid id);
+
 
 
     }
