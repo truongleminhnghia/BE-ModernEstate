@@ -4,6 +4,7 @@ namespace ModernEstate.Common.Enums
     {
         PAY_PAL,
         MOMO,
-        VN_PAY
+        VN_PAY,
+        CASH,
     }
 }

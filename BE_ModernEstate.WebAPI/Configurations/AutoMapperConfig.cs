@@ -5,7 +5,9 @@ namespace BE_ModernEstate.WebAPI.Configurations
 {
     public static class AutoMapperConfig
     {
-        public static IServiceCollection AddAutoMapperConfiguration(this IServiceCollection services)
+        public static IServiceCollection AddAutoMapperConfiguration(
+            this IServiceCollection services
+        )
         {
             services.AddAutoMapper(typeof(AccountMapper));
             services.AddAutoMapper(typeof(RoleMapper));
@@ -22,6 +24,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddAutoMapper(typeof(SupperMapper));
             services.AddAutoMapper(typeof(PostMapper));
             services.AddAutoMapper(typeof(ContactMapper));
+            services.AddAutoMapper(typeof(TransactionMapper));
             return services;
         }
     }
