@@ -12,6 +12,7 @@ namespace ModernEstate.Common.Models.Requests
         public double Amount { get; set; }
         public string Currency { get; set; } = "VND";
         public string OrderInfo { get; set; } = "Thanh toan don hang";
+
         public string ReturnUrl { get; set; }
         public string IpAddress { get; set; }
         //public Guid? AccountServiceId { get; set; }
