@@ -1,4 +1,5 @@
-﻿using ModernEstate.BLL.HashPasswords;
+﻿using Microsoft.Extensions.Configuration;
+using ModernEstate.BLL.HashPasswords;
 using ModernEstate.BLL.JWTServices;
 using ModernEstate.BLL.Services.AccountBuyServices;
 using ModernEstate.BLL.Services.AccountServices;
@@ -26,6 +27,8 @@ using ModernEstate.BLL.Services.ServiceServices;
 using ModernEstate.BLL.Services.SupportServices;
 using ModernEstate.BLL.Services.TagServices;
 using ModernEstate.BLL.Services.TransactionServices;
+using ModernEstate.BLL.Services.VnnPayServices;
+using ModernEstate.Common.Config;
 using ModernEstate.Common.srcs;
 using ModernEstate.DAL;
 using ModernEstate.DAL.Bases;
@@ -119,7 +122,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<ISupportRepository, SupportRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
-
+            services.AddScoped<IVNPayService, VNPayService>();
             return services;
         }
     }

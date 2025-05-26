@@ -8,6 +8,8 @@ namespace ModernEstate.BLL.Services.TransactionServices
     public interface ITransactionService
     {
         Task<CashPaymentResponse> PayByCashAsync(CashPaymentRequest dto);
+        Task<VNPayPaymentResponse> CreateVNPayPaymentAsync(VNPayPaymentRequest dto);
+        Task<VNPayCallbackResponse> ProcessVNPayCallbackAsync(Dictionary<string, string> vnpayData);
         Task<CashPaymentResponse?> GetByIdAsync(Guid id);
         Task<PageResult<CashPaymentResponse>> GetWithParamsAsync(
             Guid? accountId,

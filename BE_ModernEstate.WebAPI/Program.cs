@@ -4,6 +4,8 @@ using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
 using BE_ModernEstate.WebAPI.Middlewares;
 using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using ModernEstate.Common.Config;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
@@ -65,13 +67,13 @@ builder
     });
 
 builder.Services.AddSingleton<IBrowserProvider, PuppeteerBrowserProvider>();
-
+builder.Services.Configure<VNPayConfiguration>(builder.Configuration.GetSection("VNPay"));
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowExpoApp",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+    options.AddPolicy(
+        "AllowExpoApp",
+        policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+    );
 });
 var app = builder.Build();
 
@@ -81,7 +83,6 @@ app.Lifetime.ApplicationStopped.Register(async () =>
     var provider = app.Services.GetRequiredService<IBrowserProvider>();
     await provider.DisposeAsync();
 });
-
 
 using (var scope = app.Services.CreateScope())
 {
@@ -113,8 +114,6 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 }
-
-
 
 app.UseMiddleware<ExceptionMiddleware>();
 
