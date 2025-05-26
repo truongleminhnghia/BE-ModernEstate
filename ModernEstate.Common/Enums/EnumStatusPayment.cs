@@ -2,9 +2,9 @@ namespace ModernEstate.Common.Enums
 {
     public enum EnumStatusPayment
     {
-        PEDIND,
+        PENDING,
         SUCCESS,
         FAILED,
-        CANCELLED
+        CANCELLED,
     }
 }

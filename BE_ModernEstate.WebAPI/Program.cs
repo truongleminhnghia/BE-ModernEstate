@@ -4,6 +4,8 @@ using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
 using BE_ModernEstate.WebAPI.Middlewares;
 using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using ModernEstate.Common.Config;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
@@ -46,6 +48,7 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
 });
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddHttpContextAccessor();
 
@@ -64,13 +67,13 @@ builder
     });
 
 builder.Services.AddSingleton<IBrowserProvider, PuppeteerBrowserProvider>();
-
+builder.Services.Configure<VNPayConfiguration>(builder.Configuration.GetSection("VNPay"));
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowExpoApp",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+    options.AddPolicy(
+        "AllowExpoApp",
+        policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+    );
 });
 var app = builder.Build();
 

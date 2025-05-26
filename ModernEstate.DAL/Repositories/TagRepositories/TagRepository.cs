@@ -31,6 +31,11 @@ namespace ModernEstate.DAL.Repositories.TagRepositories
         {
             return await _context.Tags.Where(predicate).ToListAsync();
         }
+
+        public async Task<Tag> FindByTitle(string title)
+        {
+            return await _context.Tags.FirstOrDefaultAsync(t => t.TagName == title);
+        }
     }
    
 }

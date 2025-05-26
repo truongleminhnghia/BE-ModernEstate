@@ -1,4 +1,5 @@
 ﻿using ModernEstate.DAL.Entites;
+using System.Security.Claims;
 
 namespace ModernEstate.BLL.JWTServices
 {
@@ -6,6 +7,7 @@ namespace ModernEstate.BLL.JWTServices
     {
         public string GenerateJwtToken(Account _account);
         public int? ValidateToken(string token);
+        public ClaimsPrincipal ValidateTokenClaimsPrincipal(string token);
         public string GetAccountId();
         public string GetEmail();
         public string GetRole();
@@ -13,5 +15,7 @@ namespace ModernEstate.BLL.JWTServices
         DateTime GetExpire(string token);
         Guid GetAccountIdGuid();
         public string RefeshToken(string email);
+
+        string GenerateEmailVerificationToken(string email);
     }
 }
