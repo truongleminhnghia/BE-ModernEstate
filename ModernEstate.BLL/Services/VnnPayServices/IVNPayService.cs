@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ModernEstate.Common.Config;
+﻿using ModernEstate.Common.Config;
 using ModernEstate.Common.Models.Requests;
 
 namespace ModernEstate.BLL.Services.VnnPayServices

@@ -1,4 +1,8 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.Options;
 using ModernEstate.BLL.Services.VnnPayServices;
 using ModernEstate.Common.Config;
@@ -14,19 +18,19 @@ namespace ModernEstate.BLL.Services.TransactionServices
 {
     public class TransactionService : ITransactionService
     {
-        private readonly IUnitOfWork _unitofwork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IVNPayService _vnPayService;
         private readonly VNPayConfiguration _vnPayConfig;
 
         public TransactionService(
-            IUnitOfWork unitofwork,
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             IVNPayService vnPayService,
             IOptions<VNPayConfiguration> vnPayConfig
         )
         {
-            _unitofwork = unitofwork;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _vnPayService = vnPayService;
             _vnPayConfig = vnPayConfig.Value;
@@ -34,7 +38,7 @@ namespace ModernEstate.BLL.Services.TransactionServices
 
         public async Task<CashPaymentResponse> PayByCashAsync(CashPaymentRequest dto)
         {
-            var account = await _unitofwork.Accounts.GetByIdAsync(dto.AccountId);
+            var account = await _unitOfWork.Accounts.GetByIdAsync(dto.AccountId);
             if (account == null)
                 throw new KeyNotFoundException("Account không tồn tại");
 
@@ -48,33 +52,33 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 PaymentMethod = EnumPaymentMethod.CASH,
                 Status = EnumStatusPayment.SUCCESS,
                 TransactionCode =
-                    $"CASH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 6)}",
+                    $"CASH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.Substring(0,6)",
                 CreatedAt = DateTime.UtcNow,
             };
 
-            await _unitofwork.Transactions.CreateAsync(txn);
-            await _unitofwork.SaveChangesAsync();
+            await _unitOfWork.Transactions.CreateAsync(txn);
+            await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<CashPaymentResponse>(txn);
         }
 
         public async Task<VNPayPaymentResponse> CreateVNPayPaymentAsync(VNPayPaymentRequest dto)
         {
-            var account = await _unitofwork.Accounts.GetByIdAsync(dto.AccountId);
+            var account = await _unitOfWork.Accounts.GetByIdAsync(dto.AccountId);
             if (account == null)
                 throw new KeyNotFoundException("Account không tồn tại");
 
-            // Validate amount
+            // Override ReturnUrl từ appsettings.json
+            dto.ReturnUrl = _vnPayConfig.ReturnSuccessUrl;
+
+            // Validate các trường
             if (dto.Amount <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
 
-            // Validate return URL
             if (string.IsNullOrEmpty(dto.ReturnUrl))
                 throw new ArgumentException("Return URL is required");
 
-            var vnpTxnRef = DateTime.Now.Ticks.ToString();
-
-            // Tạo transaction với vnp_TxnRef
+            // Tạo transaction mới
             var txn = new Transaction
             {
                 Id = Guid.NewGuid(),
@@ -84,14 +88,13 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 TypeTransaction = EnumTypeTransaction.CashIn,
                 PaymentMethod = EnumPaymentMethod.VN_PAY,
                 Status = EnumStatusPayment.PENDING,
-                TransactionCode = $"VNPAY-{DateTime.UtcNow:yyyyMMddHHmmss}-{vnpTxnRef}",
+                TransactionCode =
+                    $"VNPAY-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.Substring(0,6)",
                 CreatedAt = DateTime.UtcNow,
-                //AccountServiceId = dto.AccountServiceId,
-                //PostPackageId = dto.PostPackageId,
             };
 
-            await _unitofwork.Transactions.CreateAsync(txn);
-            await _unitofwork.SaveChangesAsync();
+            await _unitOfWork.Transactions.CreateAsync(txn);
+            await _unitOfWork.SaveChangesAsync();
 
             // Tạo URL thanh toán VNPay
             var paymentUrl = _vnPayService.CreatePaymentUrl(dto, _vnPayConfig);
@@ -112,7 +115,7 @@ namespace ModernEstate.BLL.Services.TransactionServices
             Dictionary<string, string> vnpayData
         )
         {
-            // Validate callback từ VNPay
+            // Validate chữ ký
             if (!_vnPayService.ValidateCallback(vnpayData, _vnPayConfig.HashSecret))
             {
                 return new VNPayCallbackResponse
@@ -135,8 +138,8 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 };
             }
 
-            // Tìm transaction theo mã giao dịch
-            var transactions = await _unitofwork.Transactions.FindTransactionsAsync(
+            // Tìm transaction PENDING tương ứng
+            var transactions = await _unitOfWork.Transactions.FindTransactionsAsync(
                 null,
                 null,
                 EnumStatusPayment.PENDING,
@@ -156,24 +159,20 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 };
             }
 
-            // Cập nhật trạng thái transaction
-            if (vnpResponseCode == "00" && vnpTransactionStatus == "00")
-            {
-                transaction.Status = EnumStatusPayment.SUCCESS;
-            }
-            else
-            {
-                transaction.Status = EnumStatusPayment.FAILED;
-            }
+            // Cập nhật trạng thái
+            transaction.Status =
+                (vnpResponseCode == "00" && vnpTransactionStatus == "00")
+                    ? EnumStatusPayment.SUCCESS
+                    : EnumStatusPayment.FAILED;
 
-            await _unitofwork.Transactions.UpdateAsync(transaction);
-            await _unitofwork.SaveChangesAsync();
+            await _unitOfWork.Transactions.UpdateAsync(transaction);
+            await _unitOfWork.SaveChangesAsync();
 
             return new VNPayCallbackResponse
             {
                 TransactionId = transaction.Id,
                 TransactionCode = transaction.TransactionCode,
-                Success = transaction.Status == EnumStatusPayment.SUCCESS,
+                Success = (transaction.Status == EnumStatusPayment.SUCCESS),
                 Message =
                     transaction.Status == EnumStatusPayment.SUCCESS
                         ? "Payment successful"
@@ -183,10 +182,9 @@ namespace ModernEstate.BLL.Services.TransactionServices
 
         public async Task<CashPaymentResponse?> GetByIdAsync(Guid id)
         {
-            var transaction = await _unitofwork.Transactions.GetByIdAsync(id);
+            var transaction = await _unitOfWork.Transactions.GetByIdAsync(id);
             if (transaction == null)
                 return null;
-
             return _mapper.Map<CashPaymentResponse>(transaction);
         }
 
@@ -199,7 +197,7 @@ namespace ModernEstate.BLL.Services.TransactionServices
             int pageSize
         )
         {
-            var all = await _unitofwork.Transactions.FindTransactionsAsync(
+            var all = await _unitOfWork.Transactions.FindTransactionsAsync(
                 accountId,
                 typeTransaction,
                 status,
@@ -210,8 +208,8 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 throw new AppException(ErrorCode.LIST_EMPTY);
 
             var paged = all.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
-            var dtos = _mapper.Map<List<CashPaymentResponse>>(paged);
 
+            var dtos = _mapper.Map<List<CashPaymentResponse>>(paged);
             return new PageResult<CashPaymentResponse>(dtos, pageSize, pageCurrent, all.Count());
         }
     }
