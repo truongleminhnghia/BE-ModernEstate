@@ -27,25 +27,31 @@ namespace ModernEstate.BLL.Services.OwnerPropertyServices
             if (account == null)
                 return PropertyOwnerRegisterResponse.Fail("Invalid account");
             // Update role to PO
-            var brokerRole = await _unitOfWork.Roles.GetByName(EnumRoleName.ROLE_PROPERTY_OWNER);
+            var brokerRole = await _unitOfWork.Roles.GetByName(EnumRoleName.ROLE_BROKER);
+            var propertyOwnerRole = await _unitOfWork.Roles.GetByName(EnumRoleName.ROLE_PROPERTY_OWNER);
             // Check duplicate
-            if (account.RoleId == brokerRole.Id)
+            if (account.RoleId == propertyOwnerRole.Id)
             {
                 return PropertyOwnerRegisterResponse.Fail("Account is already registered as a property owner.");
             }
-            if (account.RoleId != brokerRole.Id)
+            if (account.RoleId == brokerRole.Id)
             {
-                account.RoleId = brokerRole.Id;
+                return PropertyOwnerRegisterResponse.Fail("Account is already registered as a broker. Can't register as a property owner");
+            }
+            if (account.RoleId != propertyOwnerRole.Id)
+            {
+                account.RoleId = propertyOwnerRole.Id;
                 _unitOfWork.Accounts.Update(account);
             }
 
             var ownerProperty = new OwnerProperty
             {
                 Code = await GenerateUniqueBrokerCodeAsync(),
-                AccountId = accountId
+                AccountId = accountId,
+                Account = account
             };
             await _unitOfWork.OwnerProperties.CreateAsync(ownerProperty);
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesWithTransactionAsync();
 
             return PropertyOwnerRegisterResponse.Ok("Property owner registered successfully."); ;
         }
