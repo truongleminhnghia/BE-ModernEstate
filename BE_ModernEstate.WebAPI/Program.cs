@@ -46,6 +46,7 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
 });
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddHttpContextAccessor();
 

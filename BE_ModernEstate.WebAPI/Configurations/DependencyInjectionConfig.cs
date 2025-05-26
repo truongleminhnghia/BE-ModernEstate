@@ -54,6 +54,7 @@ using ModernEstate.BLL.Services.SupportServices;
 using ModernEstate.BLL.Services.TagServices;
 using ModernEstate.BLL.Services.TransactionServices;
 using ModernEstate.Common.srcs;
+using ModernEstate.BLL.Services.EmailServices;
 
 namespace BE_ModernEstate.WebAPI.Configurations
 {
@@ -66,7 +67,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<Utils>();
-
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthenticateService, AuthenticateService>();
             services.AddScoped<IRoleService, RoleService>();
