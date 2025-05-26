@@ -13,6 +13,7 @@ namespace ModernEstate.BLL.JWTServices
         public string GetRole();
         public string GetTokenId();
         DateTime GetExpire(string token);
+        Guid GetAccountIdGuid();
         public string RefeshToken(string email);
 
         string GenerateEmailVerificationToken(string email);

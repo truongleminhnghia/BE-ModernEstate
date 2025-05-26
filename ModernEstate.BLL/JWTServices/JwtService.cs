@@ -71,6 +71,24 @@ namespace ModernEstate.BLL.JWTServices
             return GetUserClaims().FindFirst("accountId")?.Value;
         }
 
+        public Guid GetAccountIdGuid()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            if (user == null || !user.Identity.IsAuthenticated)
+                throw new UnauthorizedAccessException("User is not authenticated");
+
+            // thường claim NameIdentifier hoặc "sub"
+            var raw = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                   ?? user.FindFirst("sub")?.Value
+                   ?? throw new UnauthorizedAccessException("Claim 'sub' hoặc NameIdentifier không tồn tại");
+
+            if (!Guid.TryParse(raw, out var accountId))
+                throw new UnauthorizedAccessException("AccountId trong token không đúng định dạng GUID");
+
+            return accountId;
+        }
+
         public string GetEmail()
         {
             return GetUserClaims().FindFirst("email")?.Value;
