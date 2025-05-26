@@ -14,7 +14,7 @@ namespace ModernEstate.Common.Models.Requests
         public string OrderInfo { get; set; } = "Thanh toan don hang";
         public string ReturnUrl { get; set; }
         public string IpAddress { get; set; }
-        public Guid? AccountServiceId { get; set; }
-        public Guid? PostPackageId { get; set; }
+        //public Guid? AccountServiceId { get; set; }
+        //public Guid? PostPackageId { get; set; }
     }
 }

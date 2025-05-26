@@ -46,7 +46,7 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 Currency = Enum.Parse<EnumCurrency>(dto.Currency),
                 TypeTransaction = EnumTypeTransaction.CashIn,
                 PaymentMethod = EnumPaymentMethod.CASH,
-                Status = EnumStatusPayment.PENDING,
+                Status = EnumStatusPayment.SUCCESS,
                 TransactionCode =
                     $"CASH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 6)}",
                 CreatedAt = DateTime.UtcNow,
@@ -64,7 +64,17 @@ namespace ModernEstate.BLL.Services.TransactionServices
             if (account == null)
                 throw new KeyNotFoundException("Account không tồn tại");
 
-            // Tạo transaction với status PENDING
+            // Validate amount
+            if (dto.Amount <= 0)
+                throw new ArgumentException("Amount must be greater than 0");
+
+            // Validate return URL
+            if (string.IsNullOrEmpty(dto.ReturnUrl))
+                throw new ArgumentException("Return URL is required");
+
+            var vnpTxnRef = DateTime.Now.Ticks.ToString();
+
+            // Tạo transaction với vnp_TxnRef
             var txn = new Transaction
             {
                 Id = Guid.NewGuid(),
@@ -74,11 +84,10 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 TypeTransaction = EnumTypeTransaction.CashIn,
                 PaymentMethod = EnumPaymentMethod.VN_PAY,
                 Status = EnumStatusPayment.PENDING,
-                TransactionCode =
-                    $"VNPAY-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 6)}",
+                TransactionCode = $"VNPAY-{DateTime.UtcNow:yyyyMMddHHmmss}-{vnpTxnRef}",
                 CreatedAt = DateTime.UtcNow,
-                AccountServiceId = dto.AccountServiceId,
-                PostPackageId = dto.PostPackageId,
+                //AccountServiceId = dto.AccountServiceId,
+                //PostPackageId = dto.PostPackageId,
             };
 
             await _unitofwork.Transactions.CreateAsync(txn);

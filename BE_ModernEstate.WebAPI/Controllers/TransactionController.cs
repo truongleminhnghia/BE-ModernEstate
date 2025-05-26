@@ -128,8 +128,50 @@ namespace BE_ModernEstate.WebAPI.Controllers
 
             try
             {
-                // Lấy IP address từ request
-                dto.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+                // Validate required fields
+                if (dto.Amount <= 0)
+                {
+                    return BadRequest(
+                        new ApiResponse
+                        {
+                            Code = StatusCodes.Status400BadRequest,
+                            Success = false,
+                            Message = "Amount must be greater than 0",
+                            Data = null,
+                        }
+                    );
+                }
+
+                if (string.IsNullOrEmpty(dto.ReturnUrl))
+                {
+                    return BadRequest(
+                        new ApiResponse
+                        {
+                            Code = StatusCodes.Status400BadRequest,
+                            Success = false,
+                            Message = "Return URL is required",
+                            Data = null,
+                        }
+                    );
+                }
+
+                // Auto-detect IP nếu không được cung cấp
+                if (string.IsNullOrEmpty(dto.IpAddress))
+                {
+                    dto.IpAddress =
+                        HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+                }
+
+                // Set default values if empty
+                if (string.IsNullOrEmpty(dto.Currency))
+                {
+                    dto.Currency = "VND";
+                }
+
+                if (string.IsNullOrEmpty(dto.OrderInfo))
+                {
+                    dto.OrderInfo = $"Thanh toan don hang {DateTime.Now:yyyyMMddHHmmss}";
+                }
 
                 var result = await _transactionService.CreateVNPayPaymentAsync(dto);
 
@@ -152,6 +194,19 @@ namespace BE_ModernEstate.WebAPI.Controllers
                         Code = StatusCodes.Status404NotFound,
                         Success = false,
                         Message = knf.Message,
+                        Data = null,
+                    }
+                );
+            }
+            catch (ArgumentException ae)
+            {
+                _logger.LogWarning($"VNPay payment validation failed: {ae.Message}");
+                return BadRequest(
+                    new ApiResponse
+                    {
+                        Code = StatusCodes.Status400BadRequest,
+                        Success = false,
+                        Message = ae.Message,
                         Data = null,
                     }
                 );
@@ -182,12 +237,12 @@ namespace BE_ModernEstate.WebAPI.Controllers
 
                 if (result.Success)
                 {
-                    // Chuyển hướng đến trang thành công
+                    // Redirect to success page
                     return Redirect($"/payment/success?transactionId={result.TransactionId}");
                 }
                 else
                 {
-                    // Chuyển hướng đến trang lỗi
+                    // Redirect to failure page
                     return Redirect($"/payment/failed?message={result.Message}");
                 }
             }

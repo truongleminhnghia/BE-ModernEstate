@@ -14,6 +14,8 @@ namespace ModernEstate.BLL.Services.VnnPayServices
     {
         public string CreatePaymentUrl(VNPayPaymentRequest request, VNPayConfiguration config)
         {
+            var vnpTxnRef = DateTime.Now.Ticks.ToString(); // Sử dụng timestamp thay vì GUID
+
             var requestData = new SortedList<string, string>
             {
                 { "vnp_Version", config.Version },
@@ -24,16 +26,13 @@ namespace ModernEstate.BLL.Services.VnnPayServices
                 { "vnp_CurrCode", config.CurrCode },
                 { "vnp_IpAddr", request.IpAddress },
                 { "vnp_Locale", config.Locale },
-                { "vnp_OrderInfo", request.OrderInfo },
+                { "vnp_OrderInfo", WebUtility.UrlEncode(request.OrderInfo) },
                 { "vnp_OrderType", "other" },
-                { "vnp_ReturnUrl", request.ReturnUrl },
-                { "vnp_TxnRef", Guid.NewGuid().ToString() },
+                { "vnp_ReturnUrl", WebUtility.UrlEncode(request.ReturnUrl) },
+                { "vnp_TxnRef", vnpTxnRef },
             };
 
-            var query = string.Join(
-                "&",
-                requestData.Select(kv => $"{kv.Key}={WebUtility.UrlEncode(kv.Value)}")
-            );
+            var query = string.Join("&", requestData.Select(kv => $"{kv.Key}={kv.Value}"));
             var secureHash = CreateSecureHash(requestData, config.HashSecret);
 
             return $"{config.PaymentUrl}?{query}&vnp_SecureHash={secureHash}";
