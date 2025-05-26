@@ -45,8 +45,6 @@ namespace ModernEstate.BLL.Services.AccountServices
                 if (role == null) throw new AppException(ErrorCode.NOT_FOUND);
                 account.Role = role;
                 account.RoleId = role.Id;
-                account.CreatedAt = DateTime.UtcNow;
-                account.UpdatedAt = DateTime.UtcNow;
                 account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
                 account.Password = _passwordHasher.HashPassword(req.Password);
                 await _unitOfWork.Accounts.CreateAsync(account);
@@ -84,8 +82,6 @@ namespace ModernEstate.BLL.Services.AccountServices
                 if (role == null) throw new AppException(ErrorCode.NOT_FOUND);
                 account.Role = role;
                 account.RoleId = role.Id;
-                account.CreatedAt = DateTime.UtcNow;
-                account.UpdatedAt = DateTime.UtcNow;
                 account.EnumAccountStatus = EnumAccountStatus.WAIT_CONFIRM;
                 account.Password = _passwordHasher.HashPassword(req.Password);
                 await _unitOfWork.Accounts.CreateAsync(account);
@@ -223,14 +219,26 @@ namespace ModernEstate.BLL.Services.AccountServices
         {
             try
             {
+                bool checkRole = string.Equals(_jwtService.GetRole(), EnumRoleName.ROLE_ADMIN.ToString(), StringComparison.OrdinalIgnoreCase);
                 var account = _unitOfWork.Accounts.GetById(id);
                 if (account == null) throw new AppException(ErrorCode.USER_NOT_FOUND);
+                if (!checkRole && account.Id != id) throw new AppException(ErrorCode.UNAUTHORIZED);
                 if (!string.IsNullOrEmpty(req.Email)) account.Email = req.Email;
                 if (!string.IsNullOrEmpty(req.FirstName)) account.FirstName = req.FirstName;
                 if (!string.IsNullOrEmpty(req.LastName)) account.LastName = req.LastName;
                 if (!string.IsNullOrEmpty(req.Phone)) account.Phone = req.Phone;
                 if (!string.IsNullOrEmpty(req.EnumAccountStatus.ToString())) account.EnumAccountStatus = req.EnumAccountStatus;
-                // if (isAdmin && !string.IsNullOrEmpty(req.Role.ToString())) account.Role = req.Role;
+                if (req.Role.HasValue)
+                {
+                    if (!checkRole)
+                        throw new AppException(ErrorCode.UNAUTHORIZED);
+                    var role = await _unitOfWork.Roles.GetByName(req.Role.Value);
+                    if (role == null)
+                        throw new AppException(ErrorCode.NOT_FOUND);
+
+                    account.Role = role;
+                    account.RoleId = role.Id;
+                }
                 _unitOfWork.Accounts.Update(account);
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 return true;
