@@ -11,11 +11,11 @@ namespace ModernEstate.Common.Models.Requests
         public Guid AccountId { get; set; }
         public double Amount { get; set; }
         public string Currency { get; set; } = "VND";
-        public string OrderInfo { get; set; } = "Thanh toan don hang";
-
+        public string OrderInfo { get; set; }
+        public string TypeTransaction { get; set; }
+        public string PaymentMethod { get; set; }
         public string ReturnUrl { get; set; }
         public string IpAddress { get; set; }
         //public Guid? AccountServiceId { get; set; }
-        //public Guid? PostPackageId { get; set; }
     }
 }
