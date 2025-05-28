@@ -48,9 +48,9 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 AccountId = dto.AccountId,
                 Amount = dto.Amount,
                 Currency = Enum.Parse<EnumCurrency>(dto.Currency),
-                TypeTransaction = EnumTypeTransaction.CashIn,
-                PaymentMethod = EnumPaymentMethod.CASH,
-                Status = EnumStatusPayment.SUCCESS,
+                TypeTransaction = Enum.Parse<EnumTypeTransaction>(dto.TypeTransaction),
+                PaymentMethod = Enum.Parse<EnumPaymentMethod>(dto.PaymentMethod),
+                Status = EnumStatusPayment.PENDING,
                 TransactionCode =
                     $"CASH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.Substring(0,6)",
                 CreatedAt = DateTime.UtcNow,
@@ -69,7 +69,14 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 throw new KeyNotFoundException("Account không tồn tại");
 
             // Override ReturnUrl từ appsettings.json
-            dto.ReturnUrl = _vnPayConfig.ReturnSuccessUrl;
+            if (string.IsNullOrEmpty(dto.ReturnUrl))
+            {
+                dto.ReturnUrl = _vnPayConfig.ReturnError;
+            }
+            else
+            {
+                dto.ReturnUrl = _vnPayConfig.ReturnSuccessUrl;
+            }
 
             // Validate các trường
             if (dto.Amount <= 0)
@@ -85,8 +92,8 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 AccountId = dto.AccountId,
                 Amount = dto.Amount,
                 Currency = Enum.Parse<EnumCurrency>(dto.Currency),
-                TypeTransaction = EnumTypeTransaction.CashIn,
-                PaymentMethod = EnumPaymentMethod.VN_PAY,
+                TypeTransaction = Enum.Parse<EnumTypeTransaction>(dto.TypeTransaction),
+                PaymentMethod = Enum.Parse<EnumPaymentMethod>(dto.PaymentMethod),
                 Status = EnumStatusPayment.PENDING,
                 TransactionCode =
                     $"VNPAY-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.Substring(0,6)",
@@ -107,7 +114,6 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 Amount = txn.Amount,
                 Currency = txn.Currency.ToString(),
                 Status = txn.Status.ToString(),
-                CreatedAt = txn.CreatedAt,
             };
         }
 

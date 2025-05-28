@@ -6,6 +6,5 @@ namespace ModernEstate.Common.Enums
         SERVICE_PURCHASE,
         RENT_PAYMENT,
         REFUND,
-        CashIn,
     }
 }

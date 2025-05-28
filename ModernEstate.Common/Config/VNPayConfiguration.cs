@@ -11,5 +11,6 @@
         public string CurrCode { get; set; } = "VND";
         public string Locale { get; set; } = "vn";
         public string ReturnSuccessUrl { get; set; }
+        public string ReturnError { get; set; }
     }
 }

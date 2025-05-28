@@ -10,7 +10,6 @@ namespace ModernEstate.BLL.Mappers
         {
             CreateMap<Transaction, CashPaymentResponse>()
                 .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(
                     dest => dest.Currency,
@@ -19,7 +18,6 @@ namespace ModernEstate.BLL.Mappers
 
             CreateMap<Transaction, VNPayPaymentResponse>()
                 .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(
                     dest => dest.Currency,
