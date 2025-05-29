@@ -16,6 +16,7 @@ namespace ModernEstate.Common.Models.Requests
         public string PaymentMethod { get; set; }
         public string ReturnUrl { get; set; }
         public string IpAddress { get; set; }
+
         //public Guid? AccountServiceId { get; set; }
     }
 }
