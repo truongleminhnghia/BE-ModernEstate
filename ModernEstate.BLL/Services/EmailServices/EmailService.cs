@@ -18,9 +18,23 @@ namespace ModernEstate.BLL.Services.EmailServices
       _logger = logger;
     }
 
-        public async Task SendEmailAsync(string to, string subject, string verifyUrl)
-        {
-            string html = "<body \n" +
+    public async Task SendEmailAsync(string to, string subject, string verifyUrl)
+    {
+      var fromName = Environment.GetEnvironmentVariable("MailSettings__FromName")
+                ?? _settings.FromName;
+      var fromEmail = Environment.GetEnvironmentVariable("MailSettings__FromEmail")
+                      ?? _settings.FromEmail;
+      var password = Environment.GetEnvironmentVariable("MailSettings__Password")
+                      ?? _settings.Password;
+      var host = Environment.GetEnvironmentVariable("MailSettings__Host")
+                      ?? _settings.Host;
+      var portEnv = Environment.GetEnvironmentVariable("MailSettings__Port");
+      int port = 0;
+      if (!string.IsNullOrEmpty(portEnv) && int.TryParse(portEnv, out var p))
+        port = p;
+      else
+        port = _settings.Port;
+      string html = "<body \n" +
                     "    style=\"font-family: Arial, sans-serif;\n" +
                     "            background-color: #f4f4f4;\n" +
                     "            margin: 0;\n" +
@@ -68,7 +82,7 @@ namespace ModernEstate.BLL.Services.EmailServices
                     "</p>\n" +
                     "<p style=\"font-size: 14px; color: #1a0dab;\">\n" +
                     "    <a href=\"" + verifyUrl + "\" style=\"color: #1a0dab; text-decoration: underline;\">Verify your account</a>\n" +
-                    "</p>"+
+                    "</p>" +
                     "            <p>If you received this email in error, simply ignore this email and do not click the button.</p>\n" +
                     "        </div>\n" +
                     "        <div class=\"footer\"\n" +
@@ -80,10 +94,10 @@ namespace ModernEstate.BLL.Services.EmailServices
                     "        </div>\n" +
                     "    </div>\n" +
                     "</body>";
-            var email = new MimeMessage();
-            email.From.Add(new MailboxAddress(_settings.FromName, _settings.FromEmail));
-            email.To.Add(MailboxAddress.Parse(to));
-            email.Subject = subject;
+      var email = new MimeMessage();
+      email.From.Add(new MailboxAddress(fromName, fromEmail));
+      email.To.Add(MailboxAddress.Parse(to));
+      email.Subject = subject;
 
       var builder = new BodyBuilder
       {
@@ -92,8 +106,8 @@ namespace ModernEstate.BLL.Services.EmailServices
       email.Body = builder.ToMessageBody();
 
       using var smtp = new MailKit.Net.Smtp.SmtpClient();
-      await smtp.ConnectAsync(_settings.Host, _settings.Port, MailKit.Security.SecureSocketOptions.StartTls);
-      await smtp.AuthenticateAsync(_settings.FromEmail, _settings.Password);
+      await smtp.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.StartTls);
+      await smtp.AuthenticateAsync(fromEmail, password);
       await smtp.SendAsync(email);
       await smtp.DisconnectAsync(true);
 
