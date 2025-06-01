@@ -123,7 +123,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 string token = _jwtService.GenerateEmailVerificationToken(account.Email!);
 
                 string verifyUrl = $"https://modernestate.vercel.app/login?token={token}";
-                
+
 
                 await _emailService.SendEmailAsync(account.Email!, "Xác minh email", verifyUrl);
                 _logger.LogInformation("Tạo tài khoản mới thành công với email {Email}, Role: {Role}", request.Email, account.Role);
@@ -156,7 +156,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                     throw new AppException(ErrorCode.INVALID_ACCOUNT_ROLE);
 
                 if (account.EnumAccountStatus == EnumAccountStatus.ACTIVE)
-                    return; 
+                    return;
 
                 account.EnumAccountStatus = EnumAccountStatus.ACTIVE;
                 await _unitOfWork.SaveChangesWithTransactionAsync();
