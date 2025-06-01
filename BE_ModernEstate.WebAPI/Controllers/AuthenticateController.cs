@@ -55,8 +55,17 @@ namespace BE_ModernEstate.WebAPI.Controllers
         {
             try
             {
-                await _authenticateService.VerifyEmailAsync(token);
-                return Ok("Xác minh email thành công.");
+                var result = await _authenticateService.VerifyEmailAsync(token);
+                if (result)
+                {
+                    // Redirect đến trang thông báo thành công
+                    return Redirect("https://modernestate.vercel.app/login");
+                }
+                else
+                {
+                    // Redirect đến trang thông báo lỗi
+                    return Redirect("https://modernestate.vercel.app/login");
+                }
             }
             catch (AppException ex)
             {

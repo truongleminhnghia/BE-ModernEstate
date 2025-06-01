@@ -15,6 +15,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var mailSection = builder.Configuration.GetSection("MailSettings");
+var fromEmail = mailSection["FromEmail"];
+var fromName = mailSection["FromName"];
+var mailPassword = mailSection["Password"];
+var mailHost = mailSection["Host"];
+var mailPort = int.TryParse(mailSection["Port"], out var parsedPort) ? parsedPort : 587;
+
 var dbSection = builder.Configuration.GetSection("Database");
 var server = dbSection["Server"];
 var port = dbSection["Port"];

@@ -10,6 +10,6 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
         public Task<bool> Register(RegisterRequest request);
         public Task<bool> ChangePassword(string oldPassword, string newPassword, Guid id);
 
-        public Task VerifyEmailAsync(string token);
+        public Task<bool> VerifyEmailAsync(string token);
     }
 }

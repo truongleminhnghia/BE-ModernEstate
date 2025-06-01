@@ -122,7 +122,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 string token = _jwtService.GenerateEmailVerificationToken(account.Email!);
 
-                string verifyUrl = $"https://modernestate.vercel.app/login?token={token}";
+                string verifyUrl = $"https://be-modernestate.onrender.com/api/v1/auths/verify-email?token={token}";
                 
 
                 await _emailService.SendEmailAsync(account.Email!, "Xác minh email", verifyUrl);
@@ -141,7 +141,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             }
         }
 
-        public async Task VerifyEmailAsync(string token)
+        public async Task<bool> VerifyEmailAsync(string token)
         {
             try
             {
@@ -156,10 +156,11 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                     throw new AppException(ErrorCode.INVALID_ACCOUNT_ROLE);
 
                 if (account.EnumAccountStatus == EnumAccountStatus.ACTIVE)
-                    return; 
+                    return false; 
 
                 account.EnumAccountStatus = EnumAccountStatus.ACTIVE;
                 await _unitOfWork.SaveChangesWithTransactionAsync();
+                return true;
             }
             catch (SecurityTokenExpiredException)
             {

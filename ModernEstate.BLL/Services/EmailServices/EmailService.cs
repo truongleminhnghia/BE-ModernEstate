@@ -20,26 +20,66 @@ namespace ModernEstate.BLL.Services.EmailServices
 
         public async Task SendEmailAsync(string to, string subject, string verifyUrl)
         {
-            string html = $@"
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset='UTF-8'>
-  <title>Email Verification</title>
-</head>
-<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;'>
-  <table width='100%' style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);'>
-    <tr>
-      <td style='text-align: center;'>
-        <h2 style='color: #333;'>Welcome to Modern Estate</h2>
-        <p style='font-size: 16px; color: #555;'>Please confirm your email address by clicking the button below:</p>
-        <a href='{verifyUrl}' style='display: inline-block; margin-top: 20px; padding: 12px 25px; font-size: 16px; color: white; background-color: #28a745; text-decoration: none; border-radius: 5px;'>Verify Email</a>
-        <p style='font-size: 14px; color: #999; margin-top: 30px;'>If you did not request this, you can safely ignore this email.</p>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>";
+            string html = "<body \n" +
+                    "    style=\"font-family: Arial, sans-serif;\n" +
+                    "            background-color: #f4f4f4;\n" +
+                    "            margin: 0;\n" +
+                    "            padding: 0;\n" +
+                    "            -webkit-text-size-adjust: none;\n" +
+                    "            -ms-text-size-adjust: none;\">\n" +
+                    "    <div class=\"email-container\"\n" +
+                    "         style=\"max-width: 600px;\n" +
+                    "                margin: auto;\n" +
+                    "                background-color: #ffffff;\n" +
+                    "                padding: 20px;\n" +
+                    "                border-radius: 8px;\n" +
+                    "                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\">\n" +
+                    "        <div class=\"header\"\n" +
+                    "             style=\"text-align: center;\n" +
+                    "                    padding-bottom: 20px;\">\n" +
+                    "            <img src=\"https://firebasestorage.googleapis.com/v0/b/diamond-6401b.appspot.com/o/Logo.png?alt=media&token=13f983ed-b3e1-4bbe-83b2-a47edf62c6a6\"\n" +
+                    "                alt=\"Logo\" style=\"max-width: 300px;\">\n" +
+                    "        </div>\n" +
+                    "        <div class=\"content\"\n" +
+                    "              style=\"text-align: center;\n" +
+                    "                    color: #333333;\">\n" +
+                    "            <h1\n" +
+                    "            style=\"font-size: 24px;\n" +
+                    "                margin: 0;\n" +
+                    "                padding: 0;\"\n" +
+                    "            >Verify your email address</h1>\n" +
+                    "            <p\n" +
+                    "            style=\"font-size: 16px;\n" +
+                    "                    line-height: 1.5;\">Welcome to Modern Estate.</p>\n" +
+                    "            <p\n" +
+                    "            style=\"font-size: 16px;\n" +
+                    "                line-height: 1.5;\">Please click the button below to confirm your email address and activate your account.</p>\n" +
+                    "            <a href=\"" + verifyUrl + "\" class=\"btn\"\n" +
+                    "               style=\"display: inline-block;\n" +
+                    "               margin-top: 20px;\n" +
+                    "               padding: 15px 25px;\n" +
+                    "               font-size: 16px;\n" +
+                    "               color: #ffffff;\n" +
+                    "               background-color: #f52d56;\n" +
+                    "               border-radius: 5px;\n" +
+                    "               text-decoration: none;\">Confirm Email</a>\n" +
+                    "<p style=\"margin-top: 20px; font-size: 14px; color: #555555;\">" +
+                    "If the button doesn't work, please press the link below:\n" +
+                    "</p>\n" +
+                    "<p style=\"font-size: 14px; color: #1a0dab;\">\n" +
+                    "    <a href=\"" + verifyUrl + "\" style=\"color: #1a0dab; text-decoration: underline;\">Verify your account</a>\n" +
+                    "</p>"+
+                    "            <p>If you received this email in error, simply ignore this email and do not click the button.</p>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"footer\"\n" +
+                    "             style=\"text-align: center;\n" +
+                    "             font-size: 14px;\n" +
+                    "             color: #777777;\n" +
+                    "             margin-top: 20px;\">\n" +
+                    "            <h2>Thank you, have a good day .</h2></br>Modern Estate Team\n" +
+                    "        </div>\n" +
+                    "    </div>\n" +
+                    "</body>";
             var email = new MimeMessage();
             email.From.Add(new MailboxAddress(_settings.FromName, _settings.FromEmail));
             email.To.Add(MailboxAddress.Parse(to));
