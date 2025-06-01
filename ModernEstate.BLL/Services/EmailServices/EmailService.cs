@@ -92,8 +92,8 @@ namespace ModernEstate.BLL.Services.EmailServices
       email.Body = builder.ToMessageBody();
 
       using var smtp = new MailKit.Net.Smtp.SmtpClient();
-      await smtp.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.StartTls);
-      await smtp.AuthenticateAsync(fromEmail, password);
+      await smtp.ConnectAsync(_settings.Host, _settings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+      await smtp.AuthenticateAsync(_settings.FromEmail, _settings.Password);
       await smtp.SendAsync(email);
       await smtp.DisconnectAsync(true);
 
