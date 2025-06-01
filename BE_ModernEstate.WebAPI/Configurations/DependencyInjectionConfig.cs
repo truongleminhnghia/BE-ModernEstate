@@ -1,12 +1,38 @@
 ﻿using ModernEstate.BLL.HashPasswords;
 using ModernEstate.BLL.JWTServices;
+using ModernEstate.BLL.Services.AccountBuyServices;
 using ModernEstate.BLL.Services.AccountServices;
+using ModernEstate.BLL.Services.AddressServices;
 using ModernEstate.BLL.Services.AuthenticateServices;
+using ModernEstate.BLL.Services.BrokerServices;
+using ModernEstate.BLL.Services.CategoryServices;
+using ModernEstate.BLL.Services.ContactServices;
+using ModernEstate.BLL.Services.EmailServices;
+using ModernEstate.BLL.Services.EmployeeServices;
+using ModernEstate.BLL.Services.FavoriteServices;
+using ModernEstate.BLL.Services.HistoryServices;
+using ModernEstate.BLL.Services.ImageServices;
+using ModernEstate.BLL.Services.InvetorServices;
+using ModernEstate.BLL.Services.NewServices;
+using ModernEstate.BLL.Services.NewTagServices;
+using ModernEstate.BLL.Services.OwnerPropertyServices;
+using ModernEstate.BLL.Services.PackageServices;
+using ModernEstate.BLL.Services.PostPackageServices;
+using ModernEstate.BLL.Services.PostServices;
+using ModernEstate.BLL.Services.ProjectServices;
+using ModernEstate.BLL.Services.PropertyServices;
+using ModernEstate.BLL.Services.ProvideServices;
+using ModernEstate.BLL.Services.Roles;
+using ModernEstate.BLL.Services.ServiceServices;
+using ModernEstate.BLL.Services.SupportServices;
+using ModernEstate.BLL.Services.TagServices;
+using ModernEstate.BLL.Services.TransactionServices;
+using ModernEstate.BLL.Services.VnnPayServices;
+using ModernEstate.Common.srcs;
+using ModernEstate.DAL;
 using ModernEstate.DAL.Bases;
 using ModernEstate.DAL.Repositories.AccountRepositories;
-using ModernEstate.DAL;
-using ModernEstate.DAL.Repositories.RoleRepositories;
-using ModernEstate.BLL.Services.Roles;
+using ModernEstate.DAL.Repositories.AccountServiceRepositories;
 using ModernEstate.DAL.Repositories.AddressRepositories;
 using ModernEstate.DAL.Repositories.BrokerRepositories;
 using ModernEstate.DAL.Repositories.CategoryRepositories;
@@ -17,44 +43,19 @@ using ModernEstate.DAL.Repositories.HistoryRepositories;
 using ModernEstate.DAL.Repositories.ImageRepositories;
 using ModernEstate.DAL.Repositories.InvetorRepositories;
 using ModernEstate.DAL.Repositories.NewRepositories;
+using ModernEstate.DAL.Repositories.NewTagRepositories;
 using ModernEstate.DAL.Repositories.OwnerPropertyRepositories;
 using ModernEstate.DAL.Repositories.PackageRepositories;
-using ModernEstate.DAL.Repositories.PostRepositories;
 using ModernEstate.DAL.Repositories.PostPackageRepositories;
+using ModernEstate.DAL.Repositories.PostRepositories;
 using ModernEstate.DAL.Repositories.ProjectRepositories;
 using ModernEstate.DAL.Repositories.PropertyRepositories;
 using ModernEstate.DAL.Repositories.ProvideRepositories;
+using ModernEstate.DAL.Repositories.RoleRepositories;
 using ModernEstate.DAL.Repositories.ServiceRepositories;
 using ModernEstate.DAL.Repositories.SupportRepositories;
 using ModernEstate.DAL.Repositories.TagRepositories;
 using ModernEstate.DAL.Repositories.TransactionRepositories;
-using ModernEstate.DAL.Repositories.NewTagRepositories;
-using ModernEstate.DAL.Repositories.AccountServiceRepositories;
-using ModernEstate.BLL.Services.AccountBuyServices;
-using ModernEstate.BLL.Services.AddressServices;
-using ModernEstate.BLL.Services.BrokerServices;
-using ModernEstate.BLL.Services.CategoryServices;
-using ModernEstate.BLL.Services.ContactServices;
-using ModernEstate.BLL.Services.EmployeeServices;
-using ModernEstate.BLL.Services.FavoriteServices;
-using ModernEstate.BLL.Services.HistoryServices;
-using ModernEstate.BLL.Services.ImageServices;
-using ModernEstate.BLL.Services.InvetorServices;
-using ModernEstate.BLL.Services.NewServices;
-using ModernEstate.BLL.Services.NewTagServices;
-using ModernEstate.BLL.Services.OwnerPropertyServices;
-using ModernEstate.BLL.Services.PackageServices;
-using ModernEstate.BLL.Services.PostServices;
-using ModernEstate.BLL.Services.PostPackageServices;
-using ModernEstate.BLL.Services.ProjectServices;
-using ModernEstate.BLL.Services.PropertyServices;
-using ModernEstate.BLL.Services.ProvideServices;
-using ModernEstate.BLL.Services.ServiceServices;
-using ModernEstate.BLL.Services.SupportServices;
-using ModernEstate.BLL.Services.TagServices;
-using ModernEstate.BLL.Services.TransactionServices;
-using ModernEstate.Common.srcs;
-using ModernEstate.BLL.Services.EmailServices;
 
 namespace BE_ModernEstate.WebAPI.Configurations
 {
@@ -95,7 +96,6 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<ITransactionService, TransactionService>();
 
-
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IAccountBuyServiceRepository, AccountBuyServiceRepository>();
@@ -121,7 +121,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<ISupportRepository, SupportRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
-
+            services.AddScoped<IVNPayService, VNPayService>();
             return services;
         }
     }

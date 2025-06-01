@@ -7,16 +7,16 @@ using System.Net.Mail;
 
 namespace ModernEstate.BLL.Services.EmailServices
 {
-    public class EmailService : IEmailService
-    {
-        private readonly MailSettings _settings;
-        private readonly ILogger<EmailService> _logger;
+  public class EmailService : IEmailService
+  {
+    private readonly MailSettings _settings;
+    private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IOptions<MailSettings> settings, ILogger<EmailService> logger)
-        {
-            _settings = settings.Value;
-            _logger = logger;
-        }
+    public EmailService(IOptions<MailSettings> settings, ILogger<EmailService> logger)
+    {
+      _settings = settings.Value;
+      _logger = logger;
+    }
 
         public async Task SendEmailAsync(string to, string subject, string verifyUrl)
         {
@@ -85,19 +85,19 @@ namespace ModernEstate.BLL.Services.EmailServices
             email.To.Add(MailboxAddress.Parse(to));
             email.Subject = subject;
 
-            var builder = new BodyBuilder
-            {
-                HtmlBody = html
-            };
-            email.Body = builder.ToMessageBody();
+      var builder = new BodyBuilder
+      {
+        HtmlBody = html
+      };
+      email.Body = builder.ToMessageBody();
 
-            using var smtp = new MailKit.Net.Smtp.SmtpClient();
-            await smtp.ConnectAsync(_settings.Host, _settings.Port, MailKit.Security.SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(_settings.FromEmail, _settings.Password);
-            await smtp.SendAsync(email);
-            await smtp.DisconnectAsync(true);
+      using var smtp = new MailKit.Net.Smtp.SmtpClient();
+      await smtp.ConnectAsync(host, port, MailKit.Security.SecureSocketOptions.StartTls);
+      await smtp.AuthenticateAsync(fromEmail, password);
+      await smtp.SendAsync(email);
+      await smtp.DisconnectAsync(true);
 
-            _logger.LogInformation("Sent email to {Email}", to);
-        }
+      _logger.LogInformation("Sent email to {Email}", to);
     }
+  }
 }

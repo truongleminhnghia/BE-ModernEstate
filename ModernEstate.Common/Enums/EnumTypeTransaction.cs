@@ -5,6 +5,6 @@ namespace ModernEstate.Common.Enums
         PACKAGE_PURCHASE,
         SERVICE_PURCHASE,
         RENT_PAYMENT,
-        REFUND
+        REFUND,
     }
 }
