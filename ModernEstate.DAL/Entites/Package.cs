@@ -9,10 +9,6 @@ namespace ModernEstate.DAL.Entites
 {
     [Table("package")]
     [Index(nameof(PackageCode), IsUnique = true)]
-    [Index(nameof(AccessPriority))]
-    [Index(nameof(TypePackage))]
-    [Index(nameof(Highlighted))]
-    [Index(nameof(TopListing))]
     [Index(nameof(MaxPosts))]
     [Index(nameof(Price))]
     public class Package
@@ -36,10 +32,10 @@ namespace ModernEstate.DAL.Entites
         [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive number.")]
         public double Price { get; set; }
 
-        [Column("duration_days", TypeName = "int")]
-        [Description("Duration of the package in days.")]
-        [Required]
-        public int DurationDays { get; set; }
+        // [Column("duration_days", TypeName = "int")]
+        // [Description("Duration of the package in days.")]
+        // [Required]
+        // public int DurationDays { get; set; }
 
         [Column("max_posts", TypeName = "int")]
         [Required]
@@ -56,11 +52,11 @@ namespace ModernEstate.DAL.Entites
         [Description("Indicates if the package includes top listing.")]
         public bool TopListing { get; set; }
 
-        [Column("access_priority", TypeName = "varchar(50)")]
-        [Required]
-        [Description("Access priority level for the package.")]
-        [EnumDataType(typeof(EnumAccessPriority))]
-        public EnumAccessPriority AccessPriority { get; set; }
+        // [Column("access_priority", TypeName = "varchar(50)")]
+        // [Required]
+        // [Description("Access priority level for the package.")]
+        // [EnumDataType(typeof(EnumAccessPriority))]
+        // public EnumAccessPriority AccessPriority { get; set; }
 
         [Column("type_package", TypeName = "varchar(50)")]
         [Required]

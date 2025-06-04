@@ -9,7 +9,7 @@ namespace ModernEstate.Common.Models.Requests
 {
     public class PackageRequest
     {
-        public string PackageCode { get; set; }
+        // public string PackageCode { get; set; }
         public string PackageName { get; set; }
         public double Price { get; set; }
         public int DurationDays { get; set; }

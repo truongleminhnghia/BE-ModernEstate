@@ -71,13 +71,13 @@ namespace ModernEstate.DAL.Entites
         [Description("Navigation property for the associated contact.")]
         public Contact? Contact { get; set; }
 
-        [Column("support_id")]
-        [Description("ID of the support associated with the post.")]
-        public Guid? SupportId { get; set; }
+        // [Column("support_id")]
+        // [Description("ID of the support associated with the post.")]
+        // public Guid? SupportId { get; set; }
 
-        [ForeignKey(nameof(SupportId))]
-        [Description("Navigation property for the associated support.")]
-        public Support? Support { get; set; }
+        // [ForeignKey(nameof(SupportId))]
+        // [Description("Navigation property for the associated support.")]
+        // public Support? Support { get; set; }
 
         public virtual ICollection<PostPackage>? PostPackages { get; set; }
         public virtual ICollection<History>? Histories { get; set; }

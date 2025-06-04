@@ -71,7 +71,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF, ROLE_ADMIN")]
         public async Task<IActionResult> Create([FromBody] PackageRequest request)
         {
             var created = await _svc.CreateAsync(request);

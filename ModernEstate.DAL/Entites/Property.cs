@@ -90,6 +90,11 @@ namespace ModernEstate.DAL.Entites
         [ForeignKey(nameof(AddressId))]
         public Address? Address { get; set; }
 
+        [Column("package_name", TypeName = "VARCHAR(200)")]
+        [Required]
+        [EnumDataType(typeof(EnumTypePackage))]
+        public EnumTypePackage PackageName { get; set; }
+
         [Column("owner_id")]
         public Guid? OwnerId { get; set; }
 

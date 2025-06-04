@@ -5,6 +5,7 @@ using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.Pages;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
+using ModernEstate.Common.srcs;
 using ModernEstate.DAL;
 using ModernEstate.DAL.Entites;
 
@@ -14,13 +15,15 @@ namespace ModernEstate.BLL.Services.PackageServices
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly Utils _utils;
         private readonly ILogger<PackageService> _logger;
 
-        public PackageService(IUnitOfWork uow, IMapper mapper, ILogger<PackageService> logger)
+        public PackageService(IUnitOfWork uow, IMapper mapper, ILogger<PackageService> logger, Utils utils)
         {
             _uow = uow;
             _mapper = mapper;
             _logger = logger;
+            _utils = utils;
         }
 
         public async Task<IEnumerable<PackageResponse>> GetAllAsync()
@@ -42,8 +45,8 @@ namespace ModernEstate.BLL.Services.PackageServices
             try
             {
                 var entity = _mapper.Map<Package>(request);
-                entity.Id = Guid.NewGuid();
-
+                // entity.Id = Guid.NewGuid();
+                entity.PackageCode = await _utils.GenerateUniqueBrokerCodeAsync("EMP");
                 await _uow.Packages.CreateAsync(entity);
                 await _uow.SaveChangesWithTransactionAsync();
 

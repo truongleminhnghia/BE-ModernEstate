@@ -23,17 +23,17 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] PostRequest request)
         {
-            // var result = await _postService.CreatePost(request);
-            // if (!result)
-            // {
-            //     return BadRequest(new ApiResponse
-            //     {
-            //         Code = StatusCodes.Status400BadRequest,
-            //         Success = false,
-            //         Message = "Post creation failed",
-            //         Data = null
-            //     });
-            // }
+            var result = await _postService.CreatePost(request);
+            if (!result)
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = "Post creation failed",
+                    Data = null
+                });
+            }
             return Ok(new ApiResponse
             {
                 Code = StatusCodes.Status200OK,
@@ -46,17 +46,17 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            // var account = await _postService.GetById(id);
-            // if (account == null)
-            // {
-            //     return NotFound(new ApiResponse
-            //     {
-            //         Code = StatusCodes.Status404NotFound,
-            //         Success = false,
-            //         Message = "Post not found",
-            //         Data = null
-            //     });
-            // }
+            var account = await _postService.GetById(id);
+            if (account == null)
+            {
+                return NotFound(new ApiResponse
+                {
+                    Code = StatusCodes.Status404NotFound,
+                    Success = false,
+                    Message = "Post not found",
+                    Data = null
+                });
+            }
             return Ok(new ApiResponse
             {
                 Code = StatusCodes.Status200OK,
@@ -71,7 +71,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
                                                     [FromQuery] EnumSourceStatus? srcStatus,
                                                     [FromQuery] int page_current = 1, [FromQuery] int page_size = 10)
         {
-            // var result = await _postService.GetPosts(title, state, srcStatus, page_current, page_size);
+            var result = await _postService.GetPosts(title, state, srcStatus, page_current, page_size);
             return Ok(new ApiResponse
             {
                 Code = StatusCodes.Status200OK,
