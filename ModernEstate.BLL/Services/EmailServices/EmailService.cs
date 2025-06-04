@@ -116,6 +116,16 @@ namespace ModernEstate.BLL.Services.EmailServices
 
         public async Task SendEmailResetPasswordAsync(string to, string subject, string OTP)
         {
+            var fromName = Environment.GetEnvironmentVariable("MailSettings__FromName")
+                ?? _settings.FromName;
+            var fromEmail = Environment.GetEnvironmentVariable("MailSettings__FromEmail")
+                            ?? _settings.FromEmail;
+            var password = Environment.GetEnvironmentVariable("MailSettings__Password")
+                            ?? _settings.Password;
+            var host = Environment.GetEnvironmentVariable("MailSettings__Host")
+                            ?? _settings.Host;
+            var portEnv = Environment.GetEnvironmentVariable("MailSettings__Port");
+            int port = 0;
             string html = @"
 <div style=""max-width:600px;margin:auto;background-color:#ffffff;padding:30px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);font-family:Arial,sans-serif;"">
   <div style=""text-align:center;margin-bottom:30px;"">
