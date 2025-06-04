@@ -185,9 +185,11 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             account.PasswordResetToken = otp;
             account.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
 
-            _unitOfWork.Accounts.UpdateAccount(account);
+            await _unitOfWork.Accounts.UpdateAsync(account);
+            await _unitOfWork.SaveChangesWithTransactionAsync();
 
-            await _emailService.SendEmailAsync(email, "Reset Your Password", otp);
+
+            await _emailService.SendEmailResetPasswordAsync(email, "Reset Your Password", otp);
 
             return ForgetPasswordResponse.Ok("Password reset OTP has been sent to your email.");
         }
@@ -202,7 +204,8 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             account.PasswordResetToken = null;
             account.PasswordResetTokenExpiry = null;
 
-            _unitOfWork.Accounts.UpdateAccount(account);
+            await _unitOfWork.Accounts.UpdateAsync(account);
+            await _unitOfWork.SaveChangesWithTransactionAsync();
 
             return ForgetPasswordResponse.Ok("Password has been reset successfully.");
         }

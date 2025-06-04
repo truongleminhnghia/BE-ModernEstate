@@ -54,12 +54,12 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 if (result)
                 {
                     // Redirect đến trang thông báo thành công
-                    return Redirect("https://modernestate.vercel.app/login");
+                    return Redirect("https://modernestate.vercel.app/verify-success");
                 }
                 else
                 {
                     // Redirect đến trang thông báo lỗi
-                    return Redirect("https://modernestate.vercel.app/login");
+                    return Redirect("https://modernestate.vercel.app/register");
                 }
             }
             catch (AppException ex)
