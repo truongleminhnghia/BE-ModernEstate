@@ -6,8 +6,10 @@ using ModernEstate.BLL.JWTServices;
 using ModernEstate.BLL.Services.EmailServices;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
+using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.AuthenticateResponse;
 using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
 using ModernEstate.DAL.Entites;
 using System.Security.Claims;
@@ -163,6 +165,74 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
+
+        public async Task<ForgetPasswordResponse> ForgotPasswordAsync(string email)
+        {
+            var account = await _unitOfWork.Accounts.GetByEmail(email);
+            if (account == null)
+                return ForgetPasswordResponse.Fail("Email not found");
+
+            Random random = new Random();
+            string otp = random.Next(100000, 1000000).ToString();
+            account.PasswordResetToken = otp;
+            account.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
+
+            await _unitOfWork.Accounts.UpdateAsync(account);
+            await _unitOfWork.SaveChangesWithTransactionAsync();
+
+
+            await _emailService.SendEmailResetPasswordAsync(email, "Reset Your Password", otp);
+
+            return ForgetPasswordResponse.Ok("Password reset OTP has been sent to your email.");
+        }
+
+        public async Task<ForgetPasswordResponse> ResetPasswordAsync(string token, string newPassword)
+        {
+            var account = await _unitOfWork.Accounts.GetByResetTokenAsync(token);
+            if (account == null || account.PasswordResetTokenExpiry < DateTime.UtcNow)
+                return ForgetPasswordResponse.Fail("Invalid or expired password reset token.");
+
+            account.Password = _passwordHasher.HashPassword(newPassword);
+            account.PasswordResetToken = null;
+            account.PasswordResetTokenExpiry = null;
+
+            await _unitOfWork.Accounts.UpdateAsync(account);
+            await _unitOfWork.SaveChangesWithTransactionAsync();
+
+            return ForgetPasswordResponse.Ok("Password has been reset successfully.");
+        }
+
+        public async Task<bool> ResendVerificationEmailAsync(string email)
+        {
+            try
+            {
+                var account = await _unitOfWork.Accounts.GetByEmail(email);
+                if (account == null)
+                {
+                    _logger.LogWarning("Email {Email} không tồn tại.", email);
+                    throw new AppException(ErrorCode.EMAIL_DO_NOT_EXISTS);
+                }
+
+
+                string token = _jwtService.GenerateEmailVerificationToken(account.Email!);
+                string verifyUrl = $"https://be-modernestate.onrender.com/api/v1/auths/verify-email?token={token}";
+
+                await _emailService.SendEmailAsync(account.Email!, "Xác minh email", verifyUrl);
+                _logger.LogInformation("Đã gửi lại email xác minh cho {Email}", email);
+                return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
 
 
     }
