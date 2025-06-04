@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ModernEstate.BLL.Services.AuthenticateServices;
@@ -87,6 +88,20 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Message = "Change password successful",
                 Data = null
             });
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            var result = await _authenticateService.ForgotPasswordAsync(request.Email);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPassRequest request)
+        {
+            var result = await _authenticateService.ResetPasswordAsync(request.Token, request.NewPassword);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
     }
 }

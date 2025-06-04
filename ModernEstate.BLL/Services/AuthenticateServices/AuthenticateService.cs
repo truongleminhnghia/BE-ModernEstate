@@ -6,8 +6,10 @@ using ModernEstate.BLL.JWTServices;
 using ModernEstate.BLL.Services.EmailServices;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
+using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.AuthenticateResponse;
 using ModernEstate.Common.Models.Requests;
+using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
 using ModernEstate.DAL.Entites;
 using System.Security.Claims;
@@ -170,6 +172,39 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             {
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
+        }
+
+        public async Task<ForgetPasswordResponse> ForgotPasswordAsync(string email)
+        {
+            var account = await _unitOfWork.Accounts.GetByEmail(email);
+            if (account == null)
+                return ForgetPasswordResponse.Fail("Email not found");
+
+            Random random = new Random();
+            string otp = random.Next(100000, 1000000).ToString();
+            account.PasswordResetToken = otp;
+            account.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
+
+            _unitOfWork.Accounts.UpdateAccount(account);
+
+            await _emailService.SendEmailAsync(email, "Reset Your Password", otp);
+
+            return ForgetPasswordResponse.Ok("Password reset OTP has been sent to your email.");
+        }
+
+        public async Task<ForgetPasswordResponse> ResetPasswordAsync(string token, string newPassword)
+        {
+            var account = await _unitOfWork.Accounts.GetByResetTokenAsync(token);
+            if (account == null || account.PasswordResetTokenExpiry < DateTime.UtcNow)
+                return ForgetPasswordResponse.Fail("Invalid or expired password reset token.");
+
+            account.Password = _passwordHasher.HashPassword(newPassword);
+            account.PasswordResetToken = null;
+            account.PasswordResetTokenExpiry = null;
+
+            _unitOfWork.Accounts.UpdateAccount(account);
+
+            return ForgetPasswordResponse.Ok("Password has been reset successfully.");
         }
 
 
