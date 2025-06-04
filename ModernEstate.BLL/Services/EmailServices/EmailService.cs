@@ -113,5 +113,58 @@ namespace ModernEstate.BLL.Services.EmailServices
 
       _logger.LogInformation("Sent email to {Email}", to);
     }
-  }
+
+        public async Task SendEmailResetPasswordAsync(string to, string subject, string OTP)
+        {
+            var fromName = Environment.GetEnvironmentVariable("MailSettings__FromName")
+                ?? _settings.FromName;
+            var fromEmail = Environment.GetEnvironmentVariable("MailSettings__FromEmail")
+                            ?? _settings.FromEmail;
+            var password = Environment.GetEnvironmentVariable("MailSettings__Password")
+                            ?? _settings.Password;
+            var host = Environment.GetEnvironmentVariable("MailSettings__Host")
+                            ?? _settings.Host;
+            var portEnv = Environment.GetEnvironmentVariable("MailSettings__Port");
+            int port = 0;
+            string html = @"
+<div style=""max-width:600px;margin:auto;background-color:#ffffff;padding:30px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);font-family:Arial,sans-serif;"">
+  <div style=""text-align:center;margin-bottom:30px;"">
+    <h1 style=""color:#2c3e50;margin:0;"">Modern Estate</h1>
+  </div>
+  <div style=""color:#333;line-height:1.6;"">
+    <p>Hello,</p>
+    <p>Your One-Time Password (OTP) for resetting your password is:</p>
+    <div style=""text-align:center;margin:20px 0;"">
+      <span style=""display:inline-block;font-size:28px;letter-spacing:8px;background:#f1f1f1;padding:15px 25px;border-radius:8px;font-weight:bold;color:#2c3e50;"">
+        "+ OTP + @"
+      </span>
+    </div>
+    <p>This code will expire in 15 minutes. If you didn’t request this, please ignore this email.</p>
+    <p>Best regards,<br/>The Modern Estate Team</p>
+  </div>
+  <div style=""font-size:12px;color:#888;text-align:center;margin-top:40px;"">
+    &copy; Modern Estate. All rights reserved.
+  </div>
+</div>
+";
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress(_settings.FromName, _settings.FromEmail));
+            email.To.Add(MailboxAddress.Parse(to));
+            email.Subject = subject;
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = html
+            };
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new MailKit.Net.Smtp.SmtpClient();
+            await smtp.ConnectAsync(_settings.Host, _settings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_settings.FromEmail, _settings.Password);
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+
+            _logger.LogInformation("Sent email to {Email}", to);
+        }
+    }
 }

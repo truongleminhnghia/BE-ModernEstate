@@ -81,5 +81,10 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
                                             .Include(a => a.OwnerProperty)
                                             .FirstOrDefaultAsync(ac => ac.Phone.Equals(phone));
         }
+
+        public async Task<Account> GetByResetTokenAsync(String token)
+        {
+            return await _context.Accounts.FirstOrDefaultAsync(a => a.PasswordResetToken == token);
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModernEstate.DAL.Context;
 
@@ -11,9 +12,11 @@ using ModernEstate.DAL.Context;
 namespace ModernEstate.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbConext))]
-    partial class ApplicationDbConextModelSnapshot : ModelSnapshot
+    [Migration("20250604174859_UpdateAccount")]
+    partial class UpdateAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -641,9 +644,18 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("package_id");
 
+                    b.Property<string>("AccessPriority")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("access_priority");
+
                     b.Property<string>("Description")
                         .HasColumnType("varchar(1000)")
                         .HasColumnName("description");
+
+                    b.Property<int>("DurationDays")
+                        .HasColumnType("int")
+                        .HasColumnName("duration_days");
 
                     b.Property<ulong>("Highlighted")
                         .HasColumnType("bit")
@@ -678,12 +690,20 @@ namespace ModernEstate.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AccessPriority");
+
+                    b.HasIndex("Highlighted");
+
                     b.HasIndex("MaxPosts");
 
                     b.HasIndex("PackageCode")
                         .IsUnique();
 
                     b.HasIndex("Price");
+
+                    b.HasIndex("TopListing");
+
+                    b.HasIndex("TypePackage");
 
                     b.ToTable("package");
                 });
@@ -990,11 +1010,6 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("owner_id");
 
-                    b.Property<string>("PackageName")
-                        .IsRequired()
-                        .HasColumnType("VARCHAR(200)")
-                        .HasColumnName("package_name");
-
                     b.Property<string>("PriceText")
                         .HasColumnType("varchar(100)")
                         .HasColumnName("price_text");
@@ -1140,7 +1155,7 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("double")
                         .HasColumnName("price");
 
-                    b.Property<Guid?>("ProvideId")
+                    b.Property<Guid>("ProvideId")
                         .HasColumnType("char(36)")
                         .HasColumnName("provide_id");
 
@@ -1555,7 +1570,9 @@ namespace ModernEstate.DAL.Migrations
                 {
                     b.HasOne("ModernEstate.DAL.Entites.Provide", "Provide")
                         .WithMany("Services")
-                        .HasForeignKey("ProvideId");
+                        .HasForeignKey("ProvideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Provide");
                 });

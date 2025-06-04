@@ -68,6 +68,8 @@ namespace ModernEstate.DAL.Entites
 
         [InverseProperty(nameof(OwnerProperty.Account))]
         public OwnerProperty? OwnerProperty { get; set; }
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiry { get; set; }
 
         public virtual ICollection<Transaction>? Transactions { get; set; }
         public virtual ICollection<Favorite>? Favorites { get; set; }
