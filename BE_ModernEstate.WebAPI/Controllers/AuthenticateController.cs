@@ -1,16 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using ModernEstate.BLL.Services.AuthenticateServices;
-using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
-using ModernEstate.Common.Models.Settings;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 
 namespace BE_ModernEstate.WebAPI.Controllers
 {
@@ -91,7 +85,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgetPasswordRequest request)
         {
             var result = await _authenticateService.ForgotPasswordAsync(request.Email);
             return result.Success ? Ok(result) : BadRequest(result);
