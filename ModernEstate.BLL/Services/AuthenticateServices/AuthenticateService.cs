@@ -202,6 +202,38 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
             return ForgetPasswordResponse.Ok("Password has been reset successfully.");
         }
 
+        public async Task<bool> ResendVerificationEmailAsync(string email)
+        {
+            try
+            {
+                var account = await _unitOfWork.Accounts.GetByEmail(email);
+                if (account == null)
+                {
+                    _logger.LogWarning("Email {Email} không tồn tại.", email);
+                    throw new AppException(ErrorCode.EMAIL_DO_NOT_EXISTS);
+                }
+
+
+                string token = _jwtService.GenerateEmailVerificationToken(account.Email!);
+                string verifyUrl = $"https://be-modernestate.onrender.com/api/v1/auths/verify-email?token={token}";
+
+                await _emailService.SendEmailAsync(account.Email!, "Xác minh email", verifyUrl);
+                _logger.LogInformation("Đã gửi lại email xác minh cho {Email}", email);
+                return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+
 
     }
 }

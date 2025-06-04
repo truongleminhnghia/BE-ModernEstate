@@ -97,5 +97,19 @@ namespace BE_ModernEstate.WebAPI.Controllers
             var result = await _authenticateService.ResetPasswordAsync(request.Token, request.NewPassword);
             return result.Success ? Ok(result) : BadRequest(result);
         }
+
+        [HttpPost("resend-verify-email")]
+        public async Task<IActionResult> ResendVerifyEmail([FromBody] ResendEmailRequest request)
+        {
+            bool result = await _authenticateService.ResendVerificationEmailAsync(request.Email);
+            return Ok(new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Email resend successful",
+                Data = null
+            });
+        }
+
     }
 }

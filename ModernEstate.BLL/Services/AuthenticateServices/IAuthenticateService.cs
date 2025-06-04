@@ -15,5 +15,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
         public Task<bool> VerifyEmailAsync(string token);
         public Task<ForgetPasswordResponse> ForgotPasswordAsync(string email);
         public Task<ForgetPasswordResponse> ResetPasswordAsync(string token, string newPassword);
+
+        public Task<bool> ResendVerificationEmailAsync(string email);
     }
 }

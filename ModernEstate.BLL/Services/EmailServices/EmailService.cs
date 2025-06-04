@@ -139,7 +139,7 @@ namespace ModernEstate.BLL.Services.EmailServices
         "+ OTP + @"
       </span>
     </div>
-    <p>This code will expire in 5 minutes. If you didn’t request this, please ignore this email.</p>
+    <p>This code will expire in 15 minutes. If you didn’t request this, please ignore this email.</p>
     <p>Best regards,<br/>The Modern Estate Team</p>
   </div>
   <div style=""font-size:12px;color:#888;text-align:center;margin-top:40px;"">
