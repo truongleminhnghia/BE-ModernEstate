@@ -6,6 +6,8 @@ namespace ModernEstate.Common.Enums
         Đã_Cho_Thuê,
         Đang_Giao_Dịch,
         Đang_Thương_Lượng,
-        NO
+        NO,
+        Đang_Rao_Bán,
+        CHo_Thuê
     }
 }
