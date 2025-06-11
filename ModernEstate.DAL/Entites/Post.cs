@@ -27,7 +27,7 @@ namespace ModernEstate.DAL.Entites
         public string? Title { get; set; }
 
         [Column("approve_by", TypeName = "varchar(400)")]
-        [Required]
+        // [Required]
         public string? AppRovedBy { get; set; }
 
         [Column("post_by", TypeName = "varchar(400)")]

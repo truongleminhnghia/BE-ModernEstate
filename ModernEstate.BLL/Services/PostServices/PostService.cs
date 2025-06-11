@@ -126,26 +126,26 @@ namespace ModernEstate.BLL.Services.PostServices
             {
                 Guid conactId = await _contactService.GetOrCreateAsync(request.Contact);
                 if (conactId == Guid.Empty) throw new AppException(ErrorCode.NOT_NULL);
-                if (request.Property == null || request.Property.AddressRequest == null)
+                if (request.NewProperty == null || request.NewProperty.AddressRequest == null)
                 {
                     throw new AppException(ErrorCode.NOT_NULL, "Property or AddressRequest cannot be null.");
                 }
-                var addressExisting = await _addressService.GetOrCreateAsync(request.Property.AddressRequest);
+                var addressExisting = await _addressService.GetOrCreateAsync(request.NewProperty.AddressRequest);
                 if (addressExisting == null)
                 {
-                    addressExisting = _mapper.Map<Address>(request.Property.AddressRequest);
+                    addressExisting = _mapper.Map<Address>(request.NewProperty.AddressRequest);
                     addressExisting.Id = Guid.NewGuid();
                     await _unitOfWork.Addresses.CreateAsync(addressExisting);
                 }
                 Guid accountId = Guid.Empty;
-                var accountExisting = await _unitOfWork.Accounts.FindByPhone(request.Property.OwnerPropertyRequest.PhoneNumer);
+                var accountExisting = await _unitOfWork.Accounts.FindByPhone(request.NewProperty.OwnerPropertyRequest.PhoneNumer);
                 if (accountExisting == null)
                 {
                     AccountRequest accountRequest = new AccountRequest
                     {
-                        Email = request.Property.OwnerPropertyRequest.Email,
-                        FirstName = request.Property.OwnerPropertyRequest.FisrtName,
-                        LastName = request.Property.OwnerPropertyRequest.LastName,
+                        Email = request.NewProperty.OwnerPropertyRequest.Email,
+                        FirstName = request.NewProperty.OwnerPropertyRequest.FisrtName,
+                        LastName = request.NewProperty.OwnerPropertyRequest.LastName,
                         Password = "123@123",
                         RoleName = EnumRoleName.ROLE_PROPERTY_OWNER,
                         EnumAccountStatus = EnumAccountStatus.ACTIVE,
@@ -163,7 +163,7 @@ namespace ModernEstate.BLL.Services.PostServices
                 }
 
                 // 1. Tạo Property trước
-                var property = _mapper.Map<Property>(request.Property);
+                var property = _mapper.Map<Property>(request.NewProperty);
                 property.AddressId = addressExisting.Id;
                 property.Address = addressExisting;
                 property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
@@ -174,6 +174,7 @@ namespace ModernEstate.BLL.Services.PostServices
 
                 // 2. Tạo Post sau, gán PropertyId
                 var post = _mapper.Map<Post>(request);
+                post.PostBy = _jwtService.GetAccountId();
                 post.ContactId = conactId;
                 post.PropertyId = property.Id;
                 post.Code = await _utils.GenerateUniqueBrokerCodeAsync("POST_");
@@ -183,7 +184,7 @@ namespace ModernEstate.BLL.Services.PostServices
 
                 // 3. Các thao tác khác
                 History history = await setupHistory(EnumHistoryChangeType.INSERT, property.Id, "Create property");
-                var image = await setupImage(request.Property.PropertyImages, property.Id);
+                var image = await setupImage(request.NewProperty.PropertyImages, property.Id);
                 property.PropertyImages = image;
 
                 await _unitOfWork.SaveChangesWithTransactionAsync();
