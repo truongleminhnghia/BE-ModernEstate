@@ -94,16 +94,32 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
     db.Database.Migrate();
+
+    // 1. Seed các Role chung (nếu chưa có)
     foreach (var name in Enum.GetNames<EnumRoleName>())
     {
         var roleEnum = Enum.Parse<EnumRoleName>(name);
         if (!db.Roles.Any(r => r.RoleName == roleEnum))
+        {
             db.Roles.Add(new Role { RoleName = roleEnum });
+        }
     }
     db.SaveChanges();
-    var adminRole = db.Roles.Single(r => r.RoleName == EnumRoleName.ROLE_ADMIN);
-    bool exists = db.Accounts.Any(u => u.RoleId == adminRole.Id);
-    if (!exists)
+
+    // 2. Lấy hoặc tạo ROLE_ADMIN
+    var adminRole = db.Roles
+                      .FirstOrDefault(r => r.RoleName == EnumRoleName.ROLE_ADMIN);
+    if (adminRole == null)
+    {
+        adminRole = new Role { RoleName = EnumRoleName.ROLE_ADMIN };
+        db.Roles.Add(adminRole);
+        db.SaveChanges();
+    }
+
+    // 3. Seed tài khoản admin nếu chưa có
+    bool adminExists = db.Accounts
+                         .Any(u => u.RoleId == adminRole.Id);
+    if (!adminExists)
     {
         var admin = new Account
         {
@@ -116,6 +132,7 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 }
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 

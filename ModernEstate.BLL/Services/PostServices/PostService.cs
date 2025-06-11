@@ -1,12 +1,13 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using ModernEstate.BLL.Services.ContactServices;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.Pages;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
+using ModernEstate.Common.srcs;
 using ModernEstate.DAL;
-using ModernEstate.DAL.Bases;
 using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.BLL.Services.PostServices
@@ -16,19 +17,33 @@ namespace ModernEstate.BLL.Services.PostServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<PostService> _logger;
+        private readonly IContactService _contactService;
+        private readonly Utils _utils;
 
-        public PostService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<PostService> logger)
+        public PostService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<PostService> logger,
+                           IContactService contactService, Utils utils)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _contactService = contactService;
+            _utils = utils;
         }
 
-        public Task<bool> CreatePost(PostRequest request)
+        public async Task<bool> CreatePost(PostRequest request)
         {
             try
             {
-                return null;
+                Guid conactId = await _contactService.GetOrCreateAsync(request.Contact);
+                if (conactId == Guid.Empty) throw new AppException(ErrorCode.NOT_NULL);
+                var post = _mapper.Map<Post>(request);
+                post.ContactId = conactId;
+                post.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
+                await _unitOfWork.Posts.CreateAsync(post);
+                await _unitOfWork.PostPackages.CreateAsync(_mapper.Map<PostPackage>(request.PostPackage));
+                await _unitOfWork.SaveChangesWithTransactionAsync();
+                _logger.LogInformation("Post created successfully with ID: {Id}", post.Id);
+                return true;
             }
             catch (AppException ex)
             {
