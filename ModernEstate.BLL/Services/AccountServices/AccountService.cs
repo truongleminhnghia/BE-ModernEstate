@@ -86,7 +86,7 @@ namespace ModernEstate.BLL.Services.AccountServices
                 account.Password = _passwordHasher.HashPassword(req.Password);
                 await _unitOfWork.Accounts.CreateAsync(account);
                 await setUpdateByRole(account.Role.RoleName, account.Id);
-                await _unitOfWork.SaveChangesWithTransactionAsync();
+                // await _unitOfWork.SaveChangesWithTransactionAsync();
                 return account.OwnerProperty.Id;
             }
             catch (AppException ex)

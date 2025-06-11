@@ -118,15 +118,20 @@ namespace ModernEstate.BLL.Services.PropertyServices
             }
         }
 
-        public async Task<bool> Save(PropertyRequest request)
+        public async Task<Property> Save(PropertyRequest request)
         {
             try
             {
                 Guid accountId = Guid.Empty;
                 var propertyExisting = await _unitOfWork.Properties.FindByTitle(request.Title);
                 if (propertyExisting != null) throw new AppException(ErrorCode.HAS_EXISTED);
-                Guid addressId = await _addressService.CreateAddress(request.AddressRequest);
-                if (addressId == null) throw new AppException(ErrorCode.NOT_NULL);
+                var addressExisting = await _addressService.GetOrCreateAsync(request.AddressRequest);
+                if (addressExisting == null)
+                {
+                    addressExisting = _mapper.Map<Address>(request.AddressRequest);
+                    addressExisting.Id = Guid.NewGuid();
+                    await _unitOfWork.Addresses.CreateAsync(addressExisting);
+                }
                 var accountExisting = await _unitOfWork.Accounts.FindByPhone(request.OwnerPropertyRequest.PhoneNumer);
                 if (accountExisting == null)
                 {
@@ -151,7 +156,8 @@ namespace ModernEstate.BLL.Services.PropertyServices
                     accountId = accountExisting.OwnerProperty.Id;
                 }
                 var property = _mapper.Map<Property>(request);
-                property.AddressId = addressId;
+                property.AddressId = addressExisting.Id;
+                property.Address = addressExisting;
                 property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
                 property.OwnerId = accountId;
                 await _unitOfWork.Properties.CreateAsync(property);
@@ -159,7 +165,8 @@ namespace ModernEstate.BLL.Services.PropertyServices
                 var image = await setupImage(request.PropertyImages, property.Id);
                 property.PropertyImages = image;
                 await _unitOfWork.SaveChangesWithTransactionAsync();
-                return true;
+                // return _mapper.Map<PropertyResponse>(property);
+                return property;
             }
             catch (AppException ex)
             {

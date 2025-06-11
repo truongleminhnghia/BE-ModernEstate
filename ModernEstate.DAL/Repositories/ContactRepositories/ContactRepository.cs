@@ -21,7 +21,7 @@ namespace ModernEstate.DAL.Repositories.ContactRepositories
                 return existing.Id;
 
             await _context.contacts.AddAsync(contact);
-            await _context.SaveChangesAsync();
+            // await _context.SaveChangesAsync();
             return contact.Id;
         }
     }

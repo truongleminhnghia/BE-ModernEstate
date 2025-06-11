@@ -24,7 +24,7 @@ namespace ModernEstate.BLL.Services.HistoryServices
             {
                 history.ChangeDate = DateTime.UtcNow;
                 await _unitOfWork.Histories.CreateAsync(history);
-                await _unitOfWork.SaveChangesWithTransactionAsync();
+                // await _unitOfWork.SaveChangesWithTransactionAsync();
                 return history;
             }
             catch (AppException ex)

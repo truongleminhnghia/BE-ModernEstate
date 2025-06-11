@@ -41,7 +41,7 @@ namespace ModernEstate.DAL.Entites
         [Column("account_id")]
         [Required]
         [Description("ID of the account associated with the subscription")]
-        public Guid AccountId { get; set; }
+        public Guid? AccountId { get; set; }
 
         [ForeignKey(nameof(AccountId))]
         [Description("Navigation property for the associated account")]
@@ -50,7 +50,7 @@ namespace ModernEstate.DAL.Entites
         [Column("package_id")]
         [Required]
         [Description("ID of the package associated with the subscription")]
-        public Guid PackageId { get; set; }
+        public Guid? PackageId { get; set; }
 
         [ForeignKey(nameof(PackageId))]
         [Description("Navigation property for the associated package")]

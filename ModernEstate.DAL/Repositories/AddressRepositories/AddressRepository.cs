@@ -10,7 +10,7 @@ namespace ModernEstate.DAL.Repositories.AddressRepositories
         public AddressRepository(ApplicationDbConext context)
             : base(context) { }
 
-        public async Task<Guid> GetOrCreateAsync(Address address)
+        public async Task<Address> GetOrCreateAsync(Address address)
         {
             var existing = await _context.Addresses.FirstOrDefaultAsync(a =>
                 a.HouseNumber == address.HouseNumber
@@ -20,12 +20,7 @@ namespace ModernEstate.DAL.Repositories.AddressRepositories
                 && a.City == address.City
                 && a.Country == address.Country
             );
-            if (existing != null)
-                return existing.Id;
-
-            await _context.Addresses.AddAsync(address);
-            await _context.SaveChangesAsync();
-            return address.Id;
+            return existing;
         }
 
         public async Task<IEnumerable<Address>> FindAddressesAsync(

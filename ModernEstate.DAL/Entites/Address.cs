@@ -55,5 +55,7 @@ namespace ModernEstate.DAL.Entites
         [Column("address_detail", TypeName = "varchar(500)")]
         [Description("Detailed address information")]
         public string? AddressDetail { get; set; }
+
+        public virtual ICollection<Property>? Properties { get; set; }
     }
 }
