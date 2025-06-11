@@ -22,8 +22,8 @@ services:
     depends_on:
       - mysql
     ports:
-      - 80
-      - 443
+      - "8080:80"
+      - "8443:443"
     environment:
       - DB_PORT=3306
       - DB_HOST=mysql
