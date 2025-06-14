@@ -18,6 +18,10 @@ namespace ModernEstate.Common.Models.Requests
         public EnumPaymentMethod PaymentMethod { get; set; }
 
         [Required]
+        [EnumDataType(typeof(EnumCurrency))]
+        public EnumCurrency Currency { get; set; }
+
+        [Required]
         public Guid AccountId { get; set; }
     }
 }

@@ -2,19 +2,11 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 
 namespace ModernEstate.DAL.Entites
 {
     [Table("account_package_subscriptions")]
-    [Index(nameof(AccountId), Name = "IX_Account_Package_Subscription_AccountId")]
-    [Index(nameof(PackageId), Name = "IX_Account_Package_Subscription_PackageId")]
-    [Index(nameof(PostId), Name = "IX_Account_Package_Subscription_PostId")]
-    [Index(nameof(Id), Name = "IX_Account_Package_Subscription_Id")]
-    [Index(nameof(Status), Name = "IX_Account_Package_Subscription_Status")]
-    [Index(nameof(StartDate), Name = "IX_Account_Package_Subscription_StartDate")]
-    [Index(nameof(EndDate), Name = "IX_Account_Package_Subscription_EndDate")]
     public class PostPackage : BaseEntity
     {
 
@@ -29,14 +21,38 @@ namespace ModernEstate.DAL.Entites
         public DateTime StartDate { get; set; }
 
         [Column("end_date", TypeName = "datetime")]
-        [Required]
+        // [Required]
         [Description("End date of the subscription")]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         [Column("status", TypeName = "varchar(100)")]
         [Required]
         [Description("Status of the subscription")]
         public EnumStatus Status { get; set; }
+
+        [Column("total_amount")]
+        // [Required]
+        public double? TotalAmout { get; set; }
+
+        [Column("currency", TypeName = "varchar(10)")]
+        // [Required]
+        [Description("Currency of the subscription price")]
+        public EnumCurrency? Currency { get; set; } = EnumCurrency.VND;
+
+        [Column("total_day", TypeName = "int")]
+        // [Required]
+        [Description("Total number of days for the subscription")]
+        public int? TotalDay { get; set; }
+
+        [Column("purchase_date", TypeName = "datetime")]
+        // [Required]
+        [Description("Purchase date of the subscription")]
+        public DateTime? PurchaseDate { get; set; }
+
+        [Column("expired_date", TypeName = "datetime")]
+        // [Required]
+        [Description("Expiration date of the subscription")]
+        public DateTime? ExpiredDate { get; set; }
 
         [Column("account_id")]
         [Required]
@@ -48,7 +64,7 @@ namespace ModernEstate.DAL.Entites
         public Account? Account { get; set; }
 
         [Column("package_id")]
-        [Required]
+        // [Required]
         [Description("ID of the package associated with the subscription")]
         public Guid? PackageId { get; set; }
 
@@ -63,7 +79,7 @@ namespace ModernEstate.DAL.Entites
 
         [ForeignKey(nameof(PostId))]
         [Description("Navigation property for the associated post")]
-        public Post? Post { get; set; }
+        public virtual Post? Post { get; set; }
 
         public virtual ICollection<Transaction>? Transactions { get; set; }
     }

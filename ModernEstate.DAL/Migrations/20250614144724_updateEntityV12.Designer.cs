@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModernEstate.DAL.Context;
 
@@ -11,9 +12,11 @@ using ModernEstate.DAL.Context;
 namespace ModernEstate.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbConext))]
-    partial class ApplicationDbConextModelSnapshot : ModelSnapshot
+    [Migration("20250614144724_updateEntityV12")]
+    partial class updateEntityV12
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -758,11 +761,6 @@ namespace ModernEstate.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("currency");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime")
                         .HasColumnName("end_date");
@@ -793,14 +791,6 @@ namespace ModernEstate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("status");
-
-                    b.Property<double>("TotalAmout")
-                        .HasColumnType("double")
-                        .HasColumnName("total_amount");
-
-                    b.Property<int>("TotalDay")
-                        .HasColumnType("int")
-                        .HasColumnName("total_day");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");

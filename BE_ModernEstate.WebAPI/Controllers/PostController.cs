@@ -46,8 +46,8 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var account = await _postService.GetById(id);
-            if (account == null)
+            var result = await _postService.GetById(id);
+            if (result == null)
             {
                 return NotFound(new ApiResponse
                 {
@@ -62,7 +62,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Code = StatusCodes.Status200OK,
                 Success = true,
                 Message = "Post retrieved successfully",
-                Data = ""
+                Data = result
             });
         }
 
@@ -77,7 +77,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Code = StatusCodes.Status200OK,
                 Success = true,
                 Message = "Accounts retrieved successfully",
-                Data = "result"
+                Data = result
             });
         }
 

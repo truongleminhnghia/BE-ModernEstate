@@ -6,7 +6,7 @@ namespace ModernEstate.DAL.Repositories.PostPackageRepositories
 {
     public interface IPostPackageRepository : IGenericRepository<PostPackage>
     {
-
+        Task<PostPackage?> FindById(Guid id);
     }
 
 }

@@ -8,5 +8,7 @@ namespace ModernEstate.Common.Enums
         EXPIRED,
         DELETED,
         BLOCKED,
+        WAIT_APPROVE,
+        WAIT_PAYMENT,
     }
 }

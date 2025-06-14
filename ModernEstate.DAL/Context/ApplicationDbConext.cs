@@ -37,47 +37,47 @@ namespace ModernEstate.DAL.Context
         public DbSet<Contact> contacts { get; set; }
         public DbSet<Support> Supports { get; set; }
 
-        // private static readonly TimeZoneInfo _vnZone =
-        // TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+        private static readonly TimeZoneInfo _vnZone =
+        TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
         // Trả về DateTime ở múi VN
-        // private DateTime GetCurrentVnTime()
-        // {
-        //     return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _vnZone);
-        // }
+        private DateTime GetCurrentVnTime()
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, _vnZone);
+        }
 
-        // public override int SaveChanges()
-        // {
-        //     ApplyTimestamps();
-        //     return base.SaveChanges();
-        // }
+        public override int SaveChanges()
+        {
+            ApplyTimestamps();
+            return base.SaveChanges();
+        }
 
-        // public override Task<int> SaveChangesAsync(
-        //     bool acceptAllChangesOnSuccess,
-        //     CancellationToken cancellationToken = default)
-        // {
-        //     ApplyTimestamps();
-        //     return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        // }
+        public override Task<int> SaveChangesAsync(
+            bool acceptAllChangesOnSuccess,
+            CancellationToken cancellationToken = default)
+        {
+            ApplyTimestamps();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
 
-        // private void ApplyTimestamps()
-        // {
-        //     DateTime now = GetCurrentVnTime();
+        private void ApplyTimestamps()
+        {
+            DateTime now = GetCurrentVnTime();
 
-        //     foreach (var entry in ChangeTracker.Entries<BaseEntity>())
-        //     {
-        //         if (entry.State == EntityState.Added)
-        //         {
-        //             entry.Entity.CreatedAt = now;
-        //             entry.Entity.UpdatedAt = now;
-        //         }
-        //         else if (entry.State == EntityState.Modified)
-        //         {
-        //             entry.Property(x => x.CreatedAt).IsModified = false;
-        //             entry.Entity.UpdatedAt = now;
-        //         }
-        //     }
-        // }
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = now;
+                    entry.Entity.UpdatedAt = now;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Property(x => x.CreatedAt).IsModified = false;
+                    entry.Entity.UpdatedAt = now;
+                }
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

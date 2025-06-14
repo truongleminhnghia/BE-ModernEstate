@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModernEstate.DAL.Context;
 
@@ -11,9 +12,11 @@ using ModernEstate.DAL.Context;
 namespace ModernEstate.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbConext))]
-    partial class ApplicationDbConextModelSnapshot : ModelSnapshot
+    [Migration("20250614094105_updateEntityV11")]
+    partial class updateEntityV11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -698,11 +701,6 @@ namespace ModernEstate.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Demand")
-                        .IsRequired()
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("demand");
-
                     b.Property<string>("PostBy")
                         .IsRequired()
                         .HasColumnType("varchar(400)")
@@ -720,6 +718,11 @@ namespace ModernEstate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(300)")
                         .HasColumnName("source_status");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("demand");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -740,6 +743,8 @@ namespace ModernEstate.DAL.Migrations
 
                     b.HasIndex("SourceStatus");
 
+                    b.HasIndex("State");
+
                     b.ToTable("post");
                 });
 
@@ -757,11 +762,6 @@ namespace ModernEstate.DAL.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("varchar(10)")
-                        .HasColumnName("currency");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime")
@@ -793,14 +793,6 @@ namespace ModernEstate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("status");
-
-                    b.Property<double>("TotalAmout")
-                        .HasColumnType("double")
-                        .HasColumnName("total_amount");
-
-                    b.Property<int>("TotalDay")
-                        .HasColumnType("int")
-                        .HasColumnName("total_day");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -943,11 +935,6 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("float")
                         .HasColumnName("area");
 
-                    b.Property<string>("AreaUnit")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("area_unit");
-
                     b.Property<string>("Attribute")
                         .HasColumnType("JSON")
                         .HasColumnName("attribute");
@@ -993,6 +980,11 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("owner_id");
 
+                    b.Property<string>("PackageName")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(200)")
+                        .HasColumnName("package_name");
+
                     b.Property<double>("Price")
                         .HasColumnType("double")
                         .HasColumnName("price");
@@ -1006,9 +998,9 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("varchar(300)")
                         .HasColumnName("priority_status");
 
-                    b.Property<Guid?>("ProjectId")
+                    b.Property<Guid?>("ProjecyId")
                         .HasColumnType("char(36)")
-                        .HasColumnName("project_id");
+                        .HasColumnName("projecy_id");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1048,7 +1040,7 @@ namespace ModernEstate.DAL.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ProjecyId");
 
                     b.ToTable("property");
                 });
@@ -1541,7 +1533,7 @@ namespace ModernEstate.DAL.Migrations
 
                     b.HasOne("ModernEstate.DAL.Entites.Project", "Project")
                         .WithMany("Properties")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjecyId");
 
                     b.Navigation("Address");
 

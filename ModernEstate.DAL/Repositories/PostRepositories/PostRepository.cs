@@ -42,14 +42,14 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
                                 .Include(p => p.PostPackages)
                                 .Include(p => p.Histories);
 
-            if (!string.IsNullOrWhiteSpace(title))
-            {
-                query = query.Where(a => a.Title.Contains(title));
-            }
-            if (state.HasValue)
-            {
-                query = query.Where(a => a.State == state.Value);
-            }
+            // if (!string.IsNullOrWhiteSpace(title))
+            // {
+            //     query = query.Where(a => a.Title.Contains(title));
+            // }
+            // if (state.HasValue)
+            // {
+            //     query = query.Where(a => a.State == state.Value);
+            // }
             if (srcStatus.HasValue)
             {
                 query = query.Where(a => a.SourceStatus == srcStatus.Value);

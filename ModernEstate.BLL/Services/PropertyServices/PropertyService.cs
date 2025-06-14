@@ -125,48 +125,49 @@ namespace ModernEstate.BLL.Services.PropertyServices
                 Guid accountId = Guid.Empty;
                 var propertyExisting = await _unitOfWork.Properties.FindByTitle(request.Title);
                 if (propertyExisting != null) throw new AppException(ErrorCode.HAS_EXISTED);
-                var addressExisting = await _addressService.GetOrCreateAsync(request.AddressRequest);
-                if (addressExisting == null)
+                // var addressExisting = await _addressService.GetOrCreateAsync(request.AddressRequest);
+                // if (addressExisting == null)
+                // {
+                // addressExisting = _mapper.Map<Address>(request.AddressRequest);
+                // addressExisting.Id = Guid.NewGuid();
+                // await _unitOfWork.Addresses.CreateAsync(addressExisting);
+                // }
+                // var accountExisting = await _unitOfWork.Accounts.FindByPhone(request.OwnerPropertyRequest.PhoneNumer);
+                // if (accountExisting == null)
+                // {
+                AccountRequest accountRequest = new AccountRequest
                 {
-                    addressExisting = _mapper.Map<Address>(request.AddressRequest);
-                    addressExisting.Id = Guid.NewGuid();
-                    await _unitOfWork.Addresses.CreateAsync(addressExisting);
-                }
-                var accountExisting = await _unitOfWork.Accounts.FindByPhone(request.OwnerPropertyRequest.PhoneNumer);
-                if (accountExisting == null)
-                {
-                    AccountRequest accountRequest = new AccountRequest
-                    {
-                        Email = request.OwnerPropertyRequest.Email,
-                        FirstName = request.OwnerPropertyRequest.FisrtName,
-                        LastName = request.OwnerPropertyRequest.LastName,
-                        Password = "123@123",
-                        RoleName = EnumRoleName.ROLE_PROPERTY_OWNER,
-                        EnumAccountStatus = EnumAccountStatus.ACTIVE,
-                    };
-                    accountId = await _accountService.CreateAccountBrokerOrOwner(accountRequest);
-                }
-                else
-                {
-                    if (!accountExisting.Role.RoleName.Equals(EnumRoleName.ROLE_PROPERTY_OWNER))
-                    {
-                        accountExisting.Role.RoleName = EnumRoleName.ROLE_PROPERTY_OWNER;
-                        await _unitOfWork.Accounts.UpdateAsync(accountExisting);
-                    }
-                    accountId = accountExisting.OwnerProperty.Id;
-                }
-                var property = _mapper.Map<Property>(request);
-                property.AddressId = addressExisting.Id;
-                property.Address = addressExisting;
-                property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
-                property.OwnerId = accountId;
-                await _unitOfWork.Properties.CreateAsync(property);
-                History history = await setupHistory(EnumHistoryChangeType.INSERT, property.Id, "Create property");
-                var image = await setupImage(request.PropertyImages, property.Id);
-                property.PropertyImages = image;
-                await _unitOfWork.SaveChangesWithTransactionAsync();
+                    // Email = request.OwnerPropertyRequest.Email,
+                    // FirstName = request.OwnerPropertyRequest.FisrtName,
+                    // LastName = request.OwnerPropertyRequest.LastName,
+                    Password = "123@123",
+                    RoleName = EnumRoleName.ROLE_PROPERTY_OWNER,
+                    EnumAccountStatus = EnumAccountStatus.ACTIVE,
+                };
+                // accountId = await _accountService.CreateAccountBrokerOrOwner(accountRequest);
+                // }
+                // else
+                // {
+                // if (!accountExisting.Role.RoleName.Equals(EnumRoleName.ROLE_PROPERTY_OWNER))
+                // {
+                // accountExisting.Role.RoleName = EnumRoleName.ROLE_PROPERTY_OWNER;
+                // await _unitOfWork.Accounts.UpdateAsync(accountExisting);
+                // }
+                // accountId = accountExisting.OwnerProperty.Id;
+                // }
+                // var property = _mapper.Map<Property>(request);
+                // property.AddressId = addressExisting.Id;
+                // property.Address = addressExisting;
+                // property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
+                // property.OwnerId = accountId;
+                // await _unitOfWork.Properties.CreateAsync(property);
+                // History history = await setupHistory(EnumHistoryChangeType.INSERT, property.Id, "Create property");
+                // var image = await setupImage(request.PropertyImages, property.Id);
+                // property.PropertyImages = image;
+                // await _unitOfWork.SaveChangesWithTransactionAsync();
                 // return _mapper.Map<PropertyResponse>(property);
-                return property;
+                // return property;
+                return null;
             }
             catch (AppException ex)
             {

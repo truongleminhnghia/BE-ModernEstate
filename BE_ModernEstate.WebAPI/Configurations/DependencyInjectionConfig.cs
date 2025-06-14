@@ -17,6 +17,7 @@ using ModernEstate.BLL.Services.NewServices;
 using ModernEstate.BLL.Services.NewTagServices;
 using ModernEstate.BLL.Services.OwnerPropertyServices;
 using ModernEstate.BLL.Services.PackageServices;
+using ModernEstate.BLL.Services.PayosServices;
 using ModernEstate.BLL.Services.PostPackageServices;
 using ModernEstate.BLL.Services.PostServices;
 using ModernEstate.BLL.Services.ProjectServices;
@@ -95,6 +96,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<ISupportService, SupportService>();
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IPayosService, PayosService>();
 
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();

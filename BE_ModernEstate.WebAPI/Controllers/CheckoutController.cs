@@ -1,6 +1,9 @@
 
 using Microsoft.AspNetCore.Mvc;
+using ModernEstate.BLL.Services.PayosServices;
 using ModernEstate.Common.Models.ApiResponse;
+using ModernEstate.Common.Models.Requests;
+using ModernEstate.DAL.Entites;
 using Net.payOS;
 using Net.payOS.Types;
 
@@ -10,52 +13,33 @@ namespace BE_ModernEstate.WebAPI.Controllers
     [Route("api/v1/checkout")]
     public class CheckoutController : ControllerBase
     {
-        private readonly PayOS _payOS;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public CheckoutController(PayOS payOS, IHttpContextAccessor httpContextAccessor)
+        private readonly IPayosService _payosService;
+        public CheckoutController(IPayosService payosService)
         {
-            _payOS = payOS;
-            _httpContextAccessor = httpContextAccessor;
+            _payosService = payosService;
         }
 
         [HttpPost("/create-payment-link")]
-        public async Task<IActionResult> Checkout()
+        public async Task<IActionResult> Checkout([FromBody] PostPackageReuqest reuqest)
         {
-            try
+            var urlPayemt = await _payosService.CreatePaymentAsync(reuqest);
+            if (urlPayemt == null)
             {
-                int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
-                ItemData item = new ItemData("Mì tôm hảo hảo ly", 1, 1000);
-                List<ItemData> items = new List<ItemData> { item };
-
-                // Get the current request's base URL
-                var request = _httpContextAccessor.HttpContext.Request;
-                var baseUrl = $"{request.Scheme}://{request.Host}";
-
-                PaymentData paymentData = new PaymentData(
-                    orderCode,
-                    2000,
-                    "Thanh toan don hang",
-                    items,
-                    $"https://localhost:8080/api/v1/checkout/failed",
-                    $"https://localhost:8080/api/v1/checkout/success"
-                );
-
-                CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
-
-                return Ok(new ApiResponse
+                return BadRequest(new ApiResponse
                 {
-                    Code = StatusCodes.Status200OK,
-                    Success = true,
-                    Message = "Payment link created successfully.",
-                    Data = createPayment.checkoutUrl
+                    Code = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = "Failed to create payment link.",
+                    Data = null
                 });
             }
-            catch (System.Exception exception)
+            return Ok(new ApiResponse
             {
-                Console.WriteLine(exception);
-                return Redirect("/");
-            }
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Payment link created successfully.",
+                Data = urlPayemt
+            });
         }
 
         [HttpGet("/success")]

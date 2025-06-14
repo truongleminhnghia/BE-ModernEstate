@@ -56,28 +56,28 @@ namespace ModernEstate.DAL.Repositories.PropertyRepositories
                 .Include(p => p.Histories)
                 .Include(p => p.Posts)
                 .Include(p => p.Favorites);
-            if (typeProperty.HasValue)
-                query = query.Where(p => p.TypeProperty == typeProperty.Value);
-            if (!string.IsNullOrWhiteSpace(title))
-                query = query.Where(p => EF.Functions.Like(p.Title, $"%{title}%"));
-            if (minPrice.HasValue)
-                query = query.Where(p => p.SalePrice >= minPrice.Value);
-            if (maxPrice.HasValue)
-                query = query.Where(p => p.SalePrice <= maxPrice.Value);
-            if (minArea.HasValue)
-                query = query.Where(p => p.PropertyArea >= minArea.Value);
-            if (maxArea.HasValue)
-                query = query.Where(p => p.PropertyArea <= maxArea.Value);
-            if (numberOfBedroom.HasValue)
-                query = query.Where(p => p.NumberOfBedroom == numberOfBedroom.Value);
-            if (numberOfBathroom.HasValue)
-                query = query.Where(p => p.NumberOfBathroom == numberOfBathroom.Value);
-            if (numberOfFloor.HasValue)
-                query = query.Where(p => p.NumberOfFloor == numberOfFloor.Value);
-            if (numberOfRoom.HasValue)
-                query = query.Where(p => p.NumberOfRoom == numberOfRoom.Value);
-            if (state.HasValue)
-                query = query.Where(p => p.State == state.Value);
+            // if (typeProperty.HasValue)
+            //     query = query.Where(p => p.TypeProperty == typeProperty.Value);
+            // if (!string.IsNullOrWhiteSpace(title))
+            //     query = query.Where(p => EF.Functions.Like(p.Title, $"%{title}%"));
+            // if (minPrice.HasValue)
+            //     query = query.Where(p => p.SalePrice >= minPrice.Value);
+            // if (maxPrice.HasValue)
+            //     query = query.Where(p => p.SalePrice <= maxPrice.Value);
+            // if (minArea.HasValue)
+            //     query = query.Where(p => p.PropertyArea >= minArea.Value);
+            // if (maxArea.HasValue)
+            //     query = query.Where(p => p.PropertyArea <= maxArea.Value);
+            // if (numberOfBedroom.HasValue)
+            //     query = query.Where(p => p.NumberOfBedroom == numberOfBedroom.Value);
+            // if (numberOfBathroom.HasValue)
+            //     query = query.Where(p => p.NumberOfBathroom == numberOfBathroom.Value);
+            // if (numberOfFloor.HasValue)
+            //     query = query.Where(p => p.NumberOfFloor == numberOfFloor.Value);
+            // if (numberOfRoom.HasValue)
+            //     query = query.Where(p => p.NumberOfRoom == numberOfRoom.Value);
+            // if (state.HasValue)
+            //     query = query.Where(p => p.State == state.Value);
             if (status.HasValue)
                 query = query.Where(p => p.Status == status.Value);
             // if (attributes != null && attributes.Length > 0)

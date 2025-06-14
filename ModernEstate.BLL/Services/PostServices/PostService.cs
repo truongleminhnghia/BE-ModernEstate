@@ -5,6 +5,7 @@ using ModernEstate.BLL.Services.AccountServices;
 using ModernEstate.BLL.Services.AddressServices;
 using ModernEstate.BLL.Services.ContactServices;
 using ModernEstate.BLL.Services.HistoryServices;
+using ModernEstate.BLL.Services.PostPackageServices;
 using ModernEstate.BLL.Services.PropertyServices;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
@@ -28,12 +29,14 @@ namespace ModernEstate.BLL.Services.PostServices
         private readonly IAccountService _accountService;
         private readonly IJwtService _jwtService;
         private readonly IHistoryService _historyService;
+        private readonly IPostPackageService _postPackageService;
         private readonly Utils _utils;
 
         public PostService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<PostService> logger,
                            IContactService contactService, Utils utils, IPropertyService propertyService,
                            IAddressService addressService, IAccountService accountService,
-                           IJwtService jwtService, IHistoryService historyService)
+                           IJwtService jwtService, IHistoryService historyService,
+                           IPostPackageService postPackageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -45,146 +48,42 @@ namespace ModernEstate.BLL.Services.PostServices
             _accountService = accountService;
             _jwtService = jwtService;
             _historyService = historyService;
+            _postPackageService = postPackageService;
         }
-
-        // public async Task<bool> CreatePost(PostRequest request)
-        // {
-        //     try
-        //     {
-        //         Guid conactId = await _contactService.GetOrCreateAsync(request.Contact);
-        //         if (conactId == Guid.Empty) throw new AppException(ErrorCode.NOT_NULL);
-        //         if (request.Property == null || request.Property.AddressRequest == null)
-        //         {
-        //             throw new AppException(ErrorCode.NOT_NULL, "Property or AddressRequest cannot be null.");
-        //         }
-        //         var addressExisting = await _addressService.GetOrCreateAsync(request.Property.AddressRequest);
-        //         if (addressExisting == null)
-        //         {
-        //             addressExisting = _mapper.Map<Address>(request.Property.AddressRequest);
-        //             addressExisting.Id = Guid.NewGuid();
-        //             await _unitOfWork.Addresses.CreateAsync(addressExisting);
-        //         }
-        //         Guid accountId = Guid.Empty;
-        //         var accountExisting = await _unitOfWork.Accounts.FindByPhone(request.Property.OwnerPropertyRequest.PhoneNumer);
-        //         if (accountExisting == null)
-        //         {
-        //             AccountRequest accountRequest = new AccountRequest
-        //             {
-        //                 Email = request.Property.OwnerPropertyRequest.Email,
-        //                 FirstName = request.Property.OwnerPropertyRequest.FisrtName,
-        //                 LastName = request.Property.OwnerPropertyRequest.LastName,
-        //                 Password = "123@123",
-        //                 RoleName = EnumRoleName.ROLE_PROPERTY_OWNER,
-        //                 EnumAccountStatus = EnumAccountStatus.ACTIVE,
-        //             };
-        //             accountId = await _accountService.CreateAccountBrokerOrOwner(accountRequest);
-        //         }
-        //         else
-        //         {
-        //             if (!accountExisting.Role.RoleName.Equals(EnumRoleName.ROLE_PROPERTY_OWNER))
-        //             {
-        //                 accountExisting.Role.RoleName = EnumRoleName.ROLE_PROPERTY_OWNER;
-        //                 await _unitOfWork.Accounts.UpdateAsync(accountExisting);
-        //             }
-        //             accountId = accountExisting.OwnerProperty.Id;
-        //         }
-        //         var post = _mapper.Map<Post>(request);
-        //         post.ContactId = conactId;
-        //         post.Code = await _utils.GenerateUniqueBrokerCodeAsync("POST_");
-        //         await _unitOfWork.Posts.CreateAsync(post);
-        //         var property = _mapper.Map<Property>(request.Property);
-        //         property.AddressId = addressExisting.Id;
-        //         property.Address = addressExisting;
-        //         property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
-        //         property.OwnerId = accountId;
-        //         await _unitOfWork.Properties.CreateAsync(property);
-        //         History history = await setupHistory(EnumHistoryChangeType.INSERT, property.Id, "Create property");
-        //         var image = await setupImage(request.Property.PropertyImages, property.Id);
-        //         property.PropertyImages = image;
-        //         post.PropertyId = property.Id;
-        //         // post.Property.Code = property.Code;
-        //         // var PostPackage = await _unitOfWork.PostPackages.CreateAsync(_mapper.Map<PostPackage>(request.PostPackage));
-        //         await _unitOfWork.SaveChangesWithTransactionAsync();
-        //         _logger.LogInformation("Post created successfully with ID: {Id}", post.Id);
-        //         return true;
-        //     }
-        //     catch (AppException ex)
-        //     {
-        //         _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
-        //         throw;
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
-        //         throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
-        //     }
-        // }
 
         public async Task<bool> CreatePost(PostRequest request)
         {
             try
             {
                 Guid conactId = await _contactService.GetOrCreateAsync(request.Contact);
-                if (conactId == Guid.Empty) throw new AppException(ErrorCode.NOT_NULL);
-                if (request.NewProperty == null || request.NewProperty.AddressRequest == null)
+                if (conactId == Guid.Empty) throw new AppException(ErrorCode.NOT_NULL, "Thông tin liên hệ không được bỏ trống.");
+                if (request.NewProperty == null || request.NewProperty.Address == null)
                 {
                     throw new AppException(ErrorCode.NOT_NULL, "Property or AddressRequest cannot be null.");
                 }
-                var addressExisting = await _addressService.GetOrCreateAsync(request.NewProperty.AddressRequest);
+                var addressExisting = await _addressService.GetOrCreateAsync(request.NewProperty.Address);
                 if (addressExisting == null)
                 {
-                    addressExisting = _mapper.Map<Address>(request.NewProperty.AddressRequest);
+                    addressExisting = _mapper.Map<Address>(request.NewProperty.Address);
                     addressExisting.Id = Guid.NewGuid();
                     await _unitOfWork.Addresses.CreateAsync(addressExisting);
                 }
-                Guid accountId = Guid.Empty;
-                var accountExisting = await _unitOfWork.Accounts.FindByPhone(request.NewProperty.OwnerPropertyRequest.PhoneNumer);
-                if (accountExisting == null)
-                {
-                    AccountRequest accountRequest = new AccountRequest
-                    {
-                        Email = request.NewProperty.OwnerPropertyRequest.Email,
-                        FirstName = request.NewProperty.OwnerPropertyRequest.FisrtName,
-                        LastName = request.NewProperty.OwnerPropertyRequest.LastName,
-                        Password = "123@123",
-                        RoleName = EnumRoleName.ROLE_PROPERTY_OWNER,
-                        EnumAccountStatus = EnumAccountStatus.ACTIVE,
-                    };
-                    accountId = await _accountService.CreateAccountBrokerOrOwner(accountRequest);
-                }
-                else
-                {
-                    if (!accountExisting.Role.RoleName.Equals(EnumRoleName.ROLE_PROPERTY_OWNER))
-                    {
-                        accountExisting.Role.RoleName = EnumRoleName.ROLE_PROPERTY_OWNER;
-                        await _unitOfWork.Accounts.UpdateAsync(accountExisting);
-                    }
-                    accountId = accountExisting.OwnerProperty.Id;
-                }
-
-                // 1. Tạo Property trước
-                var property = _mapper.Map<Property>(request.NewProperty);
-                property.AddressId = addressExisting.Id;
-                property.Address = addressExisting;
-                property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
-                if (string.IsNullOrEmpty(property.Code))
-                    throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Property code generation failed.");
-                property.OwnerId = accountId;
-                await _unitOfWork.Properties.CreateAsync(property);
-
-                // 2. Tạo Post sau, gán PropertyId
+                var property = await CreateProperty(request.NewProperty, addressExisting, request.Demand);
+                if (property == null) throw new AppException(ErrorCode.NOT_NULL, "Property creation failed.");
                 var post = _mapper.Map<Post>(request);
-                post.PostBy = _jwtService.GetAccountId();
                 post.ContactId = conactId;
                 post.PropertyId = property.Id;
+                post.SourceStatus = EnumSourceStatus.WAIT_PAYMENT;
+                post.Status = EnumStatus.INACTIVE;
                 post.Code = await _utils.GenerateUniqueBrokerCodeAsync("POST_");
                 if (string.IsNullOrEmpty(post.Code))
                     throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, "Post code generation failed.");
                 await _unitOfWork.Posts.CreateAsync(post);
-
-                // 3. Các thao tác khác
+                var postPackage = await _postPackageService.CreateAsync(request.PostPackagesRequest, post.Id);
+                if (postPackage == null) throw new AppException(ErrorCode.NOT_NULL, "Post package creation failed.");
+                post.PostPackages.Add(postPackage);
                 History history = await setupHistory(EnumHistoryChangeType.INSERT, property.Id, "Create property");
-                var image = await setupImage(request.NewProperty.PropertyImages, property.Id);
+                var image = await setupImage(request.NewProperty.Images, property.Id);
                 property.PropertyImages = image;
 
                 await _unitOfWork.SaveChangesWithTransactionAsync();
@@ -202,6 +101,33 @@ namespace ModernEstate.BLL.Services.PostServices
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
+
+        private async Task<Property> CreateProperty(PropertyRequest propertyRequest, Address address, EnumDemand demand)
+        {
+
+            var property = _mapper.Map<Property>(propertyRequest);
+            if (propertyRequest.ProjectId != null)
+            {
+                var project = await _unitOfWork.Projects.GetByIdAsync(propertyRequest.ProjectId.Value);
+                if (project == null) throw new AppException(ErrorCode.NOT_FOUND, "Project not found.");
+                property.ProjectId = project.Id;
+            }
+            else
+            {
+                property.ProjectId = null;
+            }
+            property.AddressId = address.Id;
+            property.Address = address;
+            property.Demand = demand;
+            property.Status = EnumStatusProperty.INACTIVE;
+            property.StatusSource = EnumSourceStatus.WAIT_PAYMENT;
+            property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
+            if (string.IsNullOrEmpty(property.Code))
+                throw new AppException(ErrorCode.NOT_NULL, "Property code generation failed.");
+            await _unitOfWork.Properties.CreateAsync(property);
+            return property;
+        }
+
 
         private async Task<History> setupHistory(EnumHistoryChangeType type, Guid id, string reason)
         {

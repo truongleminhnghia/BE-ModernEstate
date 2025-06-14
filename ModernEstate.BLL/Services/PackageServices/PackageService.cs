@@ -46,7 +46,7 @@ namespace ModernEstate.BLL.Services.PackageServices
             {
                 var entity = _mapper.Map<Package>(request);
                 // entity.Id = Guid.NewGuid();
-                entity.PackageCode = await _utils.GenerateUniqueBrokerCodeAsync("EMP");
+                entity.PackageCode = await _utils.GenerateUniqueBrokerCodeAsync("PACKAGE_");
                 await _uow.Packages.CreateAsync(entity);
                 await _uow.SaveChangesWithTransactionAsync();
 
