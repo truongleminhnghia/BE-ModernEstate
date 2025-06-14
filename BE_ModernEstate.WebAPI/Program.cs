@@ -10,6 +10,7 @@ using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
+using Net.payOS;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,10 +55,24 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
     );
 });
 
+// IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+
+
+var PayOS = builder.Configuration.GetSection("PAYOS");
+var ClientId = PayOS["CLIENT_ID"];
+var APILEY = PayOS["API_KEY"];
+var CHECKSUMKEY = PayOS["CHECKSUM_KEY"];
+
+PayOS payOS = new PayOS(ClientId,
+                    APILEY,
+                    CHECKSUMKEY);
+
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton(payOS);
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
