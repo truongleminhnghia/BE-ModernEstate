@@ -53,9 +53,6 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpPost("/createPaymentLink")]
         public async Task<IActionResult> CreatePaymentLink(CreatePaymentLinkRequest request)
         {
-            // string clientId = "f7587453-3666-4c63-90d8-5e1e12bd6f27";
-            // string apiKey = "e0cce106-d673-4f48-83a5-05b615da2c73";
-            // string checksumKey = "aa56fcebad536341e2536a7989169b39f4d50e6e567134de91ab8e8de23ff7d5";
             try
             {
                 int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
