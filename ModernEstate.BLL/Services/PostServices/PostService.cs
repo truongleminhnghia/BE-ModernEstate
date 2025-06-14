@@ -51,7 +51,7 @@ namespace ModernEstate.BLL.Services.PostServices
             _postPackageService = postPackageService;
         }
 
-        public async Task<bool> CreatePost(PostRequest request)
+        public async Task<Guid> CreatePost(PostRequest request)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace ModernEstate.BLL.Services.PostServices
 
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 _logger.LogInformation("Post created successfully with ID: {Id}", post.Id);
-                return true;
+                return post.PostPackages.FirstOrDefault()?.Id ?? Guid.Empty;
             }
             catch (AppException ex)
             {

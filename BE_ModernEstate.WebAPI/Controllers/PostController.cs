@@ -24,7 +24,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         public async Task<IActionResult> CreatePost([FromBody] PostRequest request)
         {
             var result = await _postService.CreatePost(request);
-            if (!result)
+            if (result == null)
             {
                 return BadRequest(new ApiResponse
                 {
@@ -39,7 +39,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Code = StatusCodes.Status200OK,
                 Success = true,
                 Message = "Account created successfully",
-                Data = "result"
+                Data = result
             });
         }
 
