@@ -244,9 +244,63 @@ namespace ModernEstate.BLL.Services.PostServices
             }
         }
 
-        public Task<bool> UpdatePost(Guid id, UpdatePostRequest request)
+        public async Task<bool> UpdatePost(Guid id, UpdatePostRequest request, bool approval)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var postExisting = await _unitOfWork.Posts.FindById(id);
+                if (postExisting == null)
+                    throw new AppException(ErrorCode.NOT_FOUND, "Post not found.");
+                var property = await _unitOfWork.Properties.FindById(postExisting.PropertyId);
+                if (property == null)
+                    throw new AppException(ErrorCode.NOT_FOUND, "Property not found.");
+                var accountCurrentId = _jwtService.GetAccountIdGuid();
+                if (accountCurrentId == Guid.Empty)
+                    throw new AppException(ErrorCode.NOT_NULL, "Account ID cannot be null.");
+                var accountCurrent = await _unitOfWork.Accounts.FindById(accountCurrentId);
+                if (accountCurrent == null)
+                    throw new AppException(ErrorCode.NOT_FOUND, "Account not found.");
+                if (accountCurrent?.Role?.RoleName != EnumRoleName.ROLE_STAFF ||
+                    accountCurrent?.Role?.RoleName != EnumRoleName.ROLE_ADMIN ||
+                    accountCurrent.Id.ToString() != postExisting.PostBy)
+                    throw new AppException(ErrorCode.FORBIDDEN);
+                if (approval)
+                {
+                    postExisting.AppRovedBy = accountCurrent.Id.ToString();
+                    if (request.SourceStatus == EnumSourceStatus.APPROVE)
+                    {
+                        postExisting.SourceStatus = EnumSourceStatus.APPROVE;
+                        postExisting.Status = EnumStatus.ACTIVE;
+                        property.StatusSource = EnumSourceStatus.APPROVE;
+                    }
+                    else if (request.SourceStatus == EnumSourceStatus.REJECT || request.SourceStatus == EnumSourceStatus.BLOCKED)
+                    {
+                        postExisting.SourceStatus = request.SourceStatus ?? postExisting.SourceStatus;
+                        postExisting.Status = EnumStatus.INACTIVE;
+                        postExisting.RejectionReason = request.RejectionReason;
+                        property.StatusSource = request.SourceStatus ?? postExisting.SourceStatus;
+                    }
+                }
+                else
+                {
+
+                }
+                await _unitOfWork.Properties.UpdateAsync(property);
+                _logger.LogInformation("Property with ID {Id} approved successfully.", id);
+                await _unitOfWork.Posts.UpdateAsync(postExisting);
+                _logger.LogInformation("Post with ID {Id} approved successfully.", id);
+                return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 }

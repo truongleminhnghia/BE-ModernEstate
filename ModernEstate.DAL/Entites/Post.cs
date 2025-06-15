@@ -28,6 +28,11 @@ namespace ModernEstate.DAL.Entites
         [Required]
         public string PostBy { get; set; } = string.Empty;
 
+        [Column("priority_status", TypeName = "varchar(300)")]
+        [Description("Trạng thái ưu tiên của bất động sản (Ưu tiên cao, Trung bình, Thấp)")]
+        [EnumDataType(typeof(EnumPriorityStatus))]
+        public EnumPriorityStatus? PriorityStatus { get; set; }
+
         [Column("demand", TypeName = "varchar(300)")]
         [Required]
         [Description("State of the post.")]

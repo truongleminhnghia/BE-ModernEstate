@@ -73,7 +73,7 @@ namespace ModernEstate.BLL.Services.PayosServices
                 await _uow.Transactions.CreateAsync(payment);
                 await _uow.SaveChangesWithTransactionAsync();
 
-                ItemData item = new ItemData(packageExists.PackageName, 1, (int)(request.TotalAmout ?? 0));
+                ItemData item = new ItemData(packageExists.PackageName ?? "Unknown Package", 1, (int)(request.TotalAmout ?? 0));
                 List<ItemData> items = new List<ItemData> { item };
 
                 PaymentData paymentData = new PaymentData(
@@ -117,8 +117,30 @@ namespace ModernEstate.BLL.Services.PayosServices
                 if (data.code == "00")
                 {
                     _logger.LogInformation("Payment verified successfully: {Code}", data.code);
-
                     transaction.Status = EnumStatusPayment.SUCCESS;
+                    if (transaction.PostPackageId == null)
+                        throw new AppException(ErrorCode.NOT_FOUND, "PostPackageId không được null.");
+                    var postPackage = await _uow.PostPackages.FindById(transaction.PostPackageId.Value);
+                    if (postPackage == null)
+                        throw new AppException(ErrorCode.NOT_FOUND, "Gói đăng bài không tồn tại.");
+                    postPackage.Status = EnumStatus.ACTIVE;
+                    await _uow.PostPackages.UpdateAsync(postPackage);
+                    if (postPackage.PostId == null)
+                        throw new AppException(ErrorCode.NOT_FOUND, "PostId không được null.");
+                    var post = await _uow.Posts.FindById(postPackage.PostId.Value);
+                    if (post == null)
+                        throw new AppException(ErrorCode.NOT_FOUND, "Bài đăng không tồn tại.");
+                    post.SourceStatus = EnumSourceStatus.WAIT_APPROVE;
+                    post.PriorityStatus = postPackage.Package != null ? postPackage.Package.PriorityStatus : post.PriorityStatus;
+                    await _uow.Posts.UpdateAsync(post);
+                    _logger.LogInformation("Post package and post updated successfully for transaction {TransactionId}", transaction.Id);
+                    var property = await _uow.Properties.FindById(post.PropertyId);
+                    if (property == null)
+                        throw new AppException(ErrorCode.NOT_FOUND, "Bất động sản không tồn tại.");
+                    property.StatusSource = EnumSourceStatus.WAIT_APPROVE;
+                    property.PriorityStatus = post.PriorityStatus;
+                    await _uow.Properties.UpdateAsync(property);
+                    _logger.LogInformation("Property updated successfully for transaction {TransactionId}", transaction.Id);
                 }
                 else
                 {

@@ -11,7 +11,7 @@ namespace ModernEstate.BLL.Services.PostServices
         Task<PostResponse?> GetById(Guid id);
         Task<PostResponse?> GetByCode(string code);
         Task<PageResult<PostResponse>> GetPosts(string? title, EnumStatePost? state, EnumSourceStatus? srcStatus, int pageCurrent, int pageSize);
-        Task<bool> UpdatePost(Guid id, UpdatePostRequest request);
+        Task<bool> UpdatePost(Guid id, UpdatePostRequest request, bool approval);
         Task<bool> DeletePost(Guid id);
     }
 }

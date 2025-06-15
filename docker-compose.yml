@@ -22,20 +22,21 @@ services:
     depends_on:
       - mysql
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "80:80"
+      - "443:443"
     environment:
       - DB_PORT=3306
       - DB_HOST=mysql
       - DB_USER=root
       - DB_PASSWORD=123456
       - DB_NAME=modernestate
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-    # volumes:
-    #   - ~/.aspnet/https:/https:ro
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/fullchain.pem
+      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/https/privkey.pem
+    volumes:
+      - /etc/letsencrypt/live/bemodernestate.site/fullchain.pem:/https/fullchain.pem:ro
+      - /etc/letsencrypt/live/bemodernestate.site/privkey.pem:/https/privkey.pem:ro
 volumes:
   mysql_data:
 

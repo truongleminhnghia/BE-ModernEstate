@@ -61,8 +61,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Tạo thư mục mount chứng chỉ và copy file .pfx vào
-RUN mkdir /https
-COPY BE_ModernEstate.WebAPI/aspnetapp.pfx /https/aspnetapp.pfx
+# RUN mkdir /https
+# COPY BE_ModernEstate.WebAPI/aspnetapp.pfx /https/aspnetapp.pfx
 
 COPY --from=build /app/out .
 

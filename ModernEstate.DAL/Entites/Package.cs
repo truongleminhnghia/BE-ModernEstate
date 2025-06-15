@@ -29,6 +29,11 @@ namespace ModernEstate.DAL.Entites
         [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive number.")]
         public double Price { get; set; }
 
+        [Column("priority_status", TypeName = "varchar(300)")]
+        [Description("Trạng thái ưu tiên của bất động sản (Ưu tiên cao, Trung bình, Thấp)")]
+        [EnumDataType(typeof(EnumPriorityStatus))]
+        public EnumPriorityStatus? PriorityStatus { get; set; }
+
         [Column("type_package", TypeName = "varchar(50)")]
         [Required]
         [Description("Type of the package.")]
