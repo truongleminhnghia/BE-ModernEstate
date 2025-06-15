@@ -6,7 +6,6 @@ using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.srcs;
 using ModernEstate.DAL;
-using ModernEstate.DAL.Entites;
 using Net.payOS;
 using Net.payOS.Types;
 
@@ -58,6 +57,7 @@ namespace ModernEstate.BLL.Services.PayosServices
                 postPackageExists.ExpiredDate = request.EndDate;
                 postPackageExists.PackageId = request.PackageId;
                 await _uow.PostPackages.UpdateAsync(postPackageExists);
+                var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 PaymentRequest paymentRequest = new PaymentRequest
                 {
                     Amount = request.TotalAmout ?? 0,
@@ -69,23 +69,12 @@ namespace ModernEstate.BLL.Services.PayosServices
                 var payment = _mapper.Map<DAL.Entites.Transaction>(paymentRequest);
                 payment.Status = EnumStatusPayment.PENDING;
                 payment.PostPackageId = postPackageExists.Id;
+                payment.TransactionCode = orderCode.ToString();
                 await _uow.Transactions.CreateAsync(payment);
                 await _uow.SaveChangesWithTransactionAsync();
 
                 ItemData item = new ItemData(packageExists.PackageName, 1, (int)(request.TotalAmout ?? 0));
                 List<ItemData> items = new List<ItemData> { item };
-                // if (postPackageExists.Post == null)
-                // {
-                //     _logger.LogWarning("Post is null for PostPackage with ID {id}.", request.Id);
-                //     throw new AppException(ErrorCode.NOT_FOUND, "Bài đăng không tồn tại.");
-                // }
-
-                // if (!long.TryParse(postPackageExists.Post.Code, out long postCodeLong))
-                // {
-                //     _logger.LogWarning("Post.Code '{PostCode}' cannot be converted to long.", postPackageExists.Post.Code);
-                //     throw new AppException(ErrorCode.NOT_FOUND, "Mã bài đăng không hợp lệ.");
-                // }
-                int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
 
                 PaymentData paymentData = new PaymentData(
                     orderCode,
@@ -97,6 +86,51 @@ namespace ModernEstate.BLL.Services.PayosServices
                 );
                 CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
                 return createPayment.checkoutUrl;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<bool> VerifyPaymentAsync(WebhookType type)
+        {
+            try
+            {
+                var data = _payOS.verifyPaymentWebhookData(type);
+                var transaction = await _uow.Transactions.FinByTransactionCode(data.orderCode.ToString());
+                if (transaction == null)
+                {
+                    _logger.LogWarning(
+                                   "No transaction found for order code {OrderCode}, skipping webhook processing.",
+                                   data.orderCode
+                               );
+                    return true;
+                }
+
+                if (data.code == "00")
+                {
+                    _logger.LogInformation("Payment verified successfully: {Code}", data.code);
+
+                    transaction.Status = EnumStatusPayment.SUCCESS;
+                }
+                else
+                {
+                    _logger.LogWarning("Payment failed or canceled: {Code}", data.code);
+
+                    transaction.Status = EnumStatusPayment.FAILED;
+                }
+
+                await _uow.Transactions.UpdateAsync(transaction);
+                await _uow.SaveChangesWithTransactionAsync();
+
+                return data.code == "00";
             }
             catch (AppException ex)
             {

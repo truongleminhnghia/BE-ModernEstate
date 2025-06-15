@@ -11,6 +11,11 @@ namespace ModernEstate.DAL.Repositories.TransactionRepositories
         public TransactionRepository(ApplicationDbConext context)
             : base(context) { }
 
+        public async Task<Transaction?> FinByTransactionCode(string transactionCode)
+        {
+            return await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == transactionCode);
+        }
+
         public async Task<IEnumerable<Transaction>> FindTransactionsAsync(
             Guid? accountId,
             EnumTypeTransaction? typeTransaction,

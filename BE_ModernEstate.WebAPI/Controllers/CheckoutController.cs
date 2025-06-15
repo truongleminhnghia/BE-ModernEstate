@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ModernEstate.BLL.Services.PayosServices;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
-using ModernEstate.DAL.Entites;
-using Net.payOS;
 using Net.payOS.Types;
 
 namespace BE_ModernEstate.WebAPI.Controllers
@@ -19,7 +17,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
             _payosService = payosService;
         }
 
-        [HttpPost("/create-payment-link")]
+        [HttpPost("create-payment-link")]
         public async Task<IActionResult> Checkout([FromBody] PostPackageReuqest reuqest)
         {
             var urlPayemt = await _payosService.CreatePaymentAsync(reuqest);
@@ -42,7 +40,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
             });
         }
 
-        [HttpGet("/success")]
+        [HttpGet("success")]
         public async Task<IActionResult> Success()
         {
             return Ok(
@@ -56,7 +54,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
             );
         }
 
-        [HttpGet("/failed")]
+        [HttpGet("failed")]
         public async Task<IActionResult> Failed()
         {
             return Ok(
@@ -68,6 +66,32 @@ namespace BE_ModernEstate.WebAPI.Controllers
                     Data = null
                 }
             );
+        }
+
+        [HttpPost("verify-payment")]
+        public async Task<IActionResult> VerifyPayment([FromBody] WebhookType type)
+        {
+            var resullt = await _payosService.VerifyPaymentAsync(type);
+            if (resullt)
+            {
+                return Ok(new ApiResponse
+                {
+                    Code = StatusCodes.Status200OK,
+                    Success = true,
+                    Message = "Payment verified successfully.",
+                    Data = null
+                });
+            }
+            else
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Code = StatusCodes.Status400BadRequest,
+                    Success = false,
+                    Message = "Payment verification failed.",
+                    Data = null
+                });
+            }
         }
 
     }

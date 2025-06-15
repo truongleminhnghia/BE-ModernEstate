@@ -4,7 +4,7 @@ using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
 using BE_ModernEstate.WebAPI.Middlewares;
 using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using ModernEstate.BLL.Services.BackgroundServices;
 using ModernEstate.Common.Config;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
@@ -54,8 +54,7 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
             )
     );
 });
-
-// IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+builder.Services.AddHostedService<OrderTimeoutService>();
 
 
 var PayOS = builder.Configuration.GetSection("PAYOS");

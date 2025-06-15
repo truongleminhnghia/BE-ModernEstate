@@ -30,6 +30,7 @@ namespace ShoppEcommerce_WebApp.WebAPI.Extensions
             {ErrorCode.HAS_INACTIVE, new (HttpStatusCode.BadRequest, "Status inactive")},
             {ErrorCode.HAS_EXISTED, new (HttpStatusCode.BadRequest, "Has existed")},
             {ErrorCode.NOT_NULL, new (HttpStatusCode.BadRequest, "Must be not null")},
+            { ErrorCode.PAYMENT_VERIFICATION_FAILED, new(HttpStatusCode.BadRequest, "Payment verification failed. Please check your payment details and try again.") },
 
         };
 
