@@ -14,6 +14,8 @@ namespace ModernEstate.BLL.Services.AccountServices
         public Task<AccountResponse> GetByPhone(string phone);
         public Task<bool> UpdateAccount(UpdateAccountRequest req, Guid id);
         public Task<bool> UpdateAccountStatus(Guid id);
-        Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email, int pageCurrent, int pageSize);
+        Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email, int? limit, DateTime? fromDate, DateTime? toDate, int pageCurrent, int pageSize);
+        Task<IEnumerable<AccountResponse>> GetAll(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender,
+                                                                    string email, int? limit, DateTime? fromDate, DateTime? toDate);
     }
 }

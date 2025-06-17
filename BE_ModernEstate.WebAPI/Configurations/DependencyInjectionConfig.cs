@@ -7,6 +7,7 @@ using ModernEstate.BLL.Services.AuthenticateServices;
 using ModernEstate.BLL.Services.BrokerServices;
 using ModernEstate.BLL.Services.CategoryServices;
 using ModernEstate.BLL.Services.ContactServices;
+using ModernEstate.BLL.Services.DashBoardServices;
 using ModernEstate.BLL.Services.EmailServices;
 using ModernEstate.BLL.Services.EmployeeServices;
 using ModernEstate.BLL.Services.FavoriteServices;
@@ -97,6 +98,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IPayosService, PayosService>();
+            services.AddScoped<IDashBoardService, DashBoardService>();
 
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();

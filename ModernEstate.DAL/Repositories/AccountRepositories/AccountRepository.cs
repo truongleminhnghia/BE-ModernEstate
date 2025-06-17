@@ -28,7 +28,8 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
                                             .FirstOrDefaultAsync(ac => ac.Id.Equals(id));
         }
 
-        public async Task<IEnumerable<Account>> FindWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email)
+        public async Task<IEnumerable<Account>> FindWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender,
+                                                                string email, int? limit, DateTime? fromDate, DateTime? toDate)
         {
             IQueryable<Account> query = _context.Accounts.Include(a => a.Employee).Include(a => a.OwnerProperty).Include(a => a.Broker).Include(a => a.Role);
 
@@ -56,8 +57,14 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
             {
                 query = query.Where(a => a.Gender == gender.Value);
             }
+            if (fromDate.HasValue)
+                query = query.Where(a => a.CreatedAt >= fromDate.Value);
+            if (toDate.HasValue)
+                query = query.Where(a => a.CreatedAt <= toDate.Value);
             query = query.OrderByDescending(a => a.CreatedAt); // mặc định là giảm dần, tức là cái mới nhất sẽ ở trên cùng
-            // Thay đổi thứ tự sắp xếp nếu cần thiết
+                                                               // Thay đổi thứ tự sắp xếp nếu cần thiết
+            if (limit.HasValue && limit.Value > 0)
+                query = query.Take(limit.Value);
             return await query.ToListAsync();
         }
 
@@ -85,6 +92,15 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
         public async Task<Account> GetByResetTokenAsync(String token)
         {
             return await _context.Accounts.FirstOrDefaultAsync(a => a.PasswordResetToken == token);
+        }
+
+        public async Task<IEnumerable<Account?>> FindAll()
+        {
+            return await _context.Accounts.Include(a => a.Role)
+                                            .Include(a => a.Employee)
+                                            .Include(a => a.Broker)
+                                            .Include(a => a.OwnerProperty)
+                                            .ToListAsync();
         }
     }
 }

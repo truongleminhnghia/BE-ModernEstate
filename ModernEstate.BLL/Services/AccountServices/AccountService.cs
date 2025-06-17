@@ -190,11 +190,12 @@ namespace ModernEstate.BLL.Services.AccountServices
             }
         }
 
-        public async Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email, int pageCurrent, int pageSize)
+        public async Task<PageResult<AccountResponse>> GetWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender,
+                                                                    string email, int? limit, DateTime? fromDate, DateTime? toDate, int pageCurrent, int pageSize)
         {
             try
             {
-                var result = await _unitOfWork.Accounts.FindWithParams(lastName, firstName, status, role, gender, email);
+                var result = await _unitOfWork.Accounts.FindWithParams(lastName, firstName, status, role, gender, email, limit, fromDate, toDate);
                 if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
                 var pagedResult = result.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
                 var total = result.Count();
@@ -202,6 +203,27 @@ namespace ModernEstate.BLL.Services.AccountServices
                 if (data == null || !data.Any()) throw new AppException(ErrorCode.LIST_EMPTY);
                 var pageResult = new PageResult<AccountResponse>(data, pageSize, pageCurrent, total);
                 return pageResult;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<IEnumerable<AccountResponse>> GetAll(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender,
+                                                                    string email, int? limit, DateTime? fromDate, DateTime? toDate)
+        {
+            try
+            {
+                var result = await _unitOfWork.Accounts.FindWithParams(lastName, firstName, status, role, gender, email, limit, fromDate, toDate);
+                if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
+                return _mapper.Map<IEnumerable<AccountResponse>>(result);
             }
             catch (AppException ex)
             {

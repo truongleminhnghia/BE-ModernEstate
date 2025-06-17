@@ -8,11 +8,12 @@ namespace ModernEstate.DAL.Repositories.AccountRepositories
     public interface IAccountRepository : IGenericRepository<Account>
     {
         Task<Account?> FindById(Guid id);
+        Task<IEnumerable<Account?>> FindAll();
         Task<Account?> GetByEmail(string email);
         Task<Account?> FindByPhone(string phone);
         Task<Account> UpdateAccount(Account account);
         Task<bool> DeleteAccount(Account account);
-        Task<IEnumerable<Account>> FindWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email);
+        Task<IEnumerable<Account>> FindWithParams(string? lastName, string? firstName, EnumAccountStatus? status, EnumRoleName? role, EnumGender? gender, string email, int? limit, DateTime? fromDate, DateTime? toDate);
 
         Task<Account> GetByResetTokenAsync(String token);
     }
