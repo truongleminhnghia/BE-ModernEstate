@@ -19,7 +19,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
             _service = service;
         }
 
-        [HttpGet("/accounts")]
+        [HttpGet("accounts")]
         public async Task<IActionResult> Accounts()
         {
             var account = await _service.GetAccountDashBoardAsync();
