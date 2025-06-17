@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using Microsoft.EntityFrameworkCore;
 using ModernEstate.Common.Enums;
 using ModernEstate.DAL.Bases;
@@ -24,6 +19,33 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
                                 .Include(p => p.PostPackages)
                                 .Include(p => p.Histories)
                                 .FirstOrDefaultAsync(p => p.Code.Equals(code));
+        }
+
+        public async Task<IEnumerable<Post>> FindByConfirm(EnumSourceStatus? srcStatus, DateTime? dateNow)
+        {
+            var today = (dateNow ?? DateTime.Now).Date;
+            var baseQuery = _context.Posts
+                                    .Include(p => p.Contact)
+                                    .Include(p => p.PostPackages)
+                                    .Include(p => p.Histories)
+                                    .Include(p => p.Property)
+                                    .AsQueryable();
+            if (srcStatus.HasValue)
+            {
+                baseQuery = baseQuery.Where(p => p.SourceStatus == srcStatus.Value);
+            }
+            var post = baseQuery.Select(p => new
+            {
+                Post = p,
+                EarliestStartDate = p.PostPackages.Select(pp => (DateTime?)pp.StartDate).Min()
+            });
+            var ordered = await post.OrderBy(x =>
+                x.EarliestStartDate.HasValue ? (x.EarliestStartDate.Value.Date < today ? 0
+                : x.EarliestStartDate.Value.Date == today ? 1
+                : 2)
+                : 2
+            ).ThenBy(x => x.EarliestStartDate).Select(x => x.Post).ToListAsync();
+            return ordered;
         }
 
         public async Task<Post?> FindById(Guid id)

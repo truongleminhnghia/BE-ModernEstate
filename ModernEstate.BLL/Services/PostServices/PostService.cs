@@ -302,5 +302,81 @@ namespace ModernEstate.BLL.Services.PostServices
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
         }
+
+        public async Task<bool> ConfirmPost(Guid id, ConfirmPostRequest request)
+        {
+            try
+            {
+                var curentAccount = _jwtService.GetAccountIdGuid();
+                var postExisting = await _unitOfWork.Posts.FindById(id);
+                if (postExisting == null)
+                    throw new AppException(ErrorCode.NOT_FOUND, "Post not found.");
+                var property = await _unitOfWork.Properties.FindById(postExisting.PropertyId);
+                if (property == null)
+                    throw new AppException(ErrorCode.NOT_FOUND, "Property not found.");
+                var accountCurrentId = _jwtService.GetAccountIdGuid();
+                if (accountCurrentId == Guid.Empty)
+                    throw new AppException(ErrorCode.NOT_NULL, "Account ID cannot be null.");
+                var accountCurrent = await _unitOfWork.Accounts.FindById(accountCurrentId);
+                if (accountCurrent == null)
+                    throw new AppException(ErrorCode.USER_NOT_FOUND, "Account not found or no permisstion");
+                if (accountCurrent?.Role?.RoleName != EnumRoleName.ROLE_STAFF)
+                    throw new AppException(ErrorCode.UNAUTHORIZED);
+                postExisting.AppRovedBy = accountCurrent.Id.ToString();
+                if (request.SourceStatus == EnumSourceStatus.APPROVE)
+                {
+                    postExisting.SourceStatus = EnumSourceStatus.APPROVE;
+                    postExisting.Status = EnumStatus.ACTIVE;
+                    property.StatusSource = EnumSourceStatus.APPROVE;
+                }
+                else if (request.SourceStatus == EnumSourceStatus.REJECT || request.SourceStatus == EnumSourceStatus.BLOCKED)
+                {
+                    postExisting.SourceStatus = request.SourceStatus;
+                    postExisting.Status = EnumStatus.INACTIVE;
+                    postExisting.RejectionReason = request.RejectionReason;
+                    property.StatusSource = request.SourceStatus;
+                }
+                await _unitOfWork.Posts.UpdateAsync(postExisting);
+                await _unitOfWork.Properties.UpdateAsync(property);
+                await _unitOfWork.SaveChangesWithTransactionAsync();
+                return true;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<PageResult<PostResponse>> GetPostConfirm(int pageCurrent, int pageSize)
+        {
+            try
+            {
+                DateTime now = DateTime.Now;
+                var result = await _unitOfWork.Posts.FindByConfirm(EnumSourceStatus.WAIT_APPROVE, now);
+                if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
+                var pagedResult = result.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
+                var total = result.Count();
+                var data = _mapper.Map<List<PostResponse>>(pagedResult);
+                if (data == null || !data.Any()) throw new AppException(ErrorCode.LIST_EMPTY);
+                var pageResult = new PageResult<PostResponse>(data, pageSize, pageCurrent, total);
+                return pageResult;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 }

@@ -13,5 +13,7 @@ namespace ModernEstate.BLL.Services.PostServices
         Task<PageResult<PostResponse>> GetPosts(string? title, EnumStatePost? state, EnumSourceStatus? srcStatus, int pageCurrent, int pageSize);
         Task<bool> UpdatePost(Guid id, UpdatePostRequest request, bool approval);
         Task<bool> DeletePost(Guid id);
+        Task<bool> ConfirmPost(Guid id, ConfirmPostRequest request);
+        Task<PageResult<PostResponse>> GetPostConfirm(int pageCurrent, int pageSize);
     }
 }

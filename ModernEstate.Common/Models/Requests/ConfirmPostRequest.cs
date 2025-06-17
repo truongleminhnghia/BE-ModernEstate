@@ -1,0 +1,18 @@
+
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using ModernEstate.Common.Enums;
+
+namespace ModernEstate.Common.Models.Requests
+{
+    public class ConfirmPostRequest
+    {
+        [Required]
+        [Description("Source status of the post.")]
+        [EnumDataType(typeof(EnumSourceStatus))]
+        public EnumSourceStatus SourceStatus { get; set; }
+
+        [Description("Reason for rejection, if applicable.")]
+        public string? RejectionReason { get; set; }
+    }
+}
