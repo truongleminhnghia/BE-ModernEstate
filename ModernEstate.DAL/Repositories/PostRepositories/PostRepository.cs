@@ -14,7 +14,9 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
 
         public async Task<Post?> FindByCode(string code)
         {
-            return await _context.Posts.Include(p => p.Property)
+            return await _context.Posts
+                                .Include(p => p.Property)
+                                    .ThenInclude(pro => pro.Address)
                                 .Include(p => p.Contact)
                                 .Include(p => p.PostPackages)
                                 .Include(p => p.Histories)
@@ -29,6 +31,7 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
                                     .Include(p => p.PostPackages)
                                     .Include(p => p.Histories)
                                     .Include(p => p.Property)
+                                        .ThenInclude(pro => pro.Address)
                                     .AsQueryable();
             if (srcStatus.HasValue)
             {
@@ -50,7 +53,9 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
 
         public async Task<Post?> FindById(Guid id)
         {
-            return await _context.Posts.Include(p => p.Property)
+            return await _context.Posts
+                                .Include(p => p.Property)
+                                    .ThenInclude(pro => pro.Address)
                                 .Include(p => p.Contact)
                                 .Include(p => p.PostPackages)
                                 .Include(p => p.Histories)
@@ -59,7 +64,9 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
 
         public async Task<IEnumerable<Post>> FindWithParams(string? title, EnumStatePost? state, EnumSourceStatus? srcStatus)
         {
-            IQueryable<Post> query = _context.Posts.Include(p => p.Property)
+            IQueryable<Post> query = _context.Posts
+                                .Include(p => p.Property)
+                                    .ThenInclude(pro => pro.Address)
                                 .Include(p => p.Contact)
                                 .Include(p => p.PostPackages)
                                 .Include(p => p.Histories);
