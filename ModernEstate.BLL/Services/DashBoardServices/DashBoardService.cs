@@ -1,8 +1,11 @@
 
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 using ModernEstate.BLL.Services.AccountServices;
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.DashBoards;
+using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
 
 namespace ModernEstate.BLL.Services.DashBoardServices
@@ -12,13 +15,15 @@ namespace ModernEstate.BLL.Services.DashBoardServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<DashBoardService> _logger;
         private readonly IAccountService _accountServcie;
+        private readonly IMapper _mapper;
 
 
-        public DashBoardService(IUnitOfWork unitOfWork, ILogger<DashBoardService> logger, IAccountService accountService)
+        public DashBoardService(IUnitOfWork unitOfWork, ILogger<DashBoardService> logger, IAccountService accountService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _accountServcie = accountService;
+            _mapper = mapper;
         }
 
         public async Task<AccountDashBoard> GetAccountDashBoardAsync()
@@ -36,6 +41,34 @@ namespace ModernEstate.BLL.Services.DashBoardServices
                     Accounts = accounts
                 };
                 return account;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        public async Task<PostDashboard> Post()
+        {
+            try
+            {
+                var postList = await _unitOfWork.Posts.FindWithParams(null, null, null);
+                var total = postList.Count();
+                var postConfirms = await _unitOfWork.Posts.FindWithParams(null, null, EnumSourceStatus.WAIT_APPROVE);
+                PostDashboard postDashboard = new PostDashboard
+                {
+                    TotalCount = total,
+                    TotalConfirm = postConfirms.Count(),
+                    Posts = _mapper.Map<IEnumerable<PostResponse>>(postList)
+                };
+                return postDashboard;
+
             }
             catch (AppException ex)
             {

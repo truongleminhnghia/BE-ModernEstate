@@ -16,5 +16,7 @@ namespace ModernEstate.BLL.Services.DashBoardServices
         /// </summary>
         /// <returns>Property dashboard containing total properties and a list of properties.</returns>
         // Task<PropertyDashBoard> GetPropertyDashBoardAsync();
+
+        Task<PostDashboard> Post();
     }
 }

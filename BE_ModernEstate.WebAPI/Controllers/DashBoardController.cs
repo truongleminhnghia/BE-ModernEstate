@@ -41,5 +41,30 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Data = account
             });
         }
+
+        [HttpGet("posts")]
+        public async Task<IActionResult> Posts()
+        {
+            var post = await _service.Post();
+            if (post == null)
+            {
+                return BadRequest(
+                    new ApiResponse
+                    {
+                        Code = StatusCodes.Status400BadRequest,
+                        Success = false,
+                        Message = "Thông tin post đang trống",
+                        Data = null
+                    }
+                );
+            }
+            return Ok(new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Lấy dữ liệu thành công",
+                Data = post
+            });
+        }
     }
 }
