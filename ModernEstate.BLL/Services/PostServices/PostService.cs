@@ -61,6 +61,8 @@ namespace ModernEstate.BLL.Services.PostServices
                 {
                     throw new AppException(ErrorCode.NOT_NULL, "Property or AddressRequest cannot be null.");
                 }
+                var package = await _unitOfWork.Packages.GetByIdAsync(request.PostPackagesRequest.PackageId);
+                if (package == null) throw new AppException(ErrorCode.NOT_FOUND, "Package ko tồn tại");
                 var addressExisting = await _addressService.GetOrCreateAsync(request.NewProperty.Address);
                 if (addressExisting == null)
                 {
@@ -68,11 +70,12 @@ namespace ModernEstate.BLL.Services.PostServices
                     addressExisting.Id = Guid.NewGuid();
                     await _unitOfWork.Addresses.CreateAsync(addressExisting);
                 }
-                var property = await CreateProperty(request.NewProperty, addressExisting, request.Demand);
+                var property = await CreateProperty(request.NewProperty, addressExisting, request.Demand, package);
                 if (property == null) throw new AppException(ErrorCode.NOT_NULL, "Property creation failed.");
                 var post = _mapper.Map<Post>(request);
                 post.ContactId = conactId;
                 post.PropertyId = property.Id;
+                post.PriorityStatus = package.PriorityStatus;
                 post.SourceStatus = EnumSourceStatus.WAIT_PAYMENT;
                 post.Status = EnumStatus.INACTIVE;
                 post.Code = await _utils.GenerateUniqueBrokerCodeAsync("POST_");
@@ -102,7 +105,7 @@ namespace ModernEstate.BLL.Services.PostServices
             }
         }
 
-        private async Task<Property> CreateProperty(PropertyRequest propertyRequest, Address address, EnumDemand demand)
+        private async Task<Property> CreateProperty(PropertyRequest propertyRequest, Address address, EnumDemand demand, Package package)
         {
 
             var property = _mapper.Map<Property>(propertyRequest);
@@ -121,6 +124,7 @@ namespace ModernEstate.BLL.Services.PostServices
             property.Demand = demand;
             property.Status = EnumStatusProperty.INACTIVE;
             property.StatusSource = EnumSourceStatus.WAIT_PAYMENT;
+            property.PriorityStatus = package.PriorityStatus;
             property.Code = await _utils.GenerateUniqueBrokerCodeAsync("PRO_");
             if (string.IsNullOrEmpty(property.Code))
                 throw new AppException(ErrorCode.NOT_NULL, "Property code generation failed.");

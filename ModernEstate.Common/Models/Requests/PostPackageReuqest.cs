@@ -12,26 +12,24 @@ namespace ModernEstate.Common.Models.Requests
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
-        // [Required(ErrorMessage = "Ngày kết thúc gói đăng bài là bắt buộc.")]
+        [Required(ErrorMessage = "Ngày kết thúc gói đăng bài là bắt buộc.")]
         [Description("Start date of the subscription")]
         [DataType(DataType.Date)]
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
-        // [Required]
-        public double? TotalAmout { get; set; }
+        [Required]
+        public double TotalAmout { get; set; }
 
-        // [Required]
+        [Required]
         [Description("Currency of the subscription price")]
         public EnumCurrency? Currency { get; set; } = EnumCurrency.VND;
 
         [Description("ID of the account associated with the subscription")]
-        public Guid? AccountId { get; set; }
+        public Guid AccountId { get; set; }
 
-        // [Required]
+        [Required]
         [Description("ID of the package associated with the subscription")]
-        public Guid? PackageId { get; set; }
-
-        public Guid? Id { get; set; }
+        public Guid PackageId { get; set; }
 
     }
 }

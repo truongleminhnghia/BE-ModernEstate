@@ -29,39 +29,38 @@ namespace ModernEstate.BLL.Services.PayosServices
             _payOS = payOS;
         }
 
-        public async Task<string> CreatePaymentAsync(PostPackageReuqest request)
+        public async Task<string> CreatePaymentAsync(Guid id)
         {
             try
             {
-                if (request.Id == null)
+                if (id == Guid.Empty)
                     throw new AppException(ErrorCode.NOT_NULL, "Id không được null.");
-                var postPackageExists = await _uow.PostPackages.FindById(request.Id.Value);
+                var postPackageExists = await _uow.PostPackages.FindById(id);
                 if (postPackageExists == null)
                 {
-                    _logger.LogWarning("Post package with ID {id} does not exist.", request.Id);
+                    _logger.LogWarning("Post package with ID {id} does not exist.", id);
                     throw new AppException(ErrorCode.NOT_FOUND, "Gói đăng bài không tồn tại.");
                 }
-                if (request.PackageId == null)
+                if (postPackageExists.PackageId == null)
                     throw new AppException(ErrorCode.NOT_NULL, "PackageId không được null.");
-                var packageExists = await _uow.Packages.GetByIdAsync(request.PackageId.Value);
+                var packageExists = await _uow.Packages.GetByIdAsync(postPackageExists.PackageId.Value);
                 if (packageExists == null)
                 {
-                    _logger.LogWarning("Package with ID {PackageId} does not exist.", request.PackageId);
+                    _logger.LogWarning("Package with ID {PackageId} does not exist.", postPackageExists.PackageId);
                     throw new AppException(ErrorCode.NOT_FOUND, "Gói đăng bài không tồn tại.");
                 }
-                var totalDays = (request.EndDate - request.StartDate)?.Days + 1;
+                var totalDays = (postPackageExists.EndDate - postPackageExists.StartDate)?.Days + 1;
                 if (totalDays == null)
                     throw new AppException(ErrorCode.NOT_NULL, "StartDate hoặc EndDate không được null.");
                 postPackageExists.TotalDay = totalDays.Value;
                 postPackageExists.PurchaseDate = DateTime.Now;
-                postPackageExists.ExpiredDate = request.EndDate;
-                postPackageExists.PackageId = request.PackageId;
+                postPackageExists.ExpiredDate = postPackageExists.EndDate;
                 await _uow.PostPackages.UpdateAsync(postPackageExists);
                 var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 PaymentRequest paymentRequest = new PaymentRequest
                 {
-                    Amount = request.TotalAmout ?? 0,
-                    Currency = request.Currency ?? EnumCurrency.VND,
+                    Amount = postPackageExists.TotalAmout ?? 0,
+                    Currency = postPackageExists.Currency ?? EnumCurrency.VND,
                     TypeTransaction = EnumTypeTransaction.PACKAGE_PURCHASE,
                     PaymentMethod = EnumPaymentMethod.PayOS,
                     AccountId = postPackageExists.AccountId ?? Guid.Empty
@@ -73,13 +72,13 @@ namespace ModernEstate.BLL.Services.PayosServices
                 await _uow.Transactions.CreateAsync(payment);
                 await _uow.SaveChangesWithTransactionAsync();
 
-                ItemData item = new ItemData(packageExists.PackageName ?? "Unknown Package", 1, (int)(request.TotalAmout ?? 0));
+                ItemData item = new ItemData(packageExists.PackageName ?? "Unknown Package", 1, (int)(postPackageExists.TotalAmout ?? 0));
                 List<ItemData> items = new List<ItemData> { item };
 
                 PaymentData paymentData = new PaymentData(
                     orderCode,
-                    (int)(request.TotalAmout ?? 0),
-                    "Thanh toan don hang",
+                    (int)(postPackageExists.TotalAmout ?? 0),
+                    "Đơn hàng phục vụ học tập",
                     items,
                     $"https://localhost:8080/api/v1/checkout/failed",
                     $"https://localhost:8080/api/v1/checkout/success"

@@ -12,6 +12,9 @@ namespace ModernEstate.Common.Models.Responses
         public string? AppRovedBy { get; set; }
         public string PostBy { get; set; } = string.Empty;
 
+        public DateTime CreateAt { get; set; }
+        public DateTime UpdateAt { get; set; }
+
         [Description("State of the post.")]
         [EnumDataType(typeof(EnumDemand))]
         public EnumDemand Demand { get; set; }

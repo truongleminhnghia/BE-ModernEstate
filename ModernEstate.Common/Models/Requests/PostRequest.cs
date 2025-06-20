@@ -18,13 +18,13 @@ namespace ModernEstate.Common.Models.Requests
 
         [Description("Navigation property for the associated property.")]
         [Required(ErrorMessage = "Thông tin bất động sản là bắt buộc.")]
-        public PropertyRequest NewProperty { get; set; }
+        public PropertyRequest? NewProperty { get; set; }
 
         [Description("Navigation property for the associated contact.")]
         [Required(ErrorMessage = "Thông tin liên hệ là bắt buộc.")]
-        public ContactRequest Contact { get; set; }
+        public ContactRequest? Contact { get; set; }
 
-        // [Required(ErrorMessage = "Trạng thái nguồn của bài đăng là bắt buộc.")]
+        [Required(ErrorMessage = "Post package ko được null")]
         [Description("Source status of the post.")]
         public PostPackageReuqest? PostPackagesRequest { get; set; }
     }

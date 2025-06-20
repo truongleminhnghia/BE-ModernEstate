@@ -32,7 +32,7 @@ namespace ModernEstate.BLL.Services.PostPackageServices
             {
                 if (request.AccountId == null)
                     throw new AppException(ErrorCode.NOT_NULL, "AccountId không được null.");
-                var accountExists = await _uow.Accounts.GetByIdAsync(request.AccountId.Value);
+                var accountExists = await _uow.Accounts.GetByIdAsync(request.AccountId);
 
                 if (accountExists == null)
                 {

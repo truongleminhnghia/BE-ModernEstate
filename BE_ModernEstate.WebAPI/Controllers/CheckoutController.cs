@@ -17,10 +17,10 @@ namespace BE_ModernEstate.WebAPI.Controllers
             _payosService = payosService;
         }
 
-        [HttpPost("create-payment-link")]
-        public async Task<IActionResult> Checkout([FromBody] PostPackageReuqest reuqest)
+        [HttpPost("create-payment-link/{id}")]
+        public async Task<IActionResult> Checkout(Guid id)
         {
-            var urlPayemt = await _payosService.CreatePaymentAsync(reuqest);
+            var urlPayemt = await _payosService.CreatePaymentAsync(id);
             if (urlPayemt == null)
             {
                 return BadRequest(new ApiResponse
@@ -62,7 +62,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 {
                     Code = StatusCodes.Status200OK,
                     Success = true,
-                    Message = "thatas baij",
+                    Message = "Thất bại",
                     Data = null
                 }
             );

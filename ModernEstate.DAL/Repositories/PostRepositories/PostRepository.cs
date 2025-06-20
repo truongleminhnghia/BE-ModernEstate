@@ -69,6 +69,7 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
                                     .ThenInclude(pro => pro.Address)
                                 .Include(p => p.Contact)
                                 .Include(p => p.PostPackages)
+                                    .ThenInclude(pp => pp.Account)
                                 .Include(p => p.Histories);
 
             // if (!string.IsNullOrWhiteSpace(title))

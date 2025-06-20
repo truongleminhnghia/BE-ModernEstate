@@ -13,9 +13,7 @@ namespace ModernEstate.DAL.Repositories.AddressRepositories
         public async Task<Address> GetOrCreateAsync(Address address)
         {
             var existing = await _context.Addresses.FirstOrDefaultAsync(a =>
-                a.HouseNumber == address.HouseNumber
-                && a.Street == address.Street
-                && a.Ward == address.Ward
+                a.Ward == address.Ward
                 && a.District == address.District
                 && a.City == address.City
                 && a.Country == address.Country

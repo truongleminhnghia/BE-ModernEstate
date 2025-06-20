@@ -7,7 +7,7 @@ namespace ModernEstate.BLL.Services.PayosServices
 {
     public interface IPayosService
     {
-        Task<string> CreatePaymentAsync(PostPackageReuqest request);
+        Task<string> CreatePaymentAsync(Guid id);
         Task<bool> VerifyPaymentAsync(WebhookType type);
     }
 }

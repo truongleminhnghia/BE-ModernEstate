@@ -38,7 +38,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
             {
                 Code = StatusCodes.Status200OK,
                 Success = true,
-                Message = "Account created successfully",
+                Message = "Post creation successfully",
                 Data = result
             });
         }
