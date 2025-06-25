@@ -116,7 +116,7 @@ namespace ModernEstate.BLL.Services.AuthenticateServices
                 await _unitOfWork.SaveChangesWithTransactionAsync();
                 string token = _jwtService.GenerateEmailVerificationToken(account.Email!);
 
-                string verifyUrl = $"https://bemodernestate.site//api/v1/auths/verify-email?token={token}";
+                string verifyUrl = $"https://bemodernestate.site/api/v1/auths/verify-email?token={token}";
 
 
                 await _emailService.SendEmailAsync(account.Email!, "Xác minh email", verifyUrl);
