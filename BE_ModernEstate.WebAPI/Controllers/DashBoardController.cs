@@ -66,5 +66,18 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Data = post
             });
         }
+
+        [HttpGet("revenue")]
+        public async Task<IActionResult> GetRevenue()
+        {
+            double total = await _service.GetTotalAmountAsync(); // all filters default to null
+            return Ok(new ApiResponse
+            { 
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Lấy dữ liệu thành công",
+                Data = new { TotalRevenue = total }
+            });
+        }
     }
 }
