@@ -7,6 +7,7 @@ using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.DashBoards;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
+using ModernEstate.DAL.Repositories.TransactionRepositories;
 
 namespace ModernEstate.BLL.Services.DashBoardServices
 {
@@ -80,6 +81,17 @@ namespace ModernEstate.BLL.Services.DashBoardServices
                 _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
                 throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
+        }
+
+        public async Task<double> GetTotalAmountAsync()
+        {
+            var transactions = await _unitOfWork.Transactions.GetAllAsync();
+            if (!transactions.Any(t => t.Status == EnumStatusPayment.SUCCESS))
+                return 0;
+            double total = transactions
+                    .Where(t => t.Status == EnumStatusPayment.SUCCESS)
+                    .Sum(t => t.Amount);
+            return total;
         }
     }
 }

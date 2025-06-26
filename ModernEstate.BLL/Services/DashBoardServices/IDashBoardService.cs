@@ -1,4 +1,5 @@
 
+using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.DashBoards;
 
 namespace ModernEstate.BLL.Services.DashBoardServices
@@ -18,5 +19,7 @@ namespace ModernEstate.BLL.Services.DashBoardServices
         // Task<PropertyDashBoard> GetPropertyDashBoardAsync();
 
         Task<PostDashboard> Post();
+
+        Task<double> GetTotalAmountAsync();
     }
 }
