@@ -10,7 +10,9 @@ namespace ModernEstate.BLL.Services.PostServices
         Task<Guid> CreatePost(PostRequest request);
         Task<PostResponse?> GetById(Guid id);
         Task<PostResponse?> GetByCode(string code);
-        Task<PageResult<PostResponse>> GetPosts(string? title, EnumStatePost? state, EnumSourceStatus? srcStatus, int pageCurrent, int pageSize);
+        Task<PageResult<PostResponse>> GetPosts(EnumDemand? demand, EnumSourceStatus? srcStatus, Guid? postBy,
+                                                EnumStatus? status, Guid? approveBy, EnumPriorityStatus? priority,
+                                                int pageCurrent, int pageSize);
         Task<bool> UpdatePost(Guid id, UpdatePostRequest request, bool approval);
         Task<bool> DeletePost(Guid id);
         Task<bool> ConfirmPost(Guid id, ConfirmPostRequest request);

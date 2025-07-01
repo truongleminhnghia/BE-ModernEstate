@@ -10,7 +10,8 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
         Task<Post?> FindByCode(string code);
         Task<Post?> FindById(Guid id);
 
-        Task<IEnumerable<Post>> FindWithParams(string? title, EnumStatePost? state, EnumSourceStatus? srcStatus);
+        Task<IEnumerable<Post>> FindWithParams(EnumDemand? demand, EnumSourceStatus? srcStatus, Guid? postBy,
+                                                EnumStatus? status, Guid? approveBy, EnumPriorityStatus? priority);
         Task<IEnumerable<Post>> FindByConfirm(EnumSourceStatus? srcStatus, DateTime? dateNow);
     }
 

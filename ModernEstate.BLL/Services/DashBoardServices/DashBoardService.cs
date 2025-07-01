@@ -59,9 +59,9 @@ namespace ModernEstate.BLL.Services.DashBoardServices
         {
             try
             {
-                var postList = await _unitOfWork.Posts.FindWithParams(null, null, null);
+                var postList = await _unitOfWork.Posts.FindWithParams(null, null, null, null, null, null);
                 var total = postList.Count();
-                var postConfirms = await _unitOfWork.Posts.FindWithParams(null, null, EnumSourceStatus.WAIT_APPROVE);
+                var postConfirms = await _unitOfWork.Posts.FindWithParams(null, EnumSourceStatus.WAIT_APPROVE, null, null, null, null);
                 PostDashboard postDashboard = new PostDashboard
                 {
                     TotalCount = total,

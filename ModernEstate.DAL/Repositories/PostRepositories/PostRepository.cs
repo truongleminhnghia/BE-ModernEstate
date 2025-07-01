@@ -62,7 +62,7 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
                                 .FirstOrDefaultAsync(p => p.Id.Equals(id));
         }
 
-        public async Task<IEnumerable<Post>> FindWithParams(string? title, EnumStatePost? state, EnumSourceStatus? srcStatus)
+        public async Task<IEnumerable<Post>> FindWithParams(EnumDemand? demand, EnumSourceStatus? srcStatus, Guid? postBy, EnumStatus? status, Guid? approveBy, EnumPriorityStatus? priority)
         {
             IQueryable<Post> query = _context.Posts
                                 .Include(p => p.Property)
@@ -71,20 +71,30 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
                                 .Include(p => p.PostPackages)
                                     .ThenInclude(pp => pp.Account)
                                 .Include(p => p.Histories);
-
-            // if (!string.IsNullOrWhiteSpace(title))
-            // {
-            //     query = query.Where(a => a.Title.Contains(title));
-            // }
-            // if (state.HasValue)
-            // {
-            //     query = query.Where(a => a.State == state.Value);
-            // }
+            if (postBy.HasValue)
+            {
+                query = query.Where(a => a.PostBy == postBy.Value.ToString());
+            }
+            if (approveBy.HasValue)
+            {
+                query = query.Where(a => a.AppRovedBy == approveBy.Value.ToString());
+            }
             if (srcStatus.HasValue)
             {
                 query = query.Where(a => a.SourceStatus == srcStatus.Value);
             }
-            query = query.OrderByDescending(a => a.CreatedAt);
+            if (demand.HasValue)
+            {
+                query = query.Where(a => a.Demand == demand.Value);
+            }
+            if (status.HasValue)
+            {
+                query = query.Where(a => a.Status == status.Value);
+            }
+            if (priority.HasValue)
+                query = query.Where(a => a.PriorityStatus == priority.Value);
+            query = query.OrderByDescending(a => (int)(a.PriorityStatus ?? 0))
+                        .ThenByDescending(a => a.CreatedAt);
             return await query.ToListAsync();
         }
     }

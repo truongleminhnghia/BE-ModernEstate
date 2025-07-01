@@ -223,11 +223,12 @@ namespace ModernEstate.BLL.Services.PostServices
             }
         }
 
-        public async Task<PageResult<PostResponse>> GetPosts(string? title, EnumStatePost? state, EnumSourceStatus? srcStatus, int pageCurrent, int pageSize)
+        public async Task<PageResult<PostResponse>> GetPosts(EnumDemand? demand, EnumSourceStatus? srcStatus, Guid? postBy, EnumStatus? status,
+                                                            Guid? approveBy, EnumPriorityStatus? priority, int pageCurrent, int pageSize)
         {
             try
             {
-                var result = await _unitOfWork.Posts.FindWithParams(title, state, srcStatus);
+                var result = await _unitOfWork.Posts.FindWithParams(demand, srcStatus, postBy, status, approveBy, priority);
                 if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
                 var pagedResult = result.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
                 var total = result.Count();

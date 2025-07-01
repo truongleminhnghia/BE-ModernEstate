@@ -67,11 +67,11 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPosts([FromQuery] string? title, [FromQuery] EnumStatePost? state,
-                                                    [FromQuery] EnumSourceStatus? srcStatus,
-                                                    [FromQuery] int page_current = 1, [FromQuery] int page_size = 10)
+        public async Task<IActionResult> GetPosts([FromQuery] EnumDemand? demand, [FromQuery] EnumSourceStatus? srcStatus, [FromQuery] Guid? postBy,
+                                                 [FromQuery] EnumStatus? status, [FromQuery] Guid? approveBy, [FromQuery] EnumPriorityStatus? priority,
+                                                [FromQuery] int page_current = 1, [FromQuery] int page_size = 10)
         {
-            var result = await _postService.GetPosts(title, state, srcStatus, page_current, page_size);
+            var result = await _postService.GetPosts(demand, srcStatus, postBy, status, approveBy, priority, page_current, page_size);
             return Ok(new ApiResponse
             {
                 Code = StatusCodes.Status200OK,
