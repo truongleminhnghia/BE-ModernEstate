@@ -96,15 +96,7 @@ namespace ModernEstate.BLL.Services.NewServices
                     Message = "News not found"
                 };
             }
-            var newsExist = await _unitOfWork.News.FindByTitle(request.Title);
-            if (newsExist != null)
-            {
-                return new ApiResponse
-                {
-                    Success = false,
-                    Message = "A news article with the same title already exists."
-                };
-            }
+            
             var category = await _unitOfWork.Categories.GetByIdAsync(request.CategoryId);
             if (category == null)
             {
@@ -115,9 +107,43 @@ namespace ModernEstate.BLL.Services.NewServices
                 };
             }
 
-            _mapper.Map(request, news);
+            if (!string.Equals(news.Title, request.Title, StringComparison.OrdinalIgnoreCase))
+            {
+                var newsExist = await _unitOfWork.News.FindByTitle(request.Title);
 
+                if (newsExist != null)
+                {
+                    return new ApiResponse
+                    {
+                        Success = false,
+                        Message = "A news article with the same title already exists."
+                    };
+                }
+            }
+
+            _mapper.Map(request, news);
             _unitOfWork.News.Update(news);
+
+            await _unitOfWork.NewTags.DeleteByNewIdAsync(news.Id);
+
+            foreach (var tagName in request.TagNames.Distinct())
+            {
+                var tag = await _unitOfWork.Tags.FindByTitle(tagName);
+                if (tag == null)
+                {
+                    tag = new Tag { TagName = tagName };
+                    _unitOfWork.Tags.Create(tag);
+                }
+
+                var newTag = new NewTag
+                {
+                    NewId = news.Id,
+                    TagId = tag.Id
+                };
+                _unitOfWork.NewTags.Create(newTag);
+            }
+
+
             await _unitOfWork.SaveChangesAsync();
 
             return new ApiResponse

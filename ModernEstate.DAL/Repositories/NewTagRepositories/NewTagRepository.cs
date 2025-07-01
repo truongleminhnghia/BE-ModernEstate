@@ -10,5 +10,11 @@ namespace ModernEstate.DAL.Repositories.NewTagRepositories
         public NewTagRepository(ApplicationDbConext context) : base(context)
         {
         }
+
+        public async Task DeleteByNewIdAsync(Guid newId)
+        {
+            var tags = _context.NewTags.Where(t => t.NewId == newId);
+            _context.NewTags.RemoveRange(tags);
+        }
     }
 }

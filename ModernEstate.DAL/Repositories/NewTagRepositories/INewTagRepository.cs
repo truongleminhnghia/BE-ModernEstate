@@ -7,5 +7,6 @@ namespace ModernEstate.DAL.Repositories.NewTagRepositories
 {
     public interface INewTagRepository : IGenericRepository<NewTag>
     {
+        Task DeleteByNewIdAsync(Guid newId);
     }
 }
