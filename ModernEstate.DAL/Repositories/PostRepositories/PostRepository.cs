@@ -67,6 +67,8 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
             IQueryable<Post> query = _context.Posts
                                 .Include(p => p.Property)
                                     .ThenInclude(pro => pro.Address)
+                                .Include(p => p.Property)
+                                    .ThenInclude(prop => prop.PropertyImages)
                                 .Include(p => p.Contact)
                                 .Include(p => p.PostPackages)
                                     .ThenInclude(pp => pp.Account)
