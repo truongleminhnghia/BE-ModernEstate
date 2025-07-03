@@ -56,6 +56,8 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
             return await _context.Posts
                                 .Include(p => p.Property)
                                     .ThenInclude(pro => pro.Address)
+                                .Include(p => p.Property)
+                                    .ThenInclude(prop => prop.PropertyImages)
                                 .Include(p => p.Contact)
                                 .Include(p => p.PostPackages)
                                 .Include(p => p.Histories)
