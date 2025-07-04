@@ -7,5 +7,7 @@ namespace ModernEstate.Common.Models.Responses
         public AccountResponse? Account { get; set; }
         public float? Rating { get; set; }
         public string? Comment { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }
