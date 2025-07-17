@@ -80,8 +80,8 @@ namespace ModernEstate.BLL.Services.PayosServices
                     (int)(postPackageExists.TotalAmout ?? 0),
                     "Đơn hàng phục vụ học tập",
                     items,
-                    $"https://modernestate.vercel.app/create-post-success",
-                    $"https://modernestate.vercel.app/create-post-failure"
+                    $"https://modernestate.vercel.app/create-post-failure",
+                    $"https://modernestate.vercel.app/create-post-success"
                 );
                 CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
                 return createPayment.checkoutUrl;
