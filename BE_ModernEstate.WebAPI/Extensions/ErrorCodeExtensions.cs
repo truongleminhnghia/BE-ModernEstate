@@ -17,7 +17,7 @@ namespace ShoppEcommerce_WebApp.WebAPI.Extensions
             { ErrorCode.USER_NOT_FOUND, new(HttpStatusCode.NotFound, "User not found.") },
             { ErrorCode.INTERNAL_SERVER_ERROR, new(HttpStatusCode.InternalServerError, "An unexpected error occurred. Please try again later.") },
             { ErrorCode.EMAIL_ALREADY_EXISTS, new(HttpStatusCode.BadRequest, "Email already exists.") },
-            { ErrorCode.LIST_EMPTY, new(HttpStatusCode.BadRequest, "List empty.") },
+            { ErrorCode.LIST_EMPTY, new(HttpStatusCode.NotFound, "List empty.") },
             { ErrorCode.EMAIL_DO_NOT_EXISTS, new(HttpStatusCode.BadRequest, "Email do not exist.") },
             { ErrorCode.INVALID_PASSWORD, new(HttpStatusCode.BadRequest, "invalid password.") },
             { ErrorCode.TOKEN_NOT_NULL, new(HttpStatusCode.BadRequest, "Token must be not null.") },
@@ -30,6 +30,7 @@ namespace ShoppEcommerce_WebApp.WebAPI.Extensions
             {ErrorCode.HAS_INACTIVE, new (HttpStatusCode.BadRequest, "Status inactive")},
             {ErrorCode.HAS_EXISTED, new (HttpStatusCode.BadRequest, "Has existed")},
             {ErrorCode.NOT_NULL, new (HttpStatusCode.BadRequest, "Must be not null")},
+            { ErrorCode.PAYMENT_VERIFICATION_FAILED, new(HttpStatusCode.BadRequest, "Payment verification failed. Please check your payment details and try again.") },
 
         };
 

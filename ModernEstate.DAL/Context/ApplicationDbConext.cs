@@ -36,6 +36,7 @@ namespace ModernEstate.DAL.Context
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Contact> contacts { get; set; }
         public DbSet<Support> Supports { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         private static readonly TimeZoneInfo _vnZone =
         TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");

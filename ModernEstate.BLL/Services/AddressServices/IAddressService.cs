@@ -1,6 +1,7 @@
 using ModernEstate.Common.Models.Pages;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
+using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.BLL.Services.AddressServices
 {
@@ -20,5 +21,6 @@ namespace ModernEstate.BLL.Services.AddressServices
             int pageCurrent,
             int pageSize
         );
+        Task<Address> GetOrCreateAsync(AddressRequest request);
     }
 }

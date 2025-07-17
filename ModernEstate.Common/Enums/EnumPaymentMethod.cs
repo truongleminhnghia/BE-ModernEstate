@@ -6,5 +6,6 @@ namespace ModernEstate.Common.Enums
         MOMO,
         VN_PAY,
         CASH,
+        PayOS
     }
 }

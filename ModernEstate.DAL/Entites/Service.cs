@@ -46,8 +46,8 @@ namespace ModernEstate.DAL.Entites
         public EnumStatus Status { get; set; }
 
         [Column("provide_id")]
-        [Required]
-        public Guid ProvideId { get; set; }
+        // [Required]
+        public Guid? ProvideId { get; set; }
         [ForeignKey(nameof(ProvideId))]
         public Provide? Provide { get; set; }
 

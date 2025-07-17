@@ -51,8 +51,8 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 TypeTransaction = Enum.Parse<EnumTypeTransaction>(dto.TypeTransaction),
                 PaymentMethod = Enum.Parse<EnumPaymentMethod>(dto.PaymentMethod),
                 Status = EnumStatusPayment.PENDING,
-                TransactionCode =
-                    $"CASH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.Substring(0,6)",
+                // TransactionCode =
+                //     $"CASH-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.Substring(0,6)",
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -67,18 +67,21 @@ namespace ModernEstate.BLL.Services.TransactionServices
             var account = await _unitOfWork.Accounts.GetByIdAsync(dto.AccountId);
             if (account == null)
                 throw new KeyNotFoundException("Account không tồn tại");
-
-            dto.ReturnUrl = string.IsNullOrEmpty(dto.ReturnUrl)
-                ? _vnPayConfig.ReturnError
-                : _vnPayConfig.ReturnSuccessUrl;
-
+            // Override ReturnUrl từ appsettings.json
+            if (string.IsNullOrEmpty(dto.ReturnUrl))
+            {
+                dto.ReturnUrl = _vnPayConfig.ReturnError;
+            }
+            else
+            {
+                dto.ReturnUrl = _vnPayConfig.ReturnSuccessUrl;
+            }
+            // Validate các trường
             if (dto.Amount <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
-
-            var txnId = Guid.NewGuid();
-            var shortCode = txnId.ToString("N").Substring(0, 6);
-            var transactionCode = $"VNPAY-{DateTime.UtcNow:yyyyMMddHHmmss}-{shortCode}";
-
+            if (string.IsNullOrEmpty(dto.ReturnUrl))
+                throw new ArgumentException("Return URL is required");
+            // Tạo transaction mới
             var txn = new Transaction
             {
                 Id = txnId,
@@ -86,9 +89,10 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 Amount = dto.Amount,
                 Currency = Enum.Parse<EnumCurrency>(dto.Currency),
                 TypeTransaction = Enum.Parse<EnumTypeTransaction>(dto.TypeTransaction),
-                PaymentMethod = EnumPaymentMethod.VN_PAY,
-                Status = EnumStatusPayment.SUCCESS,
-                TransactionCode = transactionCode,
+                PaymentMethod = Enum.Parse<EnumPaymentMethod>(dto.PaymentMethod),
+                Status = EnumStatusPayment.PENDING,
+                // TransactionCode =
+                //     $"VNPAY-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid():N}.Substring(0,6)",
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -102,7 +106,7 @@ namespace ModernEstate.BLL.Services.TransactionServices
             {
                 PaymentUrl = paymentUrl,
                 TransactionId = txn.Id,
-                TransactionCode = txn.TransactionCode,
+                // TransactionCode = txn.TransactionCode,
                 Amount = txn.Amount,
                 Currency = txn.Currency.ToString(),
                 Status = txn.Status.ToString(),
@@ -121,12 +125,10 @@ namespace ModernEstate.BLL.Services.TransactionServices
                     Message = "Invalid callback signature",
                 };
             }
-
             var vnpTxnRef = vnpayData.GetValueOrDefault("vnp_TxnRef");
             var vnpResponseCode = vnpayData.GetValueOrDefault("vnp_ResponseCode");
             var vnpTransactionStatus = vnpayData.GetValueOrDefault("vnp_TransactionStatus");
-
-            if (string.IsNullOrEmpty(vnpTxnRef) || !Guid.TryParse(vnpTxnRef, out var txnId))
+            if (string.IsNullOrEmpty(vnpTxnRef))
             {
                 return new VNPayCallbackResponse
                 {
@@ -134,44 +136,43 @@ namespace ModernEstate.BLL.Services.TransactionServices
                     Message = "Invalid transaction reference",
                 };
             }
+            // Tìm transaction PENDING tương ứng
+            var transactions = await _unitOfWork.Transactions.FindTransactionsAsync(
+                null,
+                null,
+                EnumStatusPayment.PENDING,
+                EnumPaymentMethod.VN_PAY
+            );
+            // var transaction = transactions.FirstOrDefault(t => t.TransactionCode.Contains(vnpTxnRef) || t.Id.ToString() == vnpTxnRef);
+            // if (transaction == null)
+            // {
+            //     return new VNPayCallbackResponse
+            //     {
+            //         Success = false,
+            //         Message = "Transaction not found",
+            //     };
+            // }
 
-            var transaction = await _unitOfWork.Transactions.GetByIdAsync(txnId);
-            if (transaction == null)
-            {
-                return new VNPayCallbackResponse
-                {
-                    Success = false,
-                    Message = "Transaction not found",
-                };
-            }
+            // Cập nhật trạng thái
+            // transaction.Status =
+            //     (vnpResponseCode == "00" && vnpTransactionStatus == "00")
+            //         ? EnumStatusPayment.SUCCESS
+            //         : EnumStatusPayment.FAILED;
 
-            if (transaction.Status != EnumStatusPayment.PENDING)
-            {
-                return new VNPayCallbackResponse
-                {
-                    Success = false,
-                    Message = "Transaction already processed",
-                };
-            }
+            // await _unitOfWork.Transactions.UpdateAsync(transaction);
+            // await _unitOfWork.SaveChangesAsync();
 
-            transaction.Status =
-                (vnpResponseCode == "00" && vnpTransactionStatus == "00")
-                    ? EnumStatusPayment.SUCCESS
-                    : EnumStatusPayment.FAILED;
-
-            await _unitOfWork.Transactions.UpdateAsync(transaction);
-            await _unitOfWork.SaveChangesAsync();
-
-            return new VNPayCallbackResponse
-            {
-                TransactionId = transaction.Id,
-                TransactionCode = transaction.TransactionCode,
-                Success = transaction.Status == EnumStatusPayment.SUCCESS,
-                Message =
-                    transaction.Status == EnumStatusPayment.SUCCESS
-                        ? "Payment successful"
-                        : "Payment failed",
-            };
+            // return new VNPayCallbackResponse
+            // {
+            //     TransactionId = transaction.Id,
+            //     TransactionCode = transaction.TransactionCode,
+            //     Success = (transaction.Status == EnumStatusPayment.SUCCESS),
+            //     Message =
+            //         transaction.Status == EnumStatusPayment.SUCCESS
+            //             ? "Payment successful"
+            //             : "Payment failed",
+            // };
+            return null;
         }
 
         public async Task<CashPaymentResponse?> GetByIdAsync(Guid id)

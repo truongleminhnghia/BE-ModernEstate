@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL.Entites;
 
@@ -24,6 +25,7 @@ namespace ModernEstate.BLL.Mappers
                     opt => opt.MapFrom(src => src.Currency.ToString())
                 )
                 .ForMember(dest => dest.PaymentUrl, opt => opt.Ignore());
+            CreateMap<PaymentRequest, Transaction>().ReverseMap();
         }
     }
 }

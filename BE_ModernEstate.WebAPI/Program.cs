@@ -4,18 +4,26 @@ using BE_ModernEstate.WebAPI.Configurations.BrowserProvider;
 using BE_ModernEstate.WebAPI.Middlewares;
 using BE_ModernEstate.WebAPI.WebAPI.Middlewares;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using ModernEstate.BLL.Services.BackgroundServices;
 using ModernEstate.Common.Config;
 using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Settings;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
+using Net.payOS;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var mailSection = builder.Configuration.GetSection("MailSettings");
+var fromEmail = mailSection["FromEmail"];
+var fromName = mailSection["FromName"];
+var mailPassword = mailSection["Password"];
+var mailHost = mailSection["Host"];
+var mailPort = int.TryParse(mailSection["Port"], out var parsedPort) ? parsedPort : 587;
 
 var dbSection = builder.Configuration.GetSection("Database");
 var server = dbSection["Server"];
@@ -46,11 +54,24 @@ builder.Services.AddDbContext<ApplicationDbConext>(options =>
             )
     );
 });
+builder.Services.AddHostedService<OrderTimeoutService>();
+
+
+var PayOS = builder.Configuration.GetSection("PAYOS");
+var ClientId = PayOS["CLIENT_ID"];
+var APILEY = PayOS["API_KEY"];
+var CHECKSUMKEY = PayOS["CHECKSUM_KEY"];
+
+PayOS payOS = new PayOS(ClientId,
+                    APILEY,
+                    CHECKSUMKEY);
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton(payOS);
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -87,16 +108,32 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbConext>();
     db.Database.Migrate();
+
+    // 1. Seed các Role chung (nếu chưa có)
     foreach (var name in Enum.GetNames<EnumRoleName>())
     {
         var roleEnum = Enum.Parse<EnumRoleName>(name);
         if (!db.Roles.Any(r => r.RoleName == roleEnum))
+        {
             db.Roles.Add(new Role { RoleName = roleEnum });
+        }
     }
     db.SaveChanges();
-    var adminRole = db.Roles.Single(r => r.RoleName == EnumRoleName.ROLE_ADMIN);
-    bool exists = db.Accounts.Any(u => u.RoleId == adminRole.Id);
-    if (!exists)
+
+    // 2. Lấy hoặc tạo ROLE_ADMIN
+    var adminRole = db.Roles
+                      .FirstOrDefault(r => r.RoleName == EnumRoleName.ROLE_ADMIN);
+    if (adminRole == null)
+    {
+        adminRole = new Role { RoleName = EnumRoleName.ROLE_ADMIN };
+        db.Roles.Add(adminRole);
+        db.SaveChanges();
+    }
+
+    // 3. Seed tài khoản admin nếu chưa có
+    bool adminExists = db.Accounts
+                         .Any(u => u.RoleId == adminRole.Id);
+    if (!adminExists)
     {
         var admin = new Account
         {
@@ -109,6 +146,7 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 }
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 

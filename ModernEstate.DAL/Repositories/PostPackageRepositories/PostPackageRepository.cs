@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using Microsoft.EntityFrameworkCore;
-using ModernEstate.Common.Enums;
 using ModernEstate.DAL.Bases;
 using ModernEstate.DAL.Context;
 using ModernEstate.DAL.Entites;
@@ -16,7 +10,12 @@ namespace ModernEstate.DAL.Repositories.PostPackageRepositories
     {
         public PostPackageRepository(ApplicationDbConext context) : base(context) { }
 
-       
+        public async Task<PostPackage?> FindById(Guid id)
+        {
+            return await _context.PostPackages
+                                        .Include(pp => pp.Post)
+                                        .FirstOrDefaultAsync(pp => pp.Id == id);
+        }
     }
-    
+
 }

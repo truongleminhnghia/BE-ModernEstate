@@ -29,13 +29,12 @@ namespace ModernEstate.DAL.Entites
         public string? HouseNumber { get; set; }
         [Column("street", TypeName = "varchar(100)")]
         [Description("Street name of the address")]
-        [Required]
+        // [Required]
         public string? Street { get; set; }
 
         [Column("ward", TypeName = "varchar(100)")]
         [Description("Ward name of the address")]
         [Required]
-
         public string? Ward { get; set; }
         [Column("district", TypeName = "varchar(100)")]
         [Description("District name of the address")]
@@ -55,5 +54,7 @@ namespace ModernEstate.DAL.Entites
         [Column("address_detail", TypeName = "varchar(500)")]
         [Description("Detailed address information")]
         public string? AddressDetail { get; set; }
+
+        public virtual ICollection<Property>? Properties { get; set; }
     }
 }

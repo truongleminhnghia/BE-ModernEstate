@@ -71,6 +71,12 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("password");
 
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiry")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(15)")
                         .HasColumnName("phone");
@@ -176,7 +182,6 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnName("house_number");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasColumnName("street");
 
@@ -635,26 +640,12 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("package_id");
 
-                    b.Property<string>("AccessPriority")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasColumnName("access_priority");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
                         .HasColumnType("varchar(1000)")
                         .HasColumnName("description");
-
-                    b.Property<int>("DurationDays")
-                        .HasColumnType("int")
-                        .HasColumnName("duration_days");
-
-                    b.Property<ulong>("Highlighted")
-                        .HasColumnType("bit")
-                        .HasColumnName("highlighted");
-
-                    b.Property<int>("MaxPosts")
-                        .HasColumnType("int")
-                        .HasColumnName("max_posts");
 
                     b.Property<string>("PackageCode")
                         .IsRequired()
@@ -670,31 +661,19 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("double")
                         .HasColumnName("price");
 
-                    b.Property<ulong>("TopListing")
-                        .HasColumnType("bit")
-                        .HasColumnName("top_listing");
+                    b.Property<string>("PriorityStatus")
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("priority_status");
 
                     b.Property<string>("TypePackage")
                         .IsRequired()
                         .HasColumnType("varchar(50)")
                         .HasColumnName("type_package");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.HasKey("Id");
-
-                    b.HasIndex("AccessPriority");
-
-                    b.HasIndex("Highlighted");
-
-                    b.HasIndex("MaxPosts");
-
-                    b.HasIndex("PackageCode")
-                        .IsUnique();
-
-                    b.HasIndex("Price");
-
-                    b.HasIndex("TopListing");
-
-                    b.HasIndex("TypePackage");
 
                     b.ToTable("package");
                 });
@@ -707,7 +686,6 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnName("post_id");
 
                     b.Property<string>("AppRovedBy")
-                        .IsRequired()
                         .HasColumnType("varchar(400)")
                         .HasColumnName("approve_by");
 
@@ -723,14 +701,19 @@ namespace ModernEstate.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                    b.Property<string>("Demand")
+                        .IsRequired()
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("demand");
 
                     b.Property<string>("PostBy")
                         .IsRequired()
                         .HasColumnType("varchar(400)")
                         .HasColumnName("post_by");
+
+                    b.Property<string>("PriorityStatus")
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("priority_status");
 
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("char(36)")
@@ -745,19 +728,10 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("varchar(300)")
                         .HasColumnName("source_status");
 
-                    b.Property<string>("State")
+                    b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("varchar(300)")
-                        .HasColumnName("state");
-
-                    b.Property<Guid?>("SupportId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("support_id");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("varchar(400)")
-                        .HasColumnName("title");
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
@@ -773,10 +747,6 @@ namespace ModernEstate.DAL.Migrations
 
                     b.HasIndex("SourceStatus");
 
-                    b.HasIndex("State");
-
-                    b.HasIndex("SupportId");
-
                     b.ToTable("post");
                 });
 
@@ -787,18 +757,27 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("account_package_subscription_id");
 
-                    b.Property<Guid>("AccountId")
+                    b.Property<Guid?>("AccountId")
+                        .IsRequired()
                         .HasColumnType("char(36)")
                         .HasColumnName("account_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<string>("Currency")
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("currency");
+
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime")
                         .HasColumnName("end_date");
 
-                    b.Property<Guid>("PackageId")
+                    b.Property<DateTime?>("ExpiredDate")
+                        .HasColumnType("datetime")
+                        .HasColumnName("expired_date");
+
+                    b.Property<Guid?>("PackageId")
                         .HasColumnType("char(36)")
                         .HasColumnName("package_id");
 
@@ -806,6 +785,10 @@ namespace ModernEstate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("char(36)")
                         .HasColumnName("post_id");
+
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("datetime")
+                        .HasColumnName("purchase_date");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime")
@@ -816,24 +799,24 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("status");
 
+                    b.Property<double?>("TotalAmout")
+                        .HasColumnType("double")
+                        .HasColumnName("total_amount");
+
+                    b.Property<int?>("TotalDay")
+                        .HasColumnType("int")
+                        .HasColumnName("total_day");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "AccountId" }, "IX_Account_Package_Subscription_AccountId");
+                    b.HasIndex("AccountId");
 
-                    b.HasIndex(new[] { "EndDate" }, "IX_Account_Package_Subscription_EndDate");
+                    b.HasIndex("PackageId");
 
-                    b.HasIndex(new[] { "Id" }, "IX_Account_Package_Subscription_Id");
-
-                    b.HasIndex(new[] { "PackageId" }, "IX_Account_Package_Subscription_PackageId");
-
-                    b.HasIndex(new[] { "PostId" }, "IX_Account_Package_Subscription_PostId");
-
-                    b.HasIndex(new[] { "StartDate" }, "IX_Account_Package_Subscription_StartDate");
-
-                    b.HasIndex(new[] { "Status" }, "IX_Account_Package_Subscription_Status");
+                    b.HasIndex("PostId");
 
                     b.ToTable("account_package_subscriptions");
                 });
@@ -961,6 +944,15 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("address_id");
 
+                    b.Property<float>("Area")
+                        .HasColumnType("float")
+                        .HasColumnName("area");
+
+                    b.Property<string>("AreaUnit")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("area_unit");
+
                     b.Property<string>("Attribute")
                         .HasColumnType("JSON")
                         .HasColumnName("attribute");
@@ -973,71 +965,82 @@ namespace ModernEstate.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Demand")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("demand");
+
                     b.Property<string>("Description")
                         .HasColumnType("varchar(1000)")
                         .HasColumnName("description");
 
-                    b.Property<int>("NumberOfBathroom")
-                        .HasColumnType("int")
-                        .HasColumnName("number_of_toilet");
+                    b.Property<string>("Document")
+                        .HasColumnType("JSON")
+                        .HasColumnName("document");
 
-                    b.Property<int>("NumberOfBedroom")
-                        .HasColumnType("int")
-                        .HasColumnName("number_of_bedroom");
+                    b.Property<string>("HouseDirection")
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("house_direction");
 
-                    b.Property<int>("NumberOfFloor")
-                        .HasColumnType("int")
-                        .HasColumnName("number_of_floor");
+                    b.Property<string>("Interior")
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("interior");
 
-                    b.Property<int>("NumberOfRoom")
+                    b.Property<int>("NumberOfBathrooms")
                         .HasColumnType("int")
-                        .HasColumnName("number_of_room");
+                        .HasColumnName("number_of_bathrooms");
 
-                    b.Property<decimal>("OriginalPrice")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("original_price");
+                    b.Property<int>("NumberOfBedrooms")
+                        .HasColumnType("int")
+                        .HasColumnName("number_Of_Bedrooms");
 
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("char(36)")
                         .HasColumnName("owner_id");
 
-                    b.Property<string>("PriceText")
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("price_text");
+                    b.Property<double>("Price")
+                        .HasColumnType("double")
+                        .HasColumnName("price");
+
+                    b.Property<string>("PriceUnit")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("price_unit");
+
+                    b.Property<string>("PriorityStatus")
+                        .HasColumnType("varchar(300)")
+                        .HasColumnName("priority_status");
 
                     b.Property<Guid?>("ProjectId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<float>("PropertyArea")
-                        .HasColumnType("float")
-                        .HasColumnName("property_area");
-
-                    b.Property<decimal>("SalePrice")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("sale_price");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("state");
+                        .HasColumnType("char(36)")
+                        .HasColumnName("project_id");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("varchar(100)")
+                        .HasColumnType("varchar(200)")
                         .HasColumnName("status");
+
+                    b.Property<string>("StatusSource")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("status_source");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("varchar(300)")
                         .HasColumnName("title");
 
-                    b.Property<string>("TypeProperty")
+                    b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(150)")
-                        .HasColumnName("type_property");
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("VideoUrl")
+                        .HasColumnType("json")
+                        .HasColumnName("video_url");
 
                     b.HasKey("Id");
 
@@ -1105,6 +1108,38 @@ namespace ModernEstate.DAL.Migrations
                     b.ToTable("provide");
                 });
 
+            modelBuilder.Entity("ModernEstate.DAL.Entites.Review", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("reivew_id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("Commnet")
+                        .HasColumnType("NVARCHAR(1000)")
+                        .HasColumnName("comment");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<float?>("Rating")
+                        .HasColumnType("float")
+                        .HasColumnName("rating");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("review");
+                });
+
             modelBuilder.Entity("ModernEstate.DAL.Entites.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1146,7 +1181,7 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnType("double")
                         .HasColumnName("price");
 
-                    b.Property<Guid>("ProvideId")
+                    b.Property<Guid?>("ProvideId")
                         .HasColumnType("char(36)")
                         .HasColumnName("provide_id");
 
@@ -1275,7 +1310,6 @@ namespace ModernEstate.DAL.Migrations
                         .HasColumnName("status");
 
                     b.Property<string>("TransactionCode")
-                        .IsRequired()
                         .HasColumnType("varchar(150)")
                         .HasColumnName("transaction_code");
 
@@ -1475,15 +1509,9 @@ namespace ModernEstate.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ModernEstate.DAL.Entites.Support", "Support")
-                        .WithMany()
-                        .HasForeignKey("SupportId");
-
                     b.Navigation("Contact");
 
                     b.Navigation("Property");
-
-                    b.Navigation("Support");
                 });
 
             modelBuilder.Entity("ModernEstate.DAL.Entites.PostPackage", b =>
@@ -1496,9 +1524,7 @@ namespace ModernEstate.DAL.Migrations
 
                     b.HasOne("ModernEstate.DAL.Entites.Package", "Package")
                         .WithMany()
-                        .HasForeignKey("PackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PackageId");
 
                     b.HasOne("ModernEstate.DAL.Entites.Post", "Post")
                         .WithMany("PostPackages")
@@ -1539,7 +1565,7 @@ namespace ModernEstate.DAL.Migrations
                         .HasForeignKey("AccountId");
 
                     b.HasOne("ModernEstate.DAL.Entites.Address", "Address")
-                        .WithMany()
+                        .WithMany("Properties")
                         .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1548,22 +1574,33 @@ namespace ModernEstate.DAL.Migrations
                         .WithMany("Properties")
                         .HasForeignKey("OwnerId");
 
-                    b.HasOne("ModernEstate.DAL.Entites.Project", null)
+                    b.HasOne("ModernEstate.DAL.Entites.Project", "Project")
                         .WithMany("Properties")
                         .HasForeignKey("ProjectId");
 
                     b.Navigation("Address");
 
                     b.Navigation("Owner");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("ModernEstate.DAL.Entites.Review", b =>
+                {
+                    b.HasOne("ModernEstate.DAL.Entites.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 
             modelBuilder.Entity("ModernEstate.DAL.Entites.Service", b =>
                 {
                     b.HasOne("ModernEstate.DAL.Entites.Provide", "Provide")
                         .WithMany("Services")
-                        .HasForeignKey("ProvideId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProvideId");
 
                     b.Navigation("Provide");
                 });
@@ -1615,6 +1652,11 @@ namespace ModernEstate.DAL.Migrations
             modelBuilder.Entity("ModernEstate.DAL.Entites.AccountBuyService", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("ModernEstate.DAL.Entites.Address", b =>
+                {
+                    b.Navigation("Properties");
                 });
 
             modelBuilder.Entity("ModernEstate.DAL.Entites.Invetor", b =>

@@ -24,7 +24,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         public async Task<IActionResult> CreateProperty([FromBody] PropertyRequest request)
         {
             var result = await _propertyService.Save(request);
-            if (!result)
+            if (result == null)
             {
                 return BadRequest(new ApiResponse
                 {

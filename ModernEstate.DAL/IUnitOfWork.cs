@@ -18,6 +18,7 @@ using ModernEstate.DAL.Repositories.PostRepositories;
 using ModernEstate.DAL.Repositories.ProjectRepositories;
 using ModernEstate.DAL.Repositories.PropertyRepositories;
 using ModernEstate.DAL.Repositories.ProvideRepositories;
+using ModernEstate.DAL.Repositories.ReviewRepositories;
 using ModernEstate.DAL.Repositories.RoleRepositories;
 using ModernEstate.DAL.Repositories.ServiceRepositories;
 using ModernEstate.DAL.Repositories.SupportRepositories;
@@ -53,6 +54,7 @@ namespace ModernEstate.DAL
         ISupportRepository Supports { get; }
         ITagRepository Tags { get; }
         ITransactionRepository Transactions { get; }
+        IReviewRepository Reviews { get; }
 
         Task<int> SaveChangesAsync();
         Task<int> SaveChangesWithTransactionAsync();

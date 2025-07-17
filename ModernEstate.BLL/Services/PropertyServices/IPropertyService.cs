@@ -3,12 +3,13 @@ using ModernEstate.Common.Enums;
 using ModernEstate.Common.Models.Pages;
 using ModernEstate.Common.Models.Requests;
 using ModernEstate.Common.Models.Responses;
+using ModernEstate.DAL.Entites;
 
 namespace ModernEstate.BLL.Services.PropertyServices
 {
     public interface IPropertyService
     {
-        Task<bool> Save(PropertyRequest request);
+        Task<Property> Save(PropertyRequest request);
         Task<PropertyResponse?> GetById(Guid id);
         Task<PropertyResponse?> GetByCode(string code);
         Task<PageResult<PropertyResponse>> GetProperties(string? Title, double? minPrice, double? maxPrice,

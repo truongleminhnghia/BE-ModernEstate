@@ -60,6 +60,15 @@ RUN apt-get update \
     **libgbm1** \
     && rm -rf /var/lib/apt/lists/*
 
+# Tạo thư mục mount chứng chỉ và copy file .pfx vào
+# RUN mkdir /https
+# COPY BE_ModernEstate.WebAPI/aspnetapp.pfx /https/aspnetapp.pfx
+
 COPY --from=build /app/out .
+
+
+# Expose HTTP & HTTPS
+EXPOSE 80
+EXPOSE 443
 
 ENTRYPOINT ["dotnet", "BE_ModernEstate.WebAPI.dll"]

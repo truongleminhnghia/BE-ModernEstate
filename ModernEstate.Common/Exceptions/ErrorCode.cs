@@ -24,6 +24,7 @@ namespace ModernEstate.Common.Exceptions
         INVALID_ACCOUNT_ROLE,
         HAS_INACTIVE,
         HAS_EXISTED,
-        NOT_NULL
+        NOT_NULL,
+        PAYMENT_VERIFICATION_FAILED
     }
 }

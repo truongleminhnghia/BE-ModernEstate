@@ -39,12 +39,11 @@ namespace ModernEstate.BLL.Services.AddressServices
             }
         }
 
-        public async Task<Guid> GetOrCreateAsync(AddressRequest request)
+        public async Task<Address> GetOrCreateAsync(AddressRequest request)
         {
             try
             {
-                var entity = _mapper.Map<Address>(request);
-                return await _uow.Addresses.GetOrCreateAsync(entity);
+                return await _uow.Addresses.GetOrCreateAsync(_mapper.Map<Address>(request));
             }
             catch (Exception ex)
             {

@@ -80,8 +80,8 @@ namespace ModernEstate.BLL.JWTServices
 
             // thường claim NameIdentifier hoặc "sub"
             var raw = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                   ?? user.FindFirst("sub")?.Value
-                   ?? throw new UnauthorizedAccessException("Claim 'sub' hoặc NameIdentifier không tồn tại");
+                   ?? user.FindFirst("accountId")?.Value
+                   ?? throw new UnauthorizedAccessException("Claim 'accountId' hoặc NameIdentifier không tồn tại");
 
             if (!Guid.TryParse(raw, out var accountId))
                 throw new UnauthorizedAccessException("AccountId trong token không đúng định dạng GUID");

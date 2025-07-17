@@ -67,6 +67,8 @@ namespace ModernEstate.BLL.Services.FavoriteServices
         {
             try
             {
+                var accountExisting = await _uow.Accounts.FindById(request.AccountId);
+                if (accountExisting == null) throw new AppException(ErrorCode.USER_NOT_FOUND);
                 var entity = _mapper.Map<Favorite>(request);
                 entity.Id = Guid.NewGuid();
 

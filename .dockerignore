@@ -1,3 +1,6 @@
+# === keep your certificate in the build context ===
+!BE_ModernEstate.WebAPI/aspnetapp.pfx
+
 # .NET build output
 **/bin/
 **/obj/

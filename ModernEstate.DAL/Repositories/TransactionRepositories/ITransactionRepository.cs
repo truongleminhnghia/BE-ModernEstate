@@ -12,5 +12,7 @@ namespace ModernEstate.DAL.Repositories.TransactionRepositories
             EnumStatusPayment? status,
             EnumPaymentMethod? paymentMethod
         );
+
+        Task<Transaction?> FinByTransactionCode(string transactionCode);
     }
 }

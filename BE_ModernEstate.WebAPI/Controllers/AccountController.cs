@@ -80,9 +80,10 @@ namespace BE_ModernEstate.WebAPI.Controllers
         public async Task<IActionResult> GetWithParams([FromQuery] string? last_name, [FromQuery] string? first_name,
                                                         [FromQuery] EnumAccountStatus? status, [FromQuery] EnumRoleName? role,
                                                         [FromQuery] EnumGender? gender, [FromQuery] string? email,
+                                                        [FromQuery] int? limit, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate,
                                                         [FromQuery] int page_current = 1, [FromQuery] int page_size = 10)
         {
-            var result = await _accountService.GetWithParams(last_name, first_name, status, role, gender, email, page_current, page_size);
+            var result = await _accountService.GetWithParams(last_name, first_name, status, role, gender, email, limit, fromDate, toDate, page_current, page_size);
             return Ok(new ApiResponse
             {
                 Code = StatusCodes.Status200OK,
@@ -118,30 +119,6 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpDelete("{id}")]
         [Authorize(Roles = "ROLE_ADMIN")]
         public async Task<IActionResult> DeleteAccount(Guid id)
-        {
-            var result = await _accountService.UpdateAccountStatus(id);
-            if (!result)
-            {
-                return NotFound(new ApiResponse
-                {
-                    Code = StatusCodes.Status404NotFound,
-                    Success = false,
-                    Message = "Account not found",
-                    Data = null
-                });
-            }
-            return Ok(new ApiResponse
-            {
-                Code = StatusCodes.Status200OK,
-                Success = true,
-                Message = "Account deleted successfully",
-                Data = result
-            });
-        }
-
-        [HttpDelete("{idd}")]
-        [Authorize(Roles = "ROLE_ADMIN")]
-        public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _accountService.UpdateAccountStatus(id);
             if (!result)

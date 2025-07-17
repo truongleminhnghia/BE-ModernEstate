@@ -27,61 +27,88 @@ namespace ModernEstate.DAL.Entites
         [Column("description", TypeName = "varchar(1000)")]
         public string? Description { get; set; }
 
-        [Column("original_price", TypeName = "decimal(18,2)")]
+        [Column("demand", TypeName = "varchar(200)")]
         [Required]
-        public double OriginalPrice { get; set; }
-
-        [Column("sale_price", TypeName = "decimal(18,2)")]
-        [Required]
-        public double SalePrice { get; set; }
-
-        [Column("price_text", TypeName = "varchar(100)")]
-        public string? PriceText { get; set; }
-
-        [Column("type_property", TypeName = "varchar(150)")]
-        [Required]
-        [Description("Type of the property")]
-        [EnumDataType(typeof(EnumTypeProperty))]
-        public EnumTypeProperty TypeProperty { get; set; }
-
-        [Column("property_area", TypeName = "float")]
-        [Description("Area of the property in square meters")]
-        [Required]
-        public float PropertyArea { get; set; }
-
-        [Column("number_of_bedroom", TypeName = "int")]
-        [Description("Number of bedrooms in the property")]
-        [Required]
-        public int NumberOfBedroom { get; set; }
-
-        [Column("number_of_toilet", TypeName = "int")]
-        [Description("Number of toilet in the property")]
-        [Required]
-        public int NumberOfBathroom { get; set; }
-
-        [Column("number_of_floor", TypeName = "int")]
-        [Description("Number of floor in the property")]
-        public int NumberOfFloor { get; set; }
-
-        [Column("number_of_room", TypeName = "int")]
-        [Description("Number of room of the property")]
-        public int NumberOfRoom { get; set; }
-
-        [Column("state", TypeName = "varchar(100)")]
-        [Required]
-        [Description("State of the property")]
-        [EnumDataType(typeof(EnumStateProperty))]
-        public EnumStateProperty State { get; set; }
-
-        [Column("status", TypeName = "varchar(100)")]
-        [Required]
-        [Description("Status of the property")]
-        [EnumDataType(typeof(EnumStatusProperty))]
-        public EnumStatusProperty Status { get; set; }
+        [EnumDataType(typeof(EnumDemand))]
+        [Description("Nhu cầu của bất động sản (BÁN hoặc CHO THUÊ)")]
+        public EnumDemand Demand { get; set; }
 
         [Column("attribute", TypeName = "JSON")]
         [Description("List of attributes of the property")]
         public string[]? Attribute { get; set; }
+
+
+        [Column("type", TypeName = "varchar(200)")]
+        [Required]
+        [EnumDataType(typeof(EnumTypeProperty))]
+        [Description("Loại bất động sản (Căn hộ, Nhà riêng, Đất nền, v.v.)")]
+        public EnumTypeProperty Type { get; set; }
+
+        [Column("area")]
+        [Required]
+        [Description("Diện tích của bất động sản (m2)")]
+        public float Area { get; set; }
+
+        [Column("area_unit", TypeName = "varchar(50)")]
+        [Required]
+        [EnumDataType(typeof(EnumAreaUnit))]
+        [Description("Đơn vị diện tích của bất động sản (m2, km2, ha, v.v.)")]
+        public EnumAreaUnit AreaUnit { get; set; }
+
+        [Column("price")]
+        [Required]
+        [Description("Giá của bất động sản (đơn vị: triệu đồng)")]
+        public double Price { get; set; }
+
+        [Column("price_unit", TypeName = "varchar(50)")]
+        [Required]
+        [EnumDataType(typeof(EnumCurrency))]
+        [Description("Đơn vị giá của bất động sản (Triệu đồng, Tỷ đồng, USD, v.v.)")]
+        public EnumCurrency PriceUnit { get; set; }
+
+        [Column("document", TypeName = "JSON")]
+        [Description("Danh sách các tài liệu liên quan đến bất động sản (Hợp đồng, Giấy tờ pháp lý, v.v.)")]
+        public string[]? Document { get; set; }
+
+        [Column("interior", TypeName = "varchar(200)")]
+        [Description("Nội thất của bất động sản (Có, Không, Hoặc mô tả chi tiết)")]
+        public string? Interior { get; set; }
+
+        [Column("number_Of_Bedrooms", TypeName = "int")]
+        [Required]
+        [Description("Số lượng phòng ngủ của bất động sản")]
+        public int NumberOfBedrooms { get; set; }
+
+        [Column("number_of_bathrooms", TypeName = "int")]
+        [Required]
+        [Description("Số lượng phòng tắm của bất động sản")]
+        public int NumberOfBathrooms { get; set; }
+
+        [Column("house_direction", TypeName = "varchar(300)")]
+        [Description("Hướng nhà của bất động sản (Bắc, Nam, Đông, Tây, v.v.)")]
+        [EnumDataType(typeof(EnumHouseDirection))]
+        public EnumHouseDirection? HouseDirection { get; set; }
+
+        [Column("video_url", TypeName = "json")]
+        [Description("URL của video giới thiệu bất động sản")]
+        public string[]? VideoUrl { get; set; }
+
+        [Column("priority_status", TypeName = "varchar(300)")]
+        [Description("Trạng thái ưu tiên của bất động sản (Ưu tiên cao, Trung bình, Thấp)")]
+        [EnumDataType(typeof(EnumPriorityStatus))]
+        public EnumPriorityStatus? PriorityStatus { get; set; }
+
+        [Column("status", TypeName = "varchar(200)")]
+        [Required]
+        [EnumDataType(typeof(EnumStatusProperty))]
+        [Description("Trạng thái của bất động sản (Đang rao bán, Đã bán, Đang cho thuê, Đã cho thuê, v.v.)")]
+        public EnumStatusProperty Status { get; set; }
+
+        [Column("status_source", TypeName = "varchar(200)")]
+        [Required]
+        [EnumDataType(typeof(EnumSourceStatus))]
+        [Description("Nguồn trạng thái của bất động sản (Tự đăng, Đăng bởi môi giới, Đăng bởi người dùng khác, v.v.)")]
+        public EnumSourceStatus StatusSource { get; set; }
 
         [Column("address_id")]
         [Required]
@@ -95,6 +122,11 @@ namespace ModernEstate.DAL.Entites
 
         [ForeignKey(nameof(OwnerId))]
         public OwnerProperty? Owner { get; set; }
+
+        [Column("project_id")]
+        public Guid? ProjectId { get; set; }
+        [ForeignKey(nameof(ProjectId))]
+        public Project? Project { get; set; }
 
         public virtual ICollection<Image>? PropertyImages { get; set; }
         public virtual ICollection<History>? Histories { get; set; }

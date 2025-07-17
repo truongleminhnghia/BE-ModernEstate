@@ -12,6 +12,7 @@
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="MailKit" Version="4.12.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
+		<PackageReference Include="payOS" Version="1.0.9" />
 		<ProjectReference Include="..\ModernEstate.Common\ModernEstate.Common.csproj" />
 		<ProjectReference Include="..\ModernEstate.DAL\ModernEstate.DAL.csproj" />
 	</ItemGroup>

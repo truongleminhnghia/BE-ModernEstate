@@ -21,7 +21,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
+        // [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> GetWithParams(
             [FromQuery] EnumTypePackage? typePackage,
             [FromQuery(Name = "page_current")] int pageCurrent = 1,
@@ -41,7 +41,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
+        // [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var dto = await _svc.GetByIdAsync(id);
@@ -71,7 +71,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF")]
+        [Authorize(Roles = "ROLE_MANAGER, ROLE_STAFF, ROLE_ADMIN")]
         public async Task<IActionResult> Create([FromBody] PackageRequest request)
         {
             var created = await _svc.CreateAsync(request);

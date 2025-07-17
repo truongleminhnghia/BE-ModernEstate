@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using ModernEstate.BLL.Services.AuthenticateServices;
-using ModernEstate.Common.Enums;
 using ModernEstate.Common.Exceptions;
 using ModernEstate.Common.Models.ApiResponse;
 using ModernEstate.Common.Models.Requests;
-using ModernEstate.Common.Models.Settings;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 
 namespace BE_ModernEstate.WebAPI.Controllers
 {
@@ -55,8 +50,17 @@ namespace BE_ModernEstate.WebAPI.Controllers
         {
             try
             {
-                await _authenticateService.VerifyEmailAsync(token);
-                return Ok("Xác minh email thành công.");
+                var result = await _authenticateService.VerifyEmailAsync(token);
+                if (result)
+                {
+                    // Redirect đến trang thông báo thành công
+                    return Redirect("https://modernestate.vercel.app/verify-success");
+                }
+                else
+                {
+                    // Redirect đến trang thông báo lỗi
+                    return Redirect("https://modernestate.vercel.app/register");
+                }
             }
             catch (AppException ex)
             {
@@ -79,5 +83,33 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Data = null
             });
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgetPasswordRequest request)
+        {
+            var result = await _authenticateService.ForgotPasswordAsync(request.Email);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPassRequest request)
+        {
+            var result = await _authenticateService.ResetPasswordAsync(request.Token, request.NewPassword);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpPost("resend-verify-email")]
+        public async Task<IActionResult> ResendVerifyEmail([FromBody] ResendEmailRequest request)
+        {
+            bool result = await _authenticateService.ResendVerificationEmailAsync(request.Email);
+            return Ok(new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Email resend successful",
+                Data = null
+            });
+        }
+
     }
 }

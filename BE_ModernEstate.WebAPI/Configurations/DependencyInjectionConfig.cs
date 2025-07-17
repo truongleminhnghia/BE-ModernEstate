@@ -7,6 +7,7 @@ using ModernEstate.BLL.Services.AuthenticateServices;
 using ModernEstate.BLL.Services.BrokerServices;
 using ModernEstate.BLL.Services.CategoryServices;
 using ModernEstate.BLL.Services.ContactServices;
+using ModernEstate.BLL.Services.DashBoardServices;
 using ModernEstate.BLL.Services.EmailServices;
 using ModernEstate.BLL.Services.EmployeeServices;
 using ModernEstate.BLL.Services.FavoriteServices;
@@ -17,11 +18,13 @@ using ModernEstate.BLL.Services.NewServices;
 using ModernEstate.BLL.Services.NewTagServices;
 using ModernEstate.BLL.Services.OwnerPropertyServices;
 using ModernEstate.BLL.Services.PackageServices;
+using ModernEstate.BLL.Services.PayosServices;
 using ModernEstate.BLL.Services.PostPackageServices;
 using ModernEstate.BLL.Services.PostServices;
 using ModernEstate.BLL.Services.ProjectServices;
 using ModernEstate.BLL.Services.PropertyServices;
 using ModernEstate.BLL.Services.ProvideServices;
+using ModernEstate.BLL.Services.ReviewServices;
 using ModernEstate.BLL.Services.Roles;
 using ModernEstate.BLL.Services.ServiceServices;
 using ModernEstate.BLL.Services.SupportServices;
@@ -51,6 +54,7 @@ using ModernEstate.DAL.Repositories.PostRepositories;
 using ModernEstate.DAL.Repositories.ProjectRepositories;
 using ModernEstate.DAL.Repositories.PropertyRepositories;
 using ModernEstate.DAL.Repositories.ProvideRepositories;
+using ModernEstate.DAL.Repositories.ReviewRepositories;
 using ModernEstate.DAL.Repositories.RoleRepositories;
 using ModernEstate.DAL.Repositories.ServiceRepositories;
 using ModernEstate.DAL.Repositories.SupportRepositories;
@@ -95,6 +99,9 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<ISupportService, SupportService>();
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<IPayosService, PayosService>();
+            services.AddScoped<IDashBoardService, DashBoardService>();
+            services.AddScoped<IReviewService, ReviewService>();
 
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
@@ -122,6 +129,7 @@ namespace BE_ModernEstate.WebAPI.Configurations
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IVNPayService, VNPayService>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
             return services;
         }
     }

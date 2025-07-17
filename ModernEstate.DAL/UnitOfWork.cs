@@ -20,6 +20,7 @@ using ModernEstate.DAL.Repositories.PostRepositories;
 using ModernEstate.DAL.Repositories.ProjectRepositories;
 using ModernEstate.DAL.Repositories.PropertyRepositories;
 using ModernEstate.DAL.Repositories.ProvideRepositories;
+using ModernEstate.DAL.Repositories.ReviewRepositories;
 using ModernEstate.DAL.Repositories.RoleRepositories;
 using ModernEstate.DAL.Repositories.ServiceRepositories;
 using ModernEstate.DAL.Repositories.SupportRepositories;
@@ -56,6 +57,7 @@ namespace ModernEstate.DAL
         private ISupportRepository? _supportRepository;
         private ITagRepository? _tagRepository;
         private ITransactionRepository? _transactionRepository;
+        private IReviewRepository? _reviewRepository;
 
         public UnitOfWork(ApplicationDbConext context)
         {
@@ -118,6 +120,8 @@ namespace ModernEstate.DAL
         public ITagRepository Tags => _tagRepository ??= new TagRepository(_unitOfWorkContext);
         public ITransactionRepository Transactions =>
             _transactionRepository ??= new TransactionRepository(_unitOfWorkContext);
+
+        public IReviewRepository Reviews => _reviewRepository ??= new ReviewRepository(_unitOfWorkContext);
 
 
         // SaveChangesWithTransaction đồng bộ

@@ -46,7 +46,7 @@ namespace ModernEstate.BLL.Services.ServiceServices
             try
             {
                 var entity = _mapper.Map<Service>(request);
-                entity.Id = Guid.NewGuid();
+                // entity.Id = Guid.NewGuid();
 
                 await _unitOfWork.Services.CreateAsync(entity);
                 await _unitOfWork.SaveChangesWithTransactionAsync();

@@ -44,7 +44,6 @@ namespace ModernEstate.DAL.Entites
         public EnumPaymentMethod PaymentMethod { get; set; }
 
         [Column("transaction_code", TypeName = "varchar(150)")]
-        [Required]
         public string? TransactionCode { get; set; }
 
         [Column("account_id")]

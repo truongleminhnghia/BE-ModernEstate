@@ -9,7 +9,6 @@ namespace ModernEstate.DAL.Entites
 {
     [Table("post")]
     [Index(nameof(Code), IsUnique = true)]
-    [Index(nameof(State))]
     [Index(nameof(SourceStatus))]
     public class Post : BaseEntity
     {
@@ -22,23 +21,23 @@ namespace ModernEstate.DAL.Entites
         [Required]
         public string? Code { get; set; }
 
-        [Column("title", TypeName = "varchar(400)")]
-        [Required]
-        public string? Title { get; set; }
-
         [Column("approve_by", TypeName = "varchar(400)")]
-        [Required]
         public string? AppRovedBy { get; set; }
 
         [Column("post_by", TypeName = "varchar(400)")]
         [Required]
-        public string? PostBy { get; set; }
+        public string PostBy { get; set; } = string.Empty;
 
-        [Column("state", TypeName = "varchar(300)")]
+        [Column("priority_status", TypeName = "varchar(300)")]
+        [Description("Trạng thái ưu tiên của bất động sản (Ưu tiên cao, Trung bình, Thấp)")]
+        [EnumDataType(typeof(EnumPriorityStatus))]
+        public EnumPriorityStatus? PriorityStatus { get; set; }
+
+        [Column("demand", TypeName = "varchar(300)")]
         [Required]
         [Description("State of the post.")]
-        [EnumDataType(typeof(EnumStatePost))]
-        public EnumStatePost State { get; set; }
+        [EnumDataType(typeof(EnumDemand))]
+        public EnumDemand Demand { get; set; }
 
         [Column("source_status", TypeName = "varchar(300)")]
         [Required]
@@ -46,12 +45,15 @@ namespace ModernEstate.DAL.Entites
         [EnumDataType(typeof(EnumSourceStatus))]
         public EnumSourceStatus SourceStatus { get; set; }
 
-        [Column("description", TypeName = "text")]
-        public string? Description { get; set; }
-
         [Column("rejection_reason", TypeName = "text")]
         [Description("Reason for rejection, if applicable.")]
         public string? RejectionReason { get; set; }
+
+        [Column("status", TypeName = "varchar(200)")]
+        [Required]
+        [Description("Status of the post (ACTIVE, INACTIVE).")]
+        [EnumDataType(typeof(EnumStatus))]
+        public EnumStatus Status { get; set; }
 
         [Column("property_id")]
         [Required]
@@ -70,14 +72,6 @@ namespace ModernEstate.DAL.Entites
         [ForeignKey(nameof(ContactId))]
         [Description("Navigation property for the associated contact.")]
         public Contact? Contact { get; set; }
-
-        [Column("support_id")]
-        [Description("ID of the support associated with the post.")]
-        public Guid? SupportId { get; set; }
-
-        [ForeignKey(nameof(SupportId))]
-        [Description("Navigation property for the associated support.")]
-        public Support? Support { get; set; }
 
         public virtual ICollection<PostPackage>? PostPackages { get; set; }
         public virtual ICollection<History>? Histories { get; set; }
