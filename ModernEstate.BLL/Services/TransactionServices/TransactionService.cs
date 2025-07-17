@@ -77,8 +77,11 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 dto.ReturnUrl = _vnPayConfig.ReturnSuccessUrl;
             }
             // Validate các trường
-            if (dto.Amount <= 0) throw new ArgumentException("Amount must be greater than 0");
-            if (string.IsNullOrEmpty(dto.ReturnUrl)) throw new ArgumentException("Return URL is required");
+            if (dto.Amount <= 0)
+                throw new ArgumentException("Amount must be greater than 0");
+            if (string.IsNullOrEmpty(dto.ReturnUrl))
+                throw new ArgumentException("Return URL is required");
+            var txnId = Guid.NewGuid();
             // Tạo transaction mới
             var txn = new Transaction
             {
@@ -111,7 +114,9 @@ namespace ModernEstate.BLL.Services.TransactionServices
             };
         }
 
-        public async Task<VNPayCallbackResponse> ProcessVNPayCallbackAsync(Dictionary<string, string> vnpayData)
+        public async Task<VNPayCallbackResponse> ProcessVNPayCallbackAsync(
+            Dictionary<string, string> vnpayData
+        )
         {
             // Validate chữ ký
             if (!_vnPayService.ValidateCallback(vnpayData, _vnPayConfig.HashSecret))
@@ -134,7 +139,12 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 };
             }
             // Tìm transaction PENDING tương ứng
-            var transactions = await _unitOfWork.Transactions.FindTransactionsAsync(null, null, EnumStatusPayment.PENDING, EnumPaymentMethod.VN_PAY);
+            var transactions = await _unitOfWork.Transactions.FindTransactionsAsync(
+                null,
+                null,
+                EnumStatusPayment.PENDING,
+                EnumPaymentMethod.VN_PAY
+            );
             // var transaction = transactions.FirstOrDefault(t => t.TransactionCode.Contains(vnpTxnRef) || t.Id.ToString() == vnpTxnRef);
             // if (transaction == null)
             // {
