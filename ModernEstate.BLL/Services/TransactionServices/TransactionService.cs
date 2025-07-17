@@ -81,11 +81,10 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 throw new ArgumentException("Amount must be greater than 0");
             if (string.IsNullOrEmpty(dto.ReturnUrl))
                 throw new ArgumentException("Return URL is required");
-            var txnId = Guid.NewGuid();
             // Tạo transaction mới
             var txn = new Transaction
             {
-                Id = Guid.NewGuid(),
+                Id = txnId,
                 AccountId = dto.AccountId,
                 Amount = dto.Amount,
                 Currency = Enum.Parse<EnumCurrency>(dto.Currency),
@@ -100,8 +99,8 @@ namespace ModernEstate.BLL.Services.TransactionServices
             await _unitOfWork.Transactions.CreateAsync(txn);
             await _unitOfWork.SaveChangesAsync();
 
-            // Tạo URL thanh toán VNPay
-            var paymentUrl = _vnPayService.CreatePaymentUrl(dto, _vnPayConfig);
+            // Tạo URL thanh toán VNPay (truyền txnId làm TxnRef)
+            var paymentUrl = _vnPayService.CreatePaymentUrl(dto, _vnPayConfig, txn.Id.ToString());
 
             return new VNPayPaymentResponse
             {
@@ -118,7 +117,6 @@ namespace ModernEstate.BLL.Services.TransactionServices
             Dictionary<string, string> vnpayData
         )
         {
-            // Validate chữ ký
             if (!_vnPayService.ValidateCallback(vnpayData, _vnPayConfig.HashSecret))
             {
                 return new VNPayCallbackResponse
@@ -135,7 +133,7 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 return new VNPayCallbackResponse
                 {
                     Success = false,
-                    Message = "Missing transaction reference",
+                    Message = "Invalid transaction reference",
                 };
             }
             // Tìm transaction PENDING tương ứng
