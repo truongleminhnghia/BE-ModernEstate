@@ -81,6 +81,7 @@ namespace ModernEstate.BLL.Services.TransactionServices
                 throw new ArgumentException("Amount must be greater than 0");
             if (string.IsNullOrEmpty(dto.ReturnUrl))
                 throw new ArgumentException("Return URL is required");
+            var txnId = Guid.NewGuid();
             // Tạo transaction mới
             var txn = new Transaction
             {
