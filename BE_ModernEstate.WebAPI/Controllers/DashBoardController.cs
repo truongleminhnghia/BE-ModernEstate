@@ -79,5 +79,17 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Data = new { TotalRevenue = total }
             });
         }
+
+        [HttpGet("trend/demand")]
+        public async Task<IActionResult> GetDemandTrends()
+        {
+            var (rentTrends, sellTrends) = await _service.GetDemandTrendsAsync();
+
+            return Ok(new
+            {
+                rentTrends,
+                sellTrends
+            });
+        }
     }
 }
