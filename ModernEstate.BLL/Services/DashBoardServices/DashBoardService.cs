@@ -104,8 +104,8 @@ namespace ModernEstate.BLL.Services.DashBoardServices
                 .Select(g => new
                 {
                     Date = g.Key,
-                    RentCount = g.Count(p => p.Demand == EnumDemand.CHO_THUÊ),
-                    SellCount = g.Count(p => p.Demand == EnumDemand.MUA_BÁN),
+                    RentCount = g.Count(p => p.Demand == EnumDemand.CHO_THUÃŠ),
+                    SellCount = g.Count(p => p.Demand == EnumDemand.MUA_BÃN),
                     Total = g.Count()
                 })
                 .OrderBy(x => x.Date)
