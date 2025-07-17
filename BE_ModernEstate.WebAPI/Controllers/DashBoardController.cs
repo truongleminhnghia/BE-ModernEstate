@@ -72,11 +72,36 @@ namespace BE_ModernEstate.WebAPI.Controllers
         {
             double total = await _service.GetTotalAmountAsync(); // all filters default to null
             return Ok(new ApiResponse
-            { 
+            {
                 Code = StatusCodes.Status200OK,
                 Success = true,
                 Message = "Lấy dữ liệu thành công",
                 Data = new { TotalRevenue = total }
+            });
+        }
+
+        [HttpGet("reviews")]
+        public async Task<IActionResult> GetReviewResponseDashboard()
+        {
+            var reviewResponseDashboard = await _service.GetReviewResponseDashboardAsync();
+            if (reviewResponseDashboard == null)
+            {
+                return BadRequest(
+                    new ApiResponse
+                    {
+                        Code = StatusCodes.Status400BadRequest,
+                        Success = false,
+                        Message = "Thông tin review đang trống",
+                        Data = null
+                    }
+                );
+            }
+            return Ok(new ApiResponse
+            {
+                Code = StatusCodes.Status200OK,
+                Success = true,
+                Message = "Lấy dữ liệu thành công",
+                Data = reviewResponseDashboard
             });
         }
     }

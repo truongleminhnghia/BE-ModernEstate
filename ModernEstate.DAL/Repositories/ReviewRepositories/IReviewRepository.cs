@@ -8,5 +8,6 @@ namespace ModernEstate.DAL.Repositories.ReviewRepositories
     {
         Task<Review?> FindById(Guid id);
         Task<IEnumerable<Review>> FindWithParams(Guid? accountId, float? fromRating, float? toRating, string? commnet);
+        Task<IEnumerable<Review>> FindAll();
     }
 }

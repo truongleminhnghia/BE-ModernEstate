@@ -93,5 +93,31 @@ namespace ModernEstate.BLL.Services.DashBoardServices
                     .Sum(t => t.Amount);
             return total;
         }
+
+        public async Task<ReviewResponseDashboard> GetReviewResponseDashboardAsync()
+        {
+            try
+            {
+                var reviews = await _unitOfWork.Reviews.FindAll();
+                var totalReviews = reviews.Count();
+                var reviewResponses = _mapper.Map<IEnumerable<ReviewResponse>>(reviews);
+                ReviewResponseDashboard reviewResponseDashboard = new ReviewResponseDashboard
+                {
+                    TotalReviews = totalReviews,
+                    Reviews = reviewResponses
+                };
+                return reviewResponseDashboard;
+            }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex, "AppException occurred: {Message}", ex.Message);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred: {Message}", ex.Message);
+                throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 }
