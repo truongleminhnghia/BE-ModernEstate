@@ -40,5 +40,10 @@ namespace ModernEstate.DAL.Repositories.ReviewRepositories
             query = query.OrderByDescending(r => r.CreatedAt);
             return await query.ToListAsync();
         }
+
+        public async Task<IEnumerable<Review>> FindAll()
+        {
+            return await _context.Reviews.Include(r => r.Account).ToListAsync();
+        }
     }
 }
