@@ -209,7 +209,18 @@ namespace ModernEstate.BLL.Services.PostServices
             {
                 var postExisting = await _unitOfWork.Posts.FindById(id);
                 if (postExisting == null) throw new AppException(ErrorCode.NOT_FOUND);
-                return _mapper.Map<PostResponse>(postExisting);
+                var post = _mapper.Map<PostResponse>(postExisting);
+                if (Guid.TryParse(postExisting.PostBy, out var createdById))
+                {
+                    var createdBy = await _unitOfWork.Accounts.FindById(createdById);
+                    post.CreatedByUser = _mapper.Map<AccountResponse>(createdBy);
+                }
+                if (Guid.TryParse(postExisting.AppRovedBy, out var approvedById))
+                {
+                    var approvedBy = await _unitOfWork.Accounts.FindById(approvedById);
+                    post.ApprovedByUser = _mapper.Map<AccountResponse>(approvedBy);
+                }
+                return post;
             }
             catch (AppException ex)
             {
@@ -232,7 +243,24 @@ namespace ModernEstate.BLL.Services.PostServices
                 if (result == null) throw new AppException(ErrorCode.LIST_EMPTY);
                 var pagedResult = result.Skip((pageCurrent - 1) * pageSize).Take(pageSize).ToList();
                 var total = result.Count();
-                var data = _mapper.Map<List<PostResponse>>(pagedResult);
+                var data = new List<PostResponse>();
+
+                foreach (var postEntity in pagedResult)
+                {
+                    var post = _mapper.Map<PostResponse>(postEntity);
+                    if (Guid.TryParse(postEntity.PostBy, out var createdById))
+                    {
+                        var createdBy = await _unitOfWork.Accounts.FindById(createdById);
+                        post.CreatedByUser = _mapper.Map<AccountResponse>(createdBy);
+                    }
+                    if (Guid.TryParse(postEntity.AppRovedBy, out var approvedById))
+                    {
+                        var approvedBy = await _unitOfWork.Accounts.FindById(approvedById);
+                        post.ApprovedByUser = _mapper.Map<AccountResponse>(approvedBy);
+                    }
+                    data.Add(post);
+                }
+
                 if (data == null || !data.Any()) throw new AppException(ErrorCode.LIST_EMPTY);
                 var pageResult = new PageResult<PostResponse>(data, pageSize, pageCurrent, total);
                 return pageResult;
