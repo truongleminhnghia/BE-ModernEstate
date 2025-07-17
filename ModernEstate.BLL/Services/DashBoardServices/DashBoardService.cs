@@ -97,7 +97,7 @@ namespace ModernEstate.BLL.Services.DashBoardServices
 
         public async Task<(List<object> RentTrends, List<object> SellTrends)> GetDemandTrendsAsync()
         {
-            var query = _unitOfWork.Posts.GetPostsCreatedInLast7Days();
+            var query = _unitOfWork.Posts.GetPostsCreatedInLast7Days().Where(p => p.SourceStatus == EnumSourceStatus.APPROVE);
 
             var data = await query
                 .GroupBy(p => p.CreatedAt.Date)
