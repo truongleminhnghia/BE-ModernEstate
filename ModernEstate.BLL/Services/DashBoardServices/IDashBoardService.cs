@@ -21,5 +21,7 @@ namespace ModernEstate.BLL.Services.DashBoardServices
         Task<PostDashboard> Post();
 
         Task<double> GetTotalAmountAsync();
+        Task<(List<object> RentTrends, List<object> SellTrends)> GetDemandTrendsAsync();
+
     }
 }

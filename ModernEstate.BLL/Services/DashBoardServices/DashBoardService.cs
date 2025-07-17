@@ -1,5 +1,6 @@
 
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernEstate.BLL.Services.AccountServices;
 using ModernEstate.Common.Enums;
@@ -93,5 +94,35 @@ namespace ModernEstate.BLL.Services.DashBoardServices
                     .Sum(t => t.Amount);
             return total;
         }
+
+        public async Task<(List<object> RentTrends, List<object> SellTrends)> GetDemandTrendsAsync()
+        {
+            var query = _unitOfWork.Posts.GetPostsCreatedInLast7Days();
+
+            var data = await query
+                .GroupBy(p => p.CreatedAt.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    RentCount = g.Count(p => p.Demand == EnumDemand.CHO_THUÊ),
+                    SellCount = g.Count(p => p.Demand == EnumDemand.MUA_BÁN),
+                    Total = g.Count()
+                })
+                .OrderBy(x => x.Date)
+                .ToListAsync();
+
+            var result = data.Select(x => new PostTrendResponse
+            {
+                Date = x.Date.ToString("yyyy-MM-dd"),
+                RentPercentage = x.Total == 0 ? 0 : Math.Round(100.0 * x.RentCount / x.Total, 2),
+                SellPercentage = x.Total == 0 ? 0 : Math.Round(100.0 * x.SellCount / x.Total, 2)
+            }).ToList();
+
+            var rentTrends = result.Select(x => new { x.Date, x.RentPercentage }).ToList<object>();
+            var sellTrends = result.Select(x => new { x.Date, x.SellPercentage }).ToList<object>();
+
+            return (rentTrends, sellTrends);
+        }
+
     }
 }

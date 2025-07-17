@@ -70,7 +70,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenue()
         {
-            double total = await _service.GetTotalAmountAsync(); // all filters default to null
+            double total = await _service.GetTotalAmountAsync();
             return Ok(new ApiResponse
             { 
                 Code = StatusCodes.Status200OK,

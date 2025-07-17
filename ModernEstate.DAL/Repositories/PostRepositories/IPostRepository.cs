@@ -13,6 +13,8 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
         Task<IEnumerable<Post>> FindWithParams(EnumDemand? demand, EnumSourceStatus? srcStatus, Guid? postBy,
                                                 EnumStatus? status, Guid? approveBy, EnumPriorityStatus? priority);
         Task<IEnumerable<Post>> FindByConfirm(EnumSourceStatus? srcStatus, DateTime? dateNow);
+        IQueryable<Post> GetPostsCreatedInLast7Days();
+
     }
 
 }
