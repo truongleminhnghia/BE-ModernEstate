@@ -1,4 +1,6 @@
-﻿namespace ModernEstate.Common.Models.Responses
+﻿using ModernEstate.Common.Models.AuthenticateResponse;
+
+namespace ModernEstate.Common.Models.Responses
 {
     public class CashPaymentResponse
     {
@@ -9,5 +11,8 @@
         public string EnumTypeTransaction { get; set; }
         public string EnumPaymentMethod { get; set; }
         public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public AccountResponse Account { get; set; }
     }
 }
