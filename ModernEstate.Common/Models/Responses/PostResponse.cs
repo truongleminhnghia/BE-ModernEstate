@@ -36,6 +36,9 @@ namespace ModernEstate.Common.Models.Responses
         [Description("Navigation property for the associated contact.")]
         public ContactResponse? Contact { get; set; }
 
+        public AccountResponse? CreatedByUser { get; set; }
+        public AccountResponse? ApprovedByUser { get; set; }
+
         public virtual ICollection<PostPackageResponse>? PostPackages { get; set; }
         // public virtual ICollection<History>? Histories { get; set; }
     }

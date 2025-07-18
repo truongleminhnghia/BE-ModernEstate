@@ -13,7 +13,9 @@ namespace ModernEstate.DAL.Repositories.TransactionRepositories
 
         public async Task<Transaction?> FinByTransactionCode(string transactionCode)
         {
-            return await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == transactionCode);
+            return await _context.Transactions.FirstOrDefaultAsync(t =>
+                t.TransactionCode == transactionCode
+            );
         }
 
         public async Task<IEnumerable<Transaction>> FindTransactionsAsync(
@@ -23,7 +25,7 @@ namespace ModernEstate.DAL.Repositories.TransactionRepositories
             EnumPaymentMethod? paymentMethod
         )
         {
-            IQueryable<Transaction> q = _context.Transactions;
+            IQueryable<Transaction> q = _context.Transactions.Include(t => t.Account);
 
             if (accountId.HasValue)
                 q = q.Where(t => t.AccountId == accountId.Value);

@@ -101,6 +101,18 @@ namespace ModernEstate.DAL.Repositories.PostRepositories
                         .ThenByDescending(a => a.CreatedAt);
             return await query.ToListAsync();
         }
+
+        public IQueryable<Post> GetPostsCreatedInLast7Days()
+        {
+            var vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); 
+                                                                                
+
+            DateTime vnNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone).Date;
+            DateTime sevenDaysAgo = vnNow.AddDays(-6);
+
+            return _context.Posts
+                .Where(p => p.CreatedAt.Date >= sevenDaysAgo && p.CreatedAt.Date <= vnNow);
+        }
     }
 
 }

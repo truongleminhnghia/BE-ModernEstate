@@ -70,7 +70,7 @@ namespace BE_ModernEstate.WebAPI.Controllers
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenue()
         {
-            double total = await _service.GetTotalAmountAsync(); // all filters default to null
+            double total = await _service.GetTotalAmountAsync();
             return Ok(new ApiResponse
             {
                 Code = StatusCodes.Status200OK,
@@ -102,6 +102,18 @@ namespace BE_ModernEstate.WebAPI.Controllers
                 Success = true,
                 Message = "Lấy dữ liệu thành công",
                 Data = reviewResponseDashboard
+            });
+        }
+
+        [HttpGet("trend/demand")]
+        public async Task<IActionResult> GetDemandTrends()
+        {
+            var (rentTrends, sellTrends) = await _service.GetDemandTrendsAsync();
+
+            return Ok(new
+            {
+                rentTrends,
+                sellTrends
             });
         }
     }

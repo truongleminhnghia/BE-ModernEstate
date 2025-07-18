@@ -1,5 +1,6 @@
 
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernEstate.BLL.Services.AccountServices;
 using ModernEstate.Common.Enums;
@@ -8,6 +9,7 @@ using ModernEstate.Common.Models.DashBoards;
 using ModernEstate.Common.Models.Responses;
 using ModernEstate.DAL;
 using ModernEstate.DAL.Repositories.TransactionRepositories;
+using System.Xml.Linq;
 
 namespace ModernEstate.BLL.Services.DashBoardServices
 {
@@ -93,6 +95,46 @@ namespace ModernEstate.BLL.Services.DashBoardServices
                     .Sum(t => t.Amount);
             return total;
         }
+
+        public async Task<(List<object> RentTrends, List<object> SellTrends)> GetDemandTrendsAsync()
+        {
+            var vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var todayVN = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone).Date;
+            var last7Days = Enumerable.Range(0, 7)
+                .Select(i => todayVN.AddDays(-6 + i))
+                .ToList();
+            var query = _unitOfWork.Posts.GetPostsCreatedInLast7Days().Where(p => p.SourceStatus == EnumSourceStatus.APPROVE);
+
+            var data = await query
+                .GroupBy(p => p.CreatedAt.Date)
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    RentCount = g.Count(p => p.Demand == EnumDemand.CHO_THUÊ),
+                    SellCount = g.Count(p => p.Demand == EnumDemand.MUA_BÁN),
+                    Total = g.Count()
+                })
+                .OrderBy(x => x.Date)
+                .ToListAsync();
+
+            var result = last7Days.Select(date =>
+            {
+                var match = data.FirstOrDefault(x => x.Date == date);
+
+                return new PostTrendResponse
+                {
+                    Date = date.ToString("yyyy-MM-dd"),
+                    RentPercentage = match == null ? 0 : Math.Round(100.0 * match.RentCount / match.Total, 2),
+                    SellPercentage = match == null ? 0 : Math.Round(100.0 * match.SellCount / match.Total, 2)
+                };
+            }).ToList();
+
+            var rentTrends = result.Select(x => new { x.Date, x.RentPercentage }).ToList<object>();
+            var sellTrends = result.Select(x => new { x.Date, x.SellPercentage }).ToList<object>();
+
+            return (rentTrends, sellTrends);
+        }
+
 
         public async Task<ReviewResponseDashboard> GetReviewResponseDashboardAsync()
         {
